@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0" />
+    <title>Gestión de Dinero</title>
+    <style>
+      /* Estilos básicos */
+      body {
+        font-family: Arial, sans-serif;
+        background: #f0f2f5;
+        margin: 0;
+        padding: 1rem;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      h1,
+      h2 {
+        text-align: center;
+        color: #333;
+      }
+      .balance {
+        font-size: 1.8rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        color: green;
+        font-weight: bold;
+      }
+      .forms {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+      .form-box {
+        flex: 1;
+        min-width: 300px;
+        background: #f9f9f9;
+        padding: 1rem;
+        border-radius: 8px;
+      }
+      label {
+        display: block;
+        margin-top: 1rem;
+        color: #555;
+      }
+      /* Cambiamos a input type="text" para aplicar formato */
+      input[type='text'],
+      textarea {
+        width: 100%;
+        padding: 0.5rem;
+        margin-top: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      .btn {
+        margin-top: 1rem;
+        background: #4caf50;
+        color: #fff;
+        border: none;
+        padding: 0.75rem;
+        width: 100%;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background 0.3s ease;
+      }
+      .btn:hover {
+        background: #45a049;
+      }
+      .toggle-btn {
+        display: block;
+        margin: 1rem auto;
+        background: #007bff;
+        color: #fff;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+      }
+      .tabla-movimientos {
+        display: none;
+        margin-top: 2rem;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      table th,
+      table td {
+        border: 1px solid #ddd;
+        padding: 0.75rem;
+        text-align: center;
+      }
+      table th {
+        background: #f4f4f4;
+      }
+      .deshacer-btn {
+        background: #dc3545;
+        color: #fff;
+        border: none;
+        padding: 0.25rem 0.5rem;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+      .logout {
+        text-align: center;
+        margin-bottom: 1rem;
+      }
+      .logout a {
+        background: #ff5722;
+        color: #fff;
+        padding: 0.5rem 1rem;
+        text-decoration: none;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="logout">
+        <a href="{{ url_for('logout') }}">Cerrar sesión</a>
+      </div>
+      <h1>Gestión de Dinero</h1>
+      <div class="balance">Balance Actual: ${{ balance|format_money }}</div>
+      <div class="forms">
+        <!-- Formulario para agregar un gasto -->
+        <div class="form-box">
+          <h2>Agregar Gasto</h2>
+          <form
+            action="{{ url_for('agregar_gasto') }}"
+            method="post">
+            <label for="monto_gasto">Monto:</label>
+            <!-- Se usa type="text" para aplicar formato en tiempo real -->
+            <input
+              type="text"
+              id="monto_gasto"
+              name="monto"
+              onblur="formatCurrencyOnBlur(this)"
+              placeholder="Ej: 10000"
+              required />
+
+            <label for="descripcion_gasto">Descripción:</label>
+            <textarea
+              id="descripcion_gasto"
+              name="descripcion"
+              rows="3"></textarea>
+
+            <button
+              class="btn"
+              type="submit">
+              Agregar Gasto
+            </button>
+          </form>
+        </div>
+        <!-- Formulario para agregar un ingreso -->
+        <div class="form-box">
+          <h2>Agregar Ingreso</h2>
+          <form
+            action="{{ url_for('agregar_ingreso') }}"
+            method="post">
+            <label for="monto_ingreso">Monto:</label>
+            <input
+              type="text"
+              id="monto_ingreso"
+              name="monto"
+              onblur="formatCurrencyOnBlur(this)"
+              placeholder="Ej: 10000"
+              required />
+
+            <label for="descripcion_ingreso">Descripción:</label>
+            <textarea
+              id="descripcion_ingreso"
+              name="descripcion"
+              rows="3"></textarea>
+
+            <button
+              class="btn"
+              type="submit">
+              Agregar Ingreso
+            </button>
+          </form>
+        </div>
+      </div>
+      <!-- Botón para mostrar/ocultar movimientos -->
+      <button
+        class="toggle-btn"
+        onclick="toggleMovimientos()">
+        Ver Movimientos
+      </button>
+
+      <!-- Sección para mostrar los movimientos en una tabla -->
+      <div
+        class="tabla-movimientos"
+        id="tablaMovimientos">
+        <h2>Movimientos</h2>
+        {% if movimientos %}
+        <table>
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Monto</th>
+              <th>Descripción</th>
+              <th>Fecha</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for mov in movimientos %}
+            <tr>
+              <td>{{ mov.tipo }}</td>
+              <td>${{ mov.monto|format_money }}</td>
+              <td>{{ mov.descripcion if mov.descripcion else "-" }}</td>
+              <td>{{ mov.fecha.strftime('%Y-%m-%d %H:%M') }}</td>
+              <td>
+                <form
+                  action="{{ url_for('deshacer_movimiento', tipo=mov.tipo|lower, mov_id=mov.id) }}"
+                  method="post"
+                  style="display: inline">
+                  <button
+                    type="submit"
+                    class="deshacer-btn">
+                    Deshacer
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p>No hay movimientos registrados.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <script>
+      // Función que formatea el valor del campo al salir (blur)
+      function formatCurrencyOnBlur(field) {
+        let value = field.value;
+        // Eliminar puntos y reemplazar la coma por punto para convertir a número
+        value = value.replace(/\./g, '').replace(',', '.');
+        let num = parseFloat(value);
+        if (!isNaN(num)) {
+          // Se formatea usando toLocaleString para el formato español
+          field.value = num.toLocaleString('es-ES', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          });
+        }
+      }
+
+      function toggleMovimientos() {
+        var tabla = document.getElementById('tablaMovimientos');
+        if (tabla.style.display === 'none' || tabla.style.display === '') {
+          tabla.style.display = 'block';
+        } else {
+          tabla.style.display = 'none';
+        }
+      }
+    </script>
+  </body>
+</html>
