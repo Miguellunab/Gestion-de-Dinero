@@ -14,13 +14,35 @@
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Favicon - se usa el archivo Favicon_dinero.png de la carpeta static -->
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="{{ url_for('static', filename='Favicon_dinero.png') }}" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="{{ url_for('static', filename='Favicon_dinero.png') }}" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="{{ url_for('static', filename='Favicon_dinero.png') }}" />
+    <link
+      rel="manifest"
+      href="{{ url_for('static', filename='site.webmanifest') }}" />
+
     <style>
       :root {
         --primary-color: #3a86ff;
         --success-color: #38b000;
         --danger-color: #ff595e;
-        --dark-color: #1a1a2e;
+        --dark-color: #3f0f3f; /* Actualizado para combinar con el logo pixelado */
         --light-color: #f8f9fa;
+        --wallet-color: #ffe8d6; /* Color que combina con la billetera del logo */
+        --coin-color: #ff9e00; /* Color que combina con la moneda del logo */
       }
 
       body {
@@ -31,6 +53,13 @@
       .navbar-brand {
         font-weight: 700;
         letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+      }
+
+      .app-logo {
+        height: 40px;
+        margin-right: 10px;
       }
 
       .top-card {
@@ -42,11 +71,11 @@
       }
 
       .balance-card {
-        background: linear-gradient(135deg, var(--primary-color), #6c5ce7);
+        background: linear-gradient(135deg, var(--dark-color), #6c3483);
         color: white;
         padding: 20px;
         border-radius: 15px;
-        box-shadow: 0 8px 16px rgba(58, 134, 255, 0.2);
+        box-shadow: 0 8px 16px rgba(63, 15, 63, 0.2);
       }
 
       .action-card {
@@ -266,27 +295,63 @@
       }
 
       .nav-tabs .nav-link.active {
-        color: var(--primary-color);
-        border-bottom: 2px solid var(--primary-color);
+        color: var(--dark-color);
+        border-bottom: 2px solid var(--dark-color);
         background: none;
       }
 
       .tab-content {
         padding-top: 20px;
       }
+
+      /* Estilo para el logo en la página principal */
+      .logo-container {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .main-logo {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 10px;
+      }
+
+      /* Paleta de colores actualizada basada en el logo pixelado */
+      .balance-logo {
+        display: inline-block;
+        vertical-align: middle;
+        width: 30px;
+        height: 30px;
+        margin-right: 5px;
+      }
     </style>
   </head>
   <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-dark bg-dark">
+    <nav
+      class="navbar navbar-dark"
+      style="background-color: var(--dark-color)">
       <div class="container">
         <span class="navbar-brand mb-0">
-          <i class="fas fa-wallet me-2"></i>Hola, Miguel
+          <img
+            src="{{ url_for('static', filename='Favicon_dinero.png') }}"
+            alt="Wallet Logo"
+            class="app-logo" />
+          Hola, Miguel
         </span>
       </div>
     </nav>
 
     <div class="container py-4">
+      <!-- Logo principal centrado -->
+      <div class="logo-container">
+        <img
+          src="{{ url_for('static', filename='Favicon_dinero.png') }}"
+          alt="Wallet Logo"
+          class="main-logo" />
+        <h1 class="h4 mb-3">Gestión de Dinero</h1>
+      </div>
+
       <!-- Balance Card -->
       <div class="balance-card mb-4">
         <div class="row align-items-center">
@@ -295,7 +360,10 @@
             <h2 class="mb-0">${{ balance|format_money }}</h2>
           </div>
           <div class="col-auto">
-            <i class="fas fa-chart-line fa-2x opacity-50"></i>
+            <img
+              src="{{ url_for('static', filename='Favicon_dinero.png') }}"
+              alt="Wallet Logo"
+              class="balance-logo" />
           </div>
         </div>
       </div>
@@ -450,7 +518,12 @@
         <div class="transactions-body">
           {% if gastos|length + ingresos|length == 0 %}
           <div class="no-transactions">
-            <i class="fas fa-receipt fa-3x mb-3 opacity-50"></i>
+            <img
+              src="{{ url_for('static', filename='Favicon_dinero.png') }}"
+              alt="Wallet Logo"
+              width="60"
+              height="60"
+              class="mb-3 opacity-50" />
             <p>No hay movimientos registrados</p>
           </div>
           {% else %} {% set combined = (gastos +
