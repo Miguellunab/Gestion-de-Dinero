@@ -3,145 +3,178 @@
   <head>
     <meta charset="UTF-8" />
     <title>Gestión de Dinero</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-      }
-      .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: #f0f0f0;
-        padding: 10px;
-        border-radius: 5px;
-      }
-      .greeting {
-        font-size: 1.2em;
-        font-weight: bold;
-        color: #333;
-      }
-      h1 {
-        text-align: center;
-      }
-      form {
-        margin: 20px 0;
-      }
-      input[type='text'] {
-        padding: 5px;
-        margin: 5px;
-        width: 200px;
-      }
-      button {
-        padding: 5px 10px;
-        margin: 5px;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-      }
-      table,
-      th,
-      td {
-        border: 1px solid #ccc;
-      }
-      th,
-      td {
-        padding: 8px;
-        text-align: center;
-      }
-      .flash {
-        margin: 10px 0;
-        padding: 10px;
-        border-radius: 5px;
-      }
-      .flash-success {
-        background: #d4edda;
-        color: #155724;
-      }
-      .flash-danger {
-        background: #f8d7da;
-        color: #721c24;
-      }
-      .flash-warning {
-        background: #fff3cd;
-        color: #856404;
-      }
-    </style>
+    <!-- Cargar Bootstrap 5 desde CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet" />
   </head>
-  <body>
-    <div class="header">
-      <div class="greeting">Hola, Miguel</div>
+  <body class="bg-light">
+    <nav class="navbar navbar-light bg-white mb-4">
+      <div class="container">
+        <span class="navbar-brand mb-0 h1">Hola, Miguel</span>
+      </div>
+    </nav>
+
+    <div class="container">
+      <h1 class="text-center mb-4">Gestión de Dinero</h1>
+
+      <div class="row">
+        <!-- Formulario para agregar gasto -->
+        <div class="col-md-6 mb-4">
+          <div class="card">
+            <div class="card-header bg-danger text-white">Agregar Gasto</div>
+            <div class="card-body">
+              <form
+                action="{{ url_for('agregar_gasto') }}"
+                method="post">
+                <div class="mb-3">
+                  <label
+                    for="monto_gasto"
+                    class="form-label"
+                    >Monto:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="monto_gasto"
+                    name="monto"
+                    placeholder="10000"
+                    required />
+                </div>
+                <div class="mb-3">
+                  <label
+                    for="descripcion_gasto"
+                    class="form-label"
+                    >Descripción (opcional):</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="descripcion_gasto"
+                    name="descripcion" />
+                </div>
+                <button
+                  type="submit"
+                  class="btn btn-danger w-100">
+                  Agregar Gasto
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Formulario para agregar ingreso -->
+        <div class="col-md-6 mb-4">
+          <div class="card">
+            <div class="card-header bg-success text-white">Agregar Ingreso</div>
+            <div class="card-body">
+              <form
+                action="{{ url_for('agregar_ingreso') }}"
+                method="post">
+                <div class="mb-3">
+                  <label
+                    for="monto_ingreso"
+                    class="form-label"
+                    >Monto:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="monto_ingreso"
+                    name="monto"
+                    placeholder="10000"
+                    required />
+                </div>
+                <div class="mb-3">
+                  <label
+                    for="descripcion_ingreso"
+                    class="form-label"
+                    >Descripción (opcional):</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="descripcion_ingreso"
+                    name="descripcion" />
+                </div>
+                <button
+                  type="submit"
+                  class="btn btn-success w-100">
+                  Agregar Ingreso
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección de movimientos -->
+      <div class="card mb-4">
+        <div class="card-header bg-primary text-white">Movimientos</div>
+        <div class="card-body p-0">
+          <table class="table table-striped mb-0">
+            <thead>
+              <tr>
+                <th scope="col">Tipo</th>
+                <th scope="col">Monto</th>
+                <th scope="col">Descripción</th>
+                <th scope="col">Fecha</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Mostramos primero los gastos, luego los ingresos -->
+              {% for gasto in gastos %}
+              <tr>
+                <td class="text-danger fw-bold">Gasto</td>
+                <td>${{ gasto.monto|format_money }}</td>
+                <td>{{ gasto.descripcion or "-" }}</td>
+                <td>{{ gasto.fecha.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>
+                  <form
+                    action="{{ url_for('deshacer_movimiento', tipo='gasto', mov_id=gasto.id) }}"
+                    method="post"
+                    style="display: inline">
+                    <button
+                      class="btn btn-sm btn-outline-danger"
+                      type="submit">
+                      Deshacer
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %} {% for ingreso in ingresos %}
+              <tr>
+                <td class="text-success fw-bold">Ingreso</td>
+                <td>${{ ingreso.monto|format_money }}</td>
+                <td>{{ ingreso.descripcion or "-" }}</td>
+                <td>{{ ingreso.fecha.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>
+                  <form
+                    action="{{ url_for('deshacer_movimiento', tipo='ingreso', mov_id=ingreso.id) }}"
+                    method="post"
+                    style="display: inline">
+                    <button
+                      class="btn btn-sm btn-outline-danger"
+                      type="submit">
+                      Deshacer
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Balance -->
+      <div class="alert alert-info text-center fs-5">
+        Balance Actual: ${{ balance|format_money }}
+      </div>
     </div>
 
-    <h1>Gestión de Dinero</h1>
-
-    <!-- Formulario para agregar gasto -->
-    <h2>Agregar Gasto</h2>
-    <form
-      action="{{ url_for('agregar_gasto') }}"
-      method="post">
-      <label>Monto:</label>
-      <input
-        type="text"
-        name="monto"
-        placeholder="10000"
-        required />
-      <label>Descripción:</label>
-      <input
-        type="text"
-        name="descripcion" />
-      <button type="submit">Agregar Gasto</button>
-    </form>
-
-    <!-- Formulario para agregar ingreso -->
-    <h2>Agregar Ingreso</h2>
-    <form
-      action="{{ url_for('agregar_ingreso') }}"
-      method="post">
-      <label>Monto:</label>
-      <input
-        type="text"
-        name="monto"
-        placeholder="10000"
-        required />
-      <label>Descripción:</label>
-      <input
-        type="text"
-        name="descripcion" />
-      <button type="submit">Agregar Ingreso</button>
-    </form>
-
-    <!-- Mostrar mensajes flash -->
-    {% with messages = get_flashed_messages(with_categories=true) %} {% if
-    messages %} {% for category, message in messages %}
-    <div class="flash flash-{{ category }}">{{ message }}</div>
-    {% endfor %} {% endif %} {% endwith %}
-
-    <!-- Tabla de movimientos -->
-    <h2>Movimientos</h2>
-    <table>
-      <tr>
-        <th>Monto</th>
-        <th>Descripción</th>
-        <th>Fecha</th>
-      </tr>
-      {% for gasto in gastos %}
-      <tr>
-        <td>{{ gasto.monto|format_money }}</td>
-        <td>{{ gasto.descripcion or "-" }}</td>
-        <td>{{ gasto.fecha.strftime('%Y-%m-%d %H:%M') }}</td>
-      </tr>
-      {% endfor %} {% for ingreso in ingresos %}
-      <tr>
-        <td>{{ ingreso.monto|format_money }}</td>
-        <td>{{ ingreso.descripcion or "-" }}</td>
-        <td>{{ ingreso.fecha.strftime('%Y-%m-%d %H:%M') }}</td>
-      </tr>
-      {% endfor %}
-    </table>
-
-    <h3>Balance Actual: ${{ balance|format_money }}</h3>
+    <!-- Cargar scripts de Bootstrap 5 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

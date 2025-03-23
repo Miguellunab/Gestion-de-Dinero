@@ -16,7 +16,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
 )
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Inicializa SQLAlchemy y Flask-Migrate
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
@@ -45,8 +44,8 @@ class Ingreso(db.Model):
 # Ruta principal
 @app.route('/')
 def index():
-    gastos = Gasto.query.all()
-    ingresos = Ingreso.query.all()
+    gastos = Gasto.query.order_by(Gasto.fecha.desc()).all()
+    ingresos = Ingreso.query.order_by(Ingreso.fecha.desc()).all()
     total_ingresos = sum(ingreso.monto for ingreso in ingresos)
     total_gastos = sum(gasto.monto for gasto in gastos)
     balance = total_ingresos - total_gastos
@@ -59,17 +58,14 @@ def agregar_gasto():
     descripcion = request.form.get('descripcion')
     if monto:
         try:
-            # Si el valor tiene formato (puntos y comas), limpia el valor:
+            # Limpieza del valor si viene con puntos o comas
             monto_clean = monto.replace(".", "").replace(",", ".")
             nuevo_gasto = Gasto(monto=float(monto_clean), descripcion=descripcion)
             db.session.add(nuevo_gasto)
             db.session.commit()
-            flash("Gasto agregado exitosamente.", "success")
         except Exception as e:
             db.session.rollback()
-            flash("Error al agregar gasto: " + str(e), "danger")
-    else:
-        flash("El campo monto es obligatorio.", "warning")
+            # flash("Error al agregar gasto: " + str(e), "danger")
     return redirect(url_for('index'))
 
 # Ruta para agregar un ingreso
@@ -83,15 +79,26 @@ def agregar_ingreso():
             nuevo_ingreso = Ingreso(monto=float(monto_clean), descripcion=descripcion)
             db.session.add(nuevo_ingreso)
             db.session.commit()
-            flash("Ingreso agregado exitosamente.", "success")
         except Exception as e:
             db.session.rollback()
-            flash("Error al agregar ingreso: " + str(e), "danger")
-    else:
-        flash("El campo monto es obligatorio.", "warning")
+            # flash("Error al agregar ingreso: " + str(e), "danger")
     return redirect(url_for('index'))
 
-# Arranque de la aplicación: Render inyecta la variable PORT; usamos 5000 por defecto.
+# Ruta para deshacer (eliminar) un movimiento
+@app.route('/deshacer/<tipo>/<int:mov_id>', methods=['POST'])
+def deshacer_movimiento(tipo, mov_id):
+    if tipo == 'gasto':
+        mov = Gasto.query.get_or_404(mov_id)
+    elif tipo == 'ingreso':
+        mov = Ingreso.query.get_or_404(mov_id)
+    else:
+        return redirect(url_for('index'))  # Si el tipo no es válido, simplemente regresa
+    
+    db.session.delete(mov)
+    db.session.commit()
+    return redirect(url_for('index'))
+
+# Arranque de la aplicación
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
