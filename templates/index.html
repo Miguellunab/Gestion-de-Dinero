@@ -6,229 +6,538 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0" />
     <title>Gestión de Dinero</title>
+    <!-- Bootstrap 5 desde CDN -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet" />
+    <!-- Font Awesome para iconos -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
+      :root {
+        --primary-color: #3a86ff;
+        --success-color: #38b000;
+        --danger-color: #ff595e;
+        --dark-color: #1a1a2e;
+        --light-color: #f8f9fa;
+      }
+
       body {
-        background-color: #f0f2f5;
+        background-color: #f5f7fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       }
-      .navbar-dark {
-        background-color: #1a202c;
+
+      .navbar-brand {
+        font-weight: 700;
+        letter-spacing: 0.5px;
       }
-      .card {
+
+      .top-card {
         border-radius: 15px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border: none;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s;
+        overflow: hidden;
       }
+
+      .balance-card {
+        background: linear-gradient(135deg, var(--primary-color), #6c5ce7);
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 8px 16px rgba(58, 134, 255, 0.2);
+      }
+
+      .action-card {
+        background: white;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        border: none;
+      }
+
+      .action-header {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 15px 20px;
+        font-weight: 600;
+      }
+
+      .action-body {
+        padding: 20px;
+      }
+
+      .btn-ingreso {
+        background-color: var(--success-color);
+        border: none;
+        border-radius: 10px;
+        padding: 10px;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s;
+      }
+
+      .btn-gasto {
+        background-color: var(--danger-color);
+        border: none;
+        border-radius: 10px;
+        padding: 10px;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s;
+      }
+
+      .btn-ingreso:hover,
+      .btn-ingreso:focus {
+        background-color: #2c9d00;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(56, 176, 0, 0.3);
+      }
+
+      .btn-gasto:hover,
+      .btn-gasto:focus {
+        background-color: #e63946;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(255, 89, 94, 0.3);
+      }
+
       .form-control {
         border-radius: 10px;
         padding: 12px;
+        border: 1px solid #e0e0e0;
       }
-      .btn {
-        border-radius: 10px;
-        padding: 10px 20px;
+
+      .form-control:focus {
+        box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.25);
+        border-color: var(--primary-color);
       }
-      .table-responsive {
+
+      .transactions-card {
         border-radius: 15px;
-        overflow: hidden;
+        border: none;
+        background: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        margin-bottom: 20px;
       }
-      .balance-card {
-        background: linear-gradient(135deg, #2b6777, #52ab98);
+
+      .transactions-header {
+        padding: 15px 20px;
+        background-color: white;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        font-weight: 600;
       }
-      @media (max-width: 768px) {
-        .navbar-brand {
-          font-size: 1.2rem;
+
+      .transaction-item {
+        padding: 15px 20px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: center;
+      }
+
+      .transaction-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        flex-shrink: 0;
+      }
+
+      .ingreso-icon {
+        background-color: rgba(56, 176, 0, 0.1);
+        color: var(--success-color);
+      }
+
+      .gasto-icon {
+        background-color: rgba(255, 89, 94, 0.1);
+        color: var(--danger-color);
+      }
+
+      .transaction-details {
+        flex-grow: 1;
+      }
+
+      .transaction-amount {
+        font-weight: 700;
+        font-size: 1.05rem;
+      }
+
+      .transaction-description {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-top: 3px;
+      }
+
+      .transaction-date {
+        font-size: 0.8rem;
+        color: #adb5bd;
+        text-align: right;
+      }
+
+      .transaction-actions {
+        flex-shrink: 0;
+        margin-left: 10px;
+      }
+
+      .btn-action {
+        border: none;
+        background: none;
+        color: #adb5bd;
+        transition: color 0.3s;
+      }
+
+      .btn-action:hover,
+      .btn-action:focus {
+        color: var(--danger-color);
+      }
+
+      .modal-content {
+        border-radius: 15px;
+        border: none;
+      }
+
+      .modal-header {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      }
+
+      .modal-footer {
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+      }
+
+      @media (max-width: 576px) {
+        .container {
+          padding-left: 15px;
+          padding-right: 15px;
         }
-        .card-header {
-          font-size: 1.1rem;
+
+        .transaction-item {
+          padding: 12px 15px;
         }
-        .table-responsive {
-          overflow-x: auto;
+
+        .transaction-icon {
+          width: 36px;
+          height: 36px;
         }
+
+        .transaction-amount {
+          font-size: 0.95rem;
+        }
+      }
+
+      .no-transactions {
+        padding: 40px 20px;
+        text-align: center;
+        color: #adb5bd;
+      }
+
+      .btn-floating {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(58, 134, 255, 0.4);
+        transition: all 0.3s;
+        z-index: 1000;
+      }
+
+      .btn-floating:hover,
+      .btn-floating:focus {
+        background-color: #2a75e8;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(58, 134, 255, 0.5);
+      }
+
+      .nav-tabs .nav-link {
+        border: none;
+        color: #6c757d;
+        padding: 12px 16px;
+        font-weight: 500;
+      }
+
+      .nav-tabs .nav-link.active {
+        color: var(--primary-color);
+        border-bottom: 2px solid var(--primary-color);
+        background: none;
+      }
+
+      .tab-content {
+        padding-top: 20px;
       }
     </style>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-      <div class="container-fluid">
-        <a
-          class="navbar-brand"
-          href="#"
-          >¡Hola, Miguel!</a
-        >
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div
-          class="collapse navbar-collapse"
-          id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                href="#"
-                >Balance</a
-              >
-            </li>
-          </ul>
-        </div>
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark bg-dark">
+      <div class="container">
+        <span class="navbar-brand mb-0">
+          <i class="fas fa-wallet me-2"></i>Hola, Miguel
+        </span>
       </div>
     </nav>
 
-    <div class="container mt-4">
-      <div class="row g-3">
-        <div class="col-md-6">
-          <div class="card">
-            <div class="card-header bg-danger text-white">Agregar Gasto</div>
-            <div class="card-body">
-              <form
-                action="{{ url_for('agregar_gasto') }}"
-                method="post">
-                <div class="mb-3">
-                  <label class="form-label">Monto (COP):</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    name="monto"
-                    placeholder="Ej: 50.000"
-                    required
-                    oninput="formatAsPesos(this)" />
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Descripción:</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    name="descripcion" />
-                </div>
-                <button
-                  type="submit"
-                  class="btn btn-danger w-100">
-                  Agregar
-                </button>
-              </form>
-            </div>
+    <div class="container py-4">
+      <!-- Balance Card -->
+      <div class="balance-card mb-4">
+        <div class="row align-items-center">
+          <div class="col">
+            <h6 class="mb-1 opacity-75">Balance Actual</h6>
+            <h2 class="mb-0">${{ balance|format_money }}</h2>
           </div>
-        </div>
-
-        <div class="col-md-6">
-          <div class="card">
-            <div class="card-header bg-success text-white">Agregar Ingreso</div>
-            <div class="card-body">
-              <form
-                action="{{ url_for('agregar_ingreso') }}"
-                method="post">
-                <div class="mb-3">
-                  <label class="form-label">Monto (COP):</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    name="monto"
-                    placeholder="Ej: 150.000"
-                    required
-                    oninput="formatAsPesos(this)" />
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Descripción:</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    name="descripcion" />
-                </div>
-                <button
-                  type="submit"
-                  class="btn btn-success w-100">
-                  Agregar
-                </button>
-              </form>
-            </div>
+          <div class="col-auto">
+            <i class="fas fa-chart-line fa-2x opacity-50"></i>
           </div>
         </div>
       </div>
 
-      <div class="card mt-4 balance-card text-white">
-        <div class="card-body text-center">
-          <h4 class="mb-0">Balance Actual</h4>
-          <h2 class="display-6">${{ balance|format_money }}</h2>
+      <!-- Tabs for actions -->
+      <div class="mb-4">
+        <ul
+          class="nav nav-tabs"
+          id="actionTabs"
+          role="tablist">
+          <li
+            class="nav-item"
+            role="presentation">
+            <button
+              class="nav-link active"
+              id="ingreso-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#ingreso"
+              type="button"
+              role="tab"
+              aria-selected="true">
+              <i class="fas fa-plus-circle text-success me-2"></i>Ingreso
+            </button>
+          </li>
+          <li
+            class="nav-item"
+            role="presentation">
+            <button
+              class="nav-link"
+              id="gasto-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#gasto"
+              type="button"
+              role="tab"
+              aria-selected="false">
+              <i class="fas fa-minus-circle text-danger me-2"></i>Gasto
+            </button>
+          </li>
+        </ul>
+
+        <div
+          class="tab-content bg-white p-3 rounded-bottom shadow-sm"
+          id="actionTabsContent">
+          <!-- Ingreso Tab -->
+          <div
+            class="tab-pane fade show active"
+            id="ingreso"
+            role="tabpanel"
+            aria-labelledby="ingreso-tab">
+            <form
+              action="{{ url_for('agregar_ingreso') }}"
+              method="post">
+              <div class="mb-3">
+                <label
+                  for="monto_ingreso"
+                  class="form-label"
+                  >Monto (COP):</label
+                >
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="monto_ingreso"
+                    name="monto"
+                    placeholder="10000"
+                    required
+                    oninput="formatAsPesos(this)" />
+                </div>
+              </div>
+              <div class="mb-3">
+                <label
+                  for="descripcion_ingreso"
+                  class="form-label"
+                  >Descripción (opcional):</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="descripcion_ingreso"
+                  name="descripcion"
+                  placeholder="Salario, venta, etc." />
+              </div>
+              <button
+                type="submit"
+                class="btn btn-ingreso w-100">
+                <i class="fas fa-check me-2"></i>Agregar Ingreso
+              </button>
+            </form>
+          </div>
+
+          <!-- Gasto Tab -->
+          <div
+            class="tab-pane fade"
+            id="gasto"
+            role="tabpanel"
+            aria-labelledby="gasto-tab">
+            <form
+              action="{{ url_for('agregar_gasto') }}"
+              method="post">
+              <div class="mb-3">
+                <label
+                  for="monto_gasto"
+                  class="form-label"
+                  >Monto (COP):</label
+                >
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="monto_gasto"
+                    name="monto"
+                    placeholder="10000"
+                    required
+                    oninput="formatAsPesos(this)" />
+                </div>
+              </div>
+              <div class="mb-3">
+                <label
+                  for="descripcion_gasto"
+                  class="form-label"
+                  >Descripción (opcional):</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="descripcion_gasto"
+                  name="descripcion"
+                  placeholder="Comida, transporte, etc." />
+              </div>
+              <button
+                type="submit"
+                class="btn btn-gasto w-100">
+                <i class="fas fa-check me-2"></i>Agregar Gasto
+              </button>
+            </form>
+          </div>
         </div>
       </div>
 
-      <div class="card mt-4">
-        <div class="card-header bg-primary text-white">Últimos Movimientos</div>
-        <div class="table-responsive">
-          <table class="table table-hover mb-0">
-            <thead>
-              <tr>
-                <th>Tipo</th>
-                <th>Monto</th>
-                <th>Descripción</th>
-                <th>Fecha</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for gasto in gastos %}
-              <tr>
-                <td class="text-danger fw-bold">↓ Gasto</td>
-                <td>${{ gasto.monto|format_money }}</td>
-                <td>{{ gasto.descripcion or '-' }}</td>
-                <td>{{ gasto.fecha.strftime('%d/%m/%Y') }}</td>
-                <td>
-                  <form
-                    action="{{ url_for('deshacer_movimiento', tipo='gasto', mov_id=gasto.id) }}"
-                    method="post"
-                    class="d-inline">
-                    <button
-                      type="submit"
-                      class="btn btn-sm btn-outline-light">
-                      Deshacer
-                    </button>
-                  </form>
-                </td>
-              </tr>
-              {% endfor %} {% for ingreso in ingresos %}
-              <tr>
-                <td class="text-success fw-bold">↑ Ingreso</td>
-                <td>${{ ingreso.monto|format_money }}</td>
-                <td>{{ ingreso.descripcion or '-' }}</td>
-                <td>{{ ingreso.fecha.strftime('%d/%m/%Y') }}</td>
-                <td>
-                  <form
-                    action="{{ url_for('deshacer_movimiento', tipo='ingreso', mov_id=ingreso.id) }}"
-                    method="post"
-                    class="d-inline">
-                    <button
-                      type="submit"
-                      class="btn btn-sm btn-outline-light">
-                      Deshacer
-                    </button>
-                  </form>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+      <!-- Transactions -->
+      <div class="transactions-card">
+        <div
+          class="transactions-header d-flex justify-content-between align-items-center">
+          <div>
+            <i class="fas fa-exchange-alt me-2"></i>
+            Movimientos Recientes
+          </div>
+        </div>
+
+        <div class="transactions-body">
+          {% if gastos|length + ingresos|length == 0 %}
+          <div class="no-transactions">
+            <i class="fas fa-receipt fa-3x mb-3 opacity-50"></i>
+            <p>No hay movimientos registrados</p>
+          </div>
+          {% else %} {% set combined = (gastos +
+          ingresos)|sort(attribute='fecha', reverse=true) %} {% for item in
+          combined %} {% if item in gastos %}
+          <div class="transaction-item">
+            <div class="transaction-icon gasto-icon">
+              <i class="fas fa-arrow-down"></i>
+            </div>
+            <div class="transaction-details">
+              <div class="transaction-amount text-danger">
+                -${{ item.monto|format_money }}
+              </div>
+              <div class="transaction-description">
+                {{ item.descripcion or "Sin descripción" }}
+              </div>
+            </div>
+            <div class="transaction-date">
+              {{ item.fecha.strftime('%d/%m/%Y') }}<br />
+              {{ item.fecha.strftime('%H:%M') }}
+            </div>
+            <div class="transaction-actions">
+              <form
+                action="{{ url_for('deshacer_movimiento', tipo='gasto', mov_id=item.id) }}"
+                method="post">
+                <button
+                  type="submit"
+                  class="btn-action"
+                  title="Eliminar movimiento">
+                  <i class="fas fa-times"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+          {% else %}
+          <div class="transaction-item">
+            <div class="transaction-icon ingreso-icon">
+              <i class="fas fa-arrow-up"></i>
+            </div>
+            <div class="transaction-details">
+              <div class="transaction-amount text-success">
+                +${{ item.monto|format_money }}
+              </div>
+              <div class="transaction-description">
+                {{ item.descripcion or "Sin descripción" }}
+              </div>
+            </div>
+            <div class="transaction-date">
+              {{ item.fecha.strftime('%d/%m/%Y') }}<br />
+              {{ item.fecha.strftime('%H:%M') }}
+            </div>
+            <div class="transaction-actions">
+              <form
+                action="{{ url_for('deshacer_movimiento', tipo='ingreso', mov_id=item.id) }}"
+                method="post">
+                <button
+                  type="submit"
+                  class="btn-action"
+                  title="Eliminar movimiento">
+                  <i class="fas fa-times"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+          {% endif %} {% endfor %} {% endif %}
         </div>
       </div>
     </div>
 
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Script para formatear el input en tiempo real -->
     <script>
       function formatAsPesos(input) {
-        let value = input.value.replace(/\D/g, '');
-        if (!value) return (input.value = '');
-
-        const formatter = new Intl.NumberFormat('es-CO', {
-          style: 'decimal',
-          minimumFractionDigits: 0,
-        });
-
-        input.value = formatter.format(value);
+        // Eliminar todo lo que no sea dígito
+        let val = input.value.replace(/\D/g, '');
+        if (val === '') {
+          input.value = '';
+          return;
+        }
+        // Formatear el número según la configuración de Colombia (sin decimales)
+        let formatted = new Intl.NumberFormat('es-CO', {
+          maximumFractionDigits: 0,
+        }).format(parseInt(val));
+        input.value = formatted;
       }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
