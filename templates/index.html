@@ -3,15 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <title>Gestión de Dinero</title>
-    <!-- Cargar Bootstrap 5 desde CDN -->
+    <!-- Bootstrap 5 desde CDN -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet" />
+    <style>
+      body {
+        background-color: #f8f9fa;
+      }
+      .navbar-custom {
+        background-color: #343a40;
+      }
+      .navbar-custom .navbar-brand,
+      .navbar-custom .nav-link {
+        color: #fff;
+      }
+      .card-header {
+        font-weight: bold;
+      }
+    </style>
   </head>
-  <body class="bg-light">
-    <nav class="navbar navbar-light bg-white mb-4">
+  <body>
+    <!-- Barra de navegación con saludo -->
+    <nav class="navbar navbar-expand-lg navbar-custom mb-4">
       <div class="container">
-        <span class="navbar-brand mb-0 h1">Hola, Miguel</span>
+        <a
+          class="navbar-brand"
+          href="#"
+          >Hola, Miguel</a
+        >
       </div>
     </nav>
 
@@ -31,7 +51,7 @@
                   <label
                     for="monto_gasto"
                     class="form-label"
-                    >Monto:</label
+                    >Monto (COP):</label
                   >
                   <input
                     type="text"
@@ -39,7 +59,8 @@
                     id="monto_gasto"
                     name="monto"
                     placeholder="10000"
-                    required />
+                    required
+                    oninput="formatAsPesos(this)" />
                 </div>
                 <div class="mb-3">
                   <label
@@ -75,7 +96,7 @@
                   <label
                     for="monto_ingreso"
                     class="form-label"
-                    >Monto:</label
+                    >Monto (COP):</label
                   >
                   <input
                     type="text"
@@ -83,7 +104,8 @@
                     id="monto_ingreso"
                     name="monto"
                     placeholder="10000"
-                    required />
+                    required
+                    oninput="formatAsPesos(this)" />
                 </div>
                 <div class="mb-3">
                   <label
@@ -108,22 +130,21 @@
         </div>
       </div>
 
-      <!-- Sección de movimientos -->
+      <!-- Tabla de movimientos -->
       <div class="card mb-4">
         <div class="card-header bg-primary text-white">Movimientos</div>
         <div class="card-body p-0">
           <table class="table table-striped mb-0">
             <thead>
               <tr>
-                <th scope="col">Tipo</th>
-                <th scope="col">Monto</th>
-                <th scope="col">Descripción</th>
-                <th scope="col">Fecha</th>
-                <th scope="col">Acciones</th>
+                <th>Tipo</th>
+                <th>Monto</th>
+                <th>Descripción</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
-              <!-- Mostramos primero los gastos, luego los ingresos -->
               {% for gasto in gastos %}
               <tr>
                 <td class="text-danger fw-bold">Gasto</td>
@@ -136,8 +157,8 @@
                     method="post"
                     style="display: inline">
                     <button
-                      class="btn btn-sm btn-outline-danger"
-                      type="submit">
+                      type="submit"
+                      class="btn btn-sm btn-outline-danger">
                       Deshacer
                     </button>
                   </form>
@@ -155,8 +176,8 @@
                     method="post"
                     style="display: inline">
                     <button
-                      class="btn btn-sm btn-outline-danger"
-                      type="submit">
+                      type="submit"
+                      class="btn btn-sm btn-outline-danger">
                       Deshacer
                     </button>
                   </form>
@@ -174,7 +195,23 @@
       </div>
     </div>
 
-    <!-- Cargar scripts de Bootstrap 5 -->
+    <!-- Script para formatear el input en tiempo real -->
+    <script>
+      function formatAsPesos(input) {
+        // Eliminar todo lo que no sea dígito
+        let val = input.value.replace(/\D/g, '');
+        if (val === '') {
+          input.value = '';
+          return;
+        }
+        // Formatear el número según la configuración de Colombia (sin decimales)
+        let formatted = new Intl.NumberFormat('es-CO', {
+          maximumFractionDigits: 0,
+        }).format(parseInt(val));
+        input.value = formatted;
+      }
+    </script>
+    <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
