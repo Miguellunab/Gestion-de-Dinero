@@ -6,11 +6,10 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# Configuración de la SECRET_KEY (puedes configurarla desde una variable de entorno)
+# Configuración de la SECRET_KEY (puedes cambiarla o configurarla desde una variable de entorno)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'super-secret-key')
 
-# Configuración de la base de datos: usa la variable DATABASE_URL de Render si existe,
-# o el External Database URL que proporcionaste.
+# Configuración de la base de datos: usa DATABASE_URL en producción, o el External Database URL
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     'DATABASE_URL',
     'postgresql://gestiondinero_user:sbZYaGViuEdnEOoVl3OuvJgqBaJPOHym@dpg-cvg6fgdumphs73dem04g-a.oregon-postgres.render.com/gestiondinero'
@@ -60,7 +59,9 @@ def agregar_gasto():
     descripcion = request.form.get('descripcion')
     if monto:
         try:
-            nuevo_gasto = Gasto(monto=float(monto), descripcion=descripcion)
+            # Si el valor tiene formato (puntos y comas), limpia el valor:
+            monto_clean = monto.replace(".", "").replace(",", ".")
+            nuevo_gasto = Gasto(monto=float(monto_clean), descripcion=descripcion)
             db.session.add(nuevo_gasto)
             db.session.commit()
             flash("Gasto agregado exitosamente.", "success")
@@ -78,7 +79,8 @@ def agregar_ingreso():
     descripcion = request.form.get('descripcion')
     if monto:
         try:
-            nuevo_ingreso = Ingreso(monto=float(monto), descripcion=descripcion)
+            monto_clean = monto.replace(".", "").replace(",", ".")
+            nuevo_ingreso = Ingreso(monto=float(monto_clean), descripcion=descripcion)
             db.session.add(nuevo_ingreso)
             db.session.commit()
             flash("Ingreso agregado exitosamente.", "success")
@@ -89,13 +91,7 @@ def agregar_ingreso():
         flash("El campo monto es obligatorio.", "warning")
     return redirect(url_for('index'))
 
-# Ruta para cerrar sesión (dummy, ya que no implementamos autenticación)
-@app.route('/logout')
-def logout():
-    flash("Sesión cerrada.", "info")
-    return redirect(url_for('index'))
-
-# Arranque de la aplicación, usando el puerto proporcionado por Render o 5000 por defecto
+# Arranque de la aplicación: Render inyecta la variable PORT; usamos 5000 por defecto.
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
