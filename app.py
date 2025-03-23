@@ -6,10 +6,11 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# Configuración de la SECRET_KEY (puedes cambiarla o configurarla desde una variable de entorno)
+# Configuración de la SECRET_KEY (puedes configurarla desde una variable de entorno)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'super-secret-key')
 
-# Configuración de la base de datos: se utiliza DATABASE_URL en producción, o el External Database URL en local
+# Configuración de la base de datos: usa la variable DATABASE_URL de Render si existe,
+# o el External Database URL que proporcionaste.
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     'DATABASE_URL',
     'postgresql://gestiondinero_user:sbZYaGViuEdnEOoVl3OuvJgqBaJPOHym@dpg-cvg6fgdumphs73dem04g-a.oregon-postgres.render.com/gestiondinero'
@@ -20,18 +21,16 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-# REGISTRAR FILTRO PERSONALIZADO PARA FORMATEAR DINERO
+# Registrar filtro personalizado para formatear el dinero
 def format_money(value):
-    # Formatea el número con dos decimales y separadores de miles
     s = "{:,.2f}".format(value)  # Ejemplo: "10,000.00"
-    # Intercambia comas y puntos para el formato español: "10.000,00"
+    # Convertir al formato español: "10.000,00"
     s = s.replace(",", "X").replace(".", ",").replace("X", ".")
     return s
 
-# Registrar el filtro en Jinja2
 app.jinja_env.filters['format_money'] = format_money
 
-# Modelos de ejemplo
+# Modelos
 class Gasto(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     monto = db.Column(db.Float, nullable=False)
@@ -44,7 +43,7 @@ class Ingreso(db.Model):
     descripcion = db.Column(db.String(200), nullable=True)
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
 
-# Ruta principal: muestra balance y registros
+# Ruta principal
 @app.route('/')
 def index():
     gastos = Gasto.query.all()
@@ -90,7 +89,13 @@ def agregar_ingreso():
         flash("El campo monto es obligatorio.", "warning")
     return redirect(url_for('index'))
 
-# Arranque de la aplicación, usando el puerto asignado por Render o 5000 por defecto
+# Ruta para cerrar sesión (dummy, ya que no implementamos autenticación)
+@app.route('/logout')
+def logout():
+    flash("Sesión cerrada.", "info")
+    return redirect(url_for('index'))
+
+# Arranque de la aplicación, usando el puerto proporcionado por Render o 5000 por defecto
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
