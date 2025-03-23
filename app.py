@@ -6,12 +6,10 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# Configuración de la Secret Key (puedes configurarla con una variable de entorno en producción)
+# Configuración de la SECRET_KEY (puedes cambiarla o configurarla desde una variable de entorno)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'super-secret-key')
 
-# Configuración de la base de datos:
-# Si la variable de entorno DATABASE_URL está definida (Render la establece), se usa esa; 
-# de lo contrario, se usa el External Database URL que me proporcionaste.
+# Configuración de la base de datos: se utiliza DATABASE_URL en producción, o el External Database URL en local
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     'DATABASE_URL',
     'postgresql://gestiondinero_user:sbZYaGViuEdnEOoVl3OuvJgqBaJPOHym@dpg-cvg6fgdumphs73dem04g-a.oregon-postgres.render.com/gestiondinero'
@@ -22,21 +20,31 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-# Modelo para Gastos
+# REGISTRAR FILTRO PERSONALIZADO PARA FORMATEAR DINERO
+def format_money(value):
+    # Formatea el número con dos decimales y separadores de miles
+    s = "{:,.2f}".format(value)  # Ejemplo: "10,000.00"
+    # Intercambia comas y puntos para el formato español: "10.000,00"
+    s = s.replace(",", "X").replace(".", ",").replace("X", ".")
+    return s
+
+# Registrar el filtro en Jinja2
+app.jinja_env.filters['format_money'] = format_money
+
+# Modelos de ejemplo
 class Gasto(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     monto = db.Column(db.Float, nullable=False)
     descripcion = db.Column(db.String(200), nullable=True)
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
 
-# Modelo para Ingresos
 class Ingreso(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     monto = db.Column(db.Float, nullable=False)
     descripcion = db.Column(db.String(200), nullable=True)
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
 
-# Ruta principal que muestra balance y registros
+# Ruta principal: muestra balance y registros
 @app.route('/')
 def index():
     gastos = Gasto.query.all()
@@ -82,7 +90,7 @@ def agregar_ingreso():
         flash("El campo monto es obligatorio.", "warning")
     return redirect(url_for('index'))
 
-# Arranque de la aplicación, utilizando el puerto definido por Render (o 5000 por defecto)
+# Arranque de la aplicación, usando el puerto asignado por Render o 5000 por defecto
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
