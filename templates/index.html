@@ -20,19 +20,19 @@
       rel="icon"
       type="image/png"
       sizes="32x32"
-      href="{{ url_for('static', filename='Favicon_dinero.png') }}" />
+      href="/static/Favicon_dinero.png" />
     <link
       rel="icon"
       type="image/png"
       sizes="16x16"
-      href="{{ url_for('static', filename='Favicon_dinero.png') }}" />
+      href="/static/Favicon_dinero.png" />
     <link
       rel="apple-touch-icon"
       sizes="180x180"
-      href="{{ url_for('static', filename='Favicon_dinero.png') }}" />
+      href="/static/Favicon_dinero.png" />
     <link
       rel="manifest"
-      href="{{ url_for('static', filename='site.webmanifest') }}" />
+      href="/static/site.webmanifest" />
 
     <style>
       :root {
@@ -334,7 +334,7 @@
       <div class="container">
         <span class="navbar-brand mb-0">
           <img
-            src="{{ url_for('static', filename='Favicon_dinero.png') }}"
+            src="/static/Favicon_dinero.png"
             alt="Wallet Logo"
             class="app-logo" />
           Hola, Miguel
@@ -346,7 +346,7 @@
       <!-- Logo principal centrado -->
       <div class="logo-container">
         <img
-          src="{{ url_for('static', filename='Favicon_dinero.png') }}"
+          src="/static/Favicon_dinero.png"
           alt="Wallet Logo"
           class="main-logo" />
         <h1 class="h4 mb-3">Gestión de Dinero</h1>
@@ -361,7 +361,7 @@
           </div>
           <div class="col-auto">
             <img
-              src="{{ url_for('static', filename='Favicon_dinero.png') }}"
+              src="/static/Favicon_dinero.png"
               alt="Wallet Logo"
               class="balance-logo" />
           </div>
@@ -519,7 +519,7 @@
           {% if gastos|length + ingresos|length == 0 %}
           <div class="no-transactions">
             <img
-              src="{{ url_for('static', filename='Favicon_dinero.png') }}"
+              src="/static/Favicon_dinero.png"
               alt="Wallet Logo"
               width="60"
               height="60"
