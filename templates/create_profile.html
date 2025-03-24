@@ -10,44 +10,253 @@
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet" />
+    <!-- Font Awesome para iconos -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='favicon.png', _external=True) }}?v=2" />
+    <style>
+      /* Colores consistentes con el dashboard */
+      :root {
+        --primary-color: #3a86ff;
+        --success-color: #38b000;
+        --danger-color: #ff595e;
+        --dark-color: #4a9de9;
+        --light-color: #f8f9fa;
+        --wallet-color: #ffe8d6;
+        --coin-color: #ff9e00;
+      }
+
+      body {
+        background-color: #f5f7fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        padding-top: 20px;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .profile-card {
+        background-color: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        width: 100%;
+        max-width: 450px;
+        margin: 0 auto;
+      }
+
+      .profile-header {
+        background: linear-gradient(135deg, var(--dark-color), #56ccf2);
+        padding: 30px 20px;
+        text-align: center;
+        color: white;
+      }
+
+      .app-logo {
+        width: 80px;
+        height: auto;
+        margin-bottom: 15px;
+      }
+
+      .profile-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 10px 0;
+      }
+
+      .profile-body {
+        padding: 30px;
+      }
+
+      .form-control {
+        padding: 12px;
+        font-size: 1rem;
+        border-radius: 10px;
+        border: 1px solid #e0e0e0;
+        transition: all 0.3s;
+      }
+
+      .form-control:focus {
+        box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.25);
+        border-color: var(--primary-color);
+      }
+
+      .input-group-text {
+        background-color: white;
+        border-color: #e0e0e0;
+        cursor: pointer;
+        color: #6c757d;
+        transition: all 0.2s;
+      }
+
+      .input-group-text:hover {
+        color: var(--primary-color);
+      }
+
+      .btn-create {
+        background-color: var(--success-color);
+        border: none;
+        border-radius: 10px;
+        padding: 12px;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s;
+        margin-top: 10px;
+      }
+
+      .btn-create:hover {
+        background-color: #2c9d00;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(56, 176, 0, 0.3);
+      }
+
+      .btn-back {
+        color: #6c757d;
+        text-decoration: none;
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+        transition: all 0.2s;
+      }
+
+      .btn-back:hover {
+        color: var(--dark-color);
+      }
+
+      .form-label {
+        font-weight: 500;
+        color: #495057;
+      }
+
+      .form-text {
+        color: #6c757d;
+        font-size: 0.85rem;
+      }
+    </style>
   </head>
-  <body class="bg-light">
-    <div class="container py-5">
-      <h2 class="text-center mb-4">Crear Nuevo Perfil</h2>
-      <form
-        action="{{ url_for('create_profile') }}"
-        method="post"
-        class="mx-auto"
-        style="max-width: 300px">
-        <div class="mb-3">
-          <input
-            type="text"
-            name="name"
-            class="form-control"
-            placeholder="Nombre del perfil"
-            required />
+  <body>
+    <div class="container py-4">
+      <div class="profile-card">
+        <div class="profile-header">
+          <img
+            src="{{ url_for('static', filename='favicon.png', _external=True) }}"
+            alt="App Logo"
+            class="app-logo" />
+          <h2 class="profile-title">Crear Nuevo Perfil</h2>
+          <p class="mb-0">
+            Completa los datos para comenzar a gestionar tus finanzas
+          </p>
         </div>
-        <div class="mb-3">
-          <input
-            type="password"
-            name="pin"
-            class="form-control"
-            placeholder="PIN de 4 dígitos"
-            maxlength="4"
-            pattern="\d{4}"
-            required />
+
+        <div class="profile-body">
+          {% with messages = get_flashed_messages(with_categories=true) %} {% if
+          messages %} {% for category, message in messages %}
+          <div
+            class="alert alert-{{ category }} mb-4"
+            role="alert">
+            {{ message }}
+          </div>
+          {% endfor %} {% endif %} {% endwith %}
+
+          <form
+            action="{{ url_for('create_profile') }}"
+            method="post">
+            <div class="mb-3">
+              <label
+                for="profileName"
+                class="form-label"
+                >Nombre del perfil</label
+              >
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="fas fa-user"></i>
+                </span>
+                <input
+                  type="text"
+                  id="profileName"
+                  name="name"
+                  class="form-control"
+                  placeholder="Ej: Miguel, Ana, Casa, etc."
+                  required />
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label
+                for="profilePin"
+                class="form-label"
+                >PIN de seguridad</label
+              >
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="fas fa-lock"></i>
+                </span>
+                <input
+                  type="password"
+                  id="profilePin"
+                  name="pin"
+                  class="form-control"
+                  placeholder="••••"
+                  maxlength="4"
+                  pattern="\d{4}"
+                  required />
+                <span
+                  class="input-group-text"
+                  id="togglePin">
+                  <i
+                    class="fa fa-eye-slash"
+                    id="toggleIcon"></i>
+                </span>
+              </div>
+              <div class="form-text">
+                Usa un PIN de 4 dígitos que puedas recordar fácilmente
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              class="btn btn-create w-100">
+              <i class="fas fa-user-plus me-2"></i>Crear Perfil
+            </button>
+          </form>
+
+          <a
+            href="{{ url_for('login') }}"
+            class="btn-back">
+            <i class="fas fa-arrow-left me-1"></i>Volver a la pantalla de
+            perfiles
+          </a>
         </div>
-        <button
-          type="submit"
-          class="btn btn-success w-100">
-          Crear Perfil
-        </button>
-      </form>
-      <div class="text-center mt-3">
-        <a href="{{ url_for('login') }}">Volver a la pantalla de perfiles</a>
       </div>
     </div>
+
     <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Script para mostrar/ocultar PIN -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const togglePin = document.getElementById('togglePin');
+        const pinInput = document.getElementById('profilePin');
+        const toggleIcon = document.getElementById('toggleIcon');
+
+        togglePin.addEventListener('click', function () {
+          if (pinInput.type === 'password') {
+            pinInput.type = 'text';
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+          } else {
+            pinInput.type = 'password';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+          }
+        });
+      });
+    </script>
   </body>
 </html>
