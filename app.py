@@ -85,23 +85,19 @@ def check_session_timeout():
         if 'last_activity' in session:
             now = datetime.utcnow()
             # Convertir el string ISO a objeto datetime
-            # Esto asume que estás usando Python 3.7+ donde fromisoformat está disponible
             try:
-                last = datetime.fromisoformat(session['last_activity'])
-            except:
-                # Compatibilidad con versiones anteriores de Python
                 from dateutil import parser
                 last = parser.parse(session['last_activity'])
                 
-            # Si han pasado más de 15 minutos, cerrar sesión
-            if (now - last).total_seconds() > 15 * 60:
-                session.clear()
-                flash("Tu sesión ha expirado por inactividad.", "info")
+                # Si han pasado más de 15 minutos, cerrar sesión
                 if (now - last).total_seconds() > 15 * 60:
                     session.clear()
                     flash("Tu sesión ha expirado por inactividad.", "info")
                     return redirect(url_for('login'))
-        
+            except Exception as e:
+                # Si hay algún error con el parseo, reiniciar el timestamp
+                print(f"Error al procesar timestamp: {e}")
+                
         # Actualizar el timestamp de última actividad
         session['last_activity'] = datetime.utcnow().isoformat()
 
