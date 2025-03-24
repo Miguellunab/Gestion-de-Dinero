@@ -127,13 +127,19 @@ def dashboard():
     if 'profile_id' not in session:
         return redirect(url_for('login'))
     profile_id = session['profile_id']
+    profile = Profile.query.get(profile_id)
+    if not profile:
+        flash("Perfil no encontrado. Por favor, inicie sesión de nuevo.", "warning")
+        return redirect(url_for('login'))
+    
     # Consulta los gastos e ingresos asociados al perfil actual, ordenados de más recientes a más antiguos.
     gastos = Gasto.query.filter_by(profile_id=profile_id).order_by(Gasto.fecha.desc()).all()
     ingresos = Ingreso.query.filter_by(profile_id=profile_id).order_by(Ingreso.fecha.desc()).all()
     total_ingresos = sum(ingreso.monto for ingreso in ingresos)
     total_gastos = sum(gasto.monto for gasto in gastos)
     balance = total_ingresos - total_gastos
-    return render_template('dashboard.html', balance=balance, gastos=gastos, ingresos=ingresos)
+
+    return render_template('dashboard.html', balance=balance, gastos=gastos, ingresos=ingresos, profile=profile)
 
 # Ruta para agregar un gasto, asociándolo al perfil logueado.
 @app.route('/agregar_gasto', methods=['POST'])
@@ -209,4 +215,3 @@ if __name__ == '__main__':
     # Render inyecta la variable PORT en producción; si no está definida, se usa 5000.
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
-    
