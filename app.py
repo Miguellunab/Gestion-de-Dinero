@@ -12,7 +12,6 @@ app = Flask(__name__)
 # Configura la clave secreta para la seguridad de las sesiones.
 # Se puede establecer mediante una variable de entorno o, si no, se usa 'super-secret-key'.
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'super-secret-key')
-
 # Desactiva el caché para archivos estáticos (útil durante el desarrollo)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
