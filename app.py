@@ -209,3 +209,4 @@ if __name__ == '__main__':
     # Render inyecta la variable PORT en producción; si no está definida, se usa 5000.
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
+    
