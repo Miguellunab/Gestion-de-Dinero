@@ -15,24 +15,18 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-    <!-- Favicon - se usa el archivo Favicon_dinero.png de la carpeta static -->
+    <!-- Favicon - Usando url_for para generar la ruta correctamente -->
     <link
       rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="/static/Favicon_dinero.png" />
+      href="{{ url_for('static', filename='Favicon_dinero.png') }}"
+      type="image/png" />
     <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="/static/Favicon_dinero.png" />
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='Favicon_dinero.png') }}"
+      type="image/png" />
     <link
       rel="apple-touch-icon"
-      sizes="180x180"
-      href="/static/Favicon_dinero.png" />
-    <link
-      rel="manifest"
-      href="/static/site.webmanifest" />
+      href="{{ url_for('static', filename='Favicon_dinero.png') }}" />
 
     <style>
       :root {
@@ -334,7 +328,7 @@
       <div class="container">
         <span class="navbar-brand mb-0">
           <img
-            src="/static/Favicon_dinero.png"
+            src="{{ url_for('static', filename='Favicon_dinero.png') }}"
             alt="Wallet Logo"
             class="app-logo" />
           Hola, Miguel
@@ -346,7 +340,7 @@
       <!-- Logo principal centrado -->
       <div class="logo-container">
         <img
-          src="/static/Favicon_dinero.png"
+          src="{{ url_for('static', filename='Favicon_dinero.png') }}"
           alt="Wallet Logo"
           class="main-logo" />
         <h1 class="h4 mb-3">Gestión de Dinero</h1>
@@ -361,7 +355,7 @@
           </div>
           <div class="col-auto">
             <img
-              src="/static/Favicon_dinero.png"
+              src="{{ url_for('static', filename='Favicon_dinero.png') }}"
               alt="Wallet Logo"
               class="balance-logo" />
           </div>
@@ -519,7 +513,7 @@
           {% if gastos|length + ingresos|length == 0 %}
           <div class="no-transactions">
             <img
-              src="/static/Favicon_dinero.png"
+              src="{{ url_for('static', filename='Favicon_dinero.png') }}"
               alt="Wallet Logo"
               width="60"
               height="60"
