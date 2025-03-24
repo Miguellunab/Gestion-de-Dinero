@@ -387,6 +387,40 @@
           padding: 8px 10px;
         }
       }
+
+      /* Estilos para el botón de ocultar/mostrar balance */
+      .btn-hide-balance {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-left: 12px;
+      }
+
+      .btn-hide-balance:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-1px);
+      }
+
+      .balance-amount {
+        display: flex;
+        align-items: center;
+      }
+
+      .balance-hidden {
+        filter: blur(8px);
+      }
+
+      .balance-hidden:hover {
+        filter: blur(8px);
+      }
     </style>
   </head>
   <body>
@@ -427,8 +461,21 @@
         <div class="row align-items-center">
           <div class="col">
             <h6 class="mb-1 opacity-75">Balance Actual</h6>
-            <h2 class="mb-0">${{ balance|format_money }}</h2>
-            <!-- Muestra el saldo actual -->
+            <div class="d-flex align-items-center balance-amount">
+              <h2
+                class="mb-0"
+                id="balanceAmount">
+                ${{ balance|format_money }}
+              </h2>
+              <button
+                class="btn-hide-balance"
+                id="toggleBalance"
+                title="Mostrar/Ocultar Balance">
+                <i
+                  class="fas fa-eye"
+                  id="balanceIcon"></i>
+              </button>
+            </div>
           </div>
           <div class="col-auto">
             <img
@@ -507,6 +554,7 @@
                     id="monto_ingreso"
                     name="monto"
                     placeholder="10000"
+                    inputmode="numeric"
                     required
                     oninput="formatAsPesos(this)" />
                 </div>
@@ -557,6 +605,7 @@
                     id="monto_gasto"
                     name="monto"
                     placeholder="10000"
+                    inputmode="numeric"
                     required
                     oninput="formatAsPesos(this)" />
                 </div>
@@ -699,6 +748,37 @@
         }).format(parseInt(val));
         input.value = formatted;
       }
+    </script>
+
+    <!-- Script para mostrar/ocultar el balance -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const toggleBalance = document.getElementById('toggleBalance');
+        const balanceAmount = document.getElementById('balanceAmount');
+        const balanceIcon = document.getElementById('balanceIcon');
+
+        // Verificar si el usuario prefiere ocultar el balance (guardado en localStorage)
+        const balanceHidden = localStorage.getItem('balanceHidden') === 'true';
+        if (balanceHidden) {
+          balanceAmount.classList.add('balance-hidden');
+          balanceIcon.classList.remove('fa-eye');
+          balanceIcon.classList.add('fa-eye-slash');
+        }
+
+        toggleBalance.addEventListener('click', function () {
+          balanceAmount.classList.toggle('balance-hidden');
+
+          if (balanceAmount.classList.contains('balance-hidden')) {
+            balanceIcon.classList.remove('fa-eye');
+            balanceIcon.classList.add('fa-eye-slash');
+            localStorage.setItem('balanceHidden', 'true');
+          } else {
+            balanceIcon.classList.remove('fa-eye-slash');
+            balanceIcon.classList.add('fa-eye');
+            localStorage.setItem('balanceHidden', 'false');
+          }
+        });
+      });
     </script>
   </body>
 </html>

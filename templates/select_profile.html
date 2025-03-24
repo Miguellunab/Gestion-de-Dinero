@@ -160,7 +160,7 @@
                 <div class="mb-4">
                   <div class="input-group">
                     <input
-                      type="tel"
+                      type="password"
                       name="pin"
                       id="pinInput"
                       class="form-control pin-input"
@@ -210,12 +210,12 @@
         const toggleIcon = document.getElementById('toggleIcon');
 
         togglePin.addEventListener('click', function () {
-          if (pinInput.type === 'tel') {
+          if (pinInput.type === 'password') {
             pinInput.type = 'text';
             toggleIcon.classList.remove('fa-eye-slash');
             toggleIcon.classList.add('fa-eye');
           } else {
-            pinInput.type = 'tel'; // Cambiado de 'password' a 'tel'
+            pinInput.type = 'password'; // Volvemos a password
             toggleIcon.classList.remove('fa-eye');
             toggleIcon.classList.add('fa-eye-slash');
           }

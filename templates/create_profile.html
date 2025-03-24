@@ -197,7 +197,7 @@
                   <i class="fas fa-lock"></i>
                 </span>
                 <input
-                  type="tel"
+                  type="password"
                   id="profilePin"
                   name="pin"
                   class="form-control"
@@ -247,13 +247,12 @@
         const toggleIcon = document.getElementById('toggleIcon');
 
         togglePin.addEventListener('click', function () {
-          if (pinInput.type === 'tel') {
-            // Cambiado de 'password' a 'tel'
+          if (pinInput.type === 'password') {
             pinInput.type = 'text';
             toggleIcon.classList.remove('fa-eye-slash');
             toggleIcon.classList.add('fa-eye');
           } else {
-            pinInput.type = 'tel'; // Cambiado de 'password' a 'tel'
+            pinInput.type = 'password'; // Cambiado de 'tel' a 'password'
             toggleIcon.classList.remove('fa-eye');
             toggleIcon.classList.add('fa-eye-slash');
           }
