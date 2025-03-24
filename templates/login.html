@@ -14,38 +14,348 @@
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='favicon.png', _external=True) }}?v=2" />
+    <style>
+      /* Colores consistentes con el dashboard */
+      :root {
+        --primary-color: #3a86ff;
+        --success-color: #38b000;
+        --danger-color: #ff595e;
+        --dark-color: #4a9de9;
+        --light-color: #f8f9fa;
+        --wallet-color: #ffe8d6;
+        --coin-color: #ff9e00;
+      }
+
+      body {
+        background-color: #f5f7fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        padding-top: 20px;
+      }
+
+      .login-header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .app-logo {
+        width: 100px;
+        height: auto;
+        margin-bottom: 15px;
+      }
+
+      .profile-card {
+        border-radius: 16px;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s, box-shadow 0.3s;
+        position: relative;
+      }
+
+      .profile-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12);
+      }
+
+      .profile-card .card-body {
+        padding: 25px;
+        min-height: 170px;
+      }
+
+      .profile-name {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #333;
+      }
+
+      .profile-pin {
+        color: #6c757d;
+        font-size: 0.95rem;
+        margin-bottom: 20px;
+      }
+
+      .btn-enter {
+        background-color: var(--dark-color);
+        border: none;
+        border-radius: 50px;
+        padding: 8px 20px;
+        color: white;
+        font-weight: 500;
+        transition: all 0.3s;
+        width: 100%;
+        margin-bottom: 10px;
+      }
+
+      .btn-enter:hover {
+        background-color: #3b7ec3;
+        transform: translateY(-2px);
+      }
+
+      .profile-actions {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        gap: 8px;
+      }
+
+      .btn-profile-action {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        transition: all 0.2s;
+      }
+
+      .btn-edit {
+        background-color: rgba(58, 134, 255, 0.1);
+        color: var(--primary-color);
+      }
+
+      .btn-delete {
+        background-color: rgba(255, 89, 94, 0.1);
+        color: var(--danger-color);
+      }
+
+      .btn-edit:hover {
+        background-color: var(--primary-color);
+        color: white;
+      }
+
+      .btn-delete:hover {
+        background-color: var(--danger-color);
+        color: white;
+      }
+
+      .new-profile-card {
+        background-color: #ffffff;
+        border: 2px dashed #ccd0d5;
+        border-radius: 16px;
+      }
+
+      .new-profile-icon {
+        font-size: 2rem;
+        color: #ccd0d5;
+        margin-bottom: 15px;
+      }
+
+      .btn-create {
+        background-color: white;
+        border: 2px solid var(--dark-color);
+        color: var(--dark-color);
+        border-radius: 50px;
+        padding: 8px 20px;
+        font-weight: 500;
+        transition: all 0.3s;
+      }
+
+      .btn-create:hover {
+        background-color: var(--dark-color);
+        color: white;
+      }
+
+      /* Header con gradiente */
+      .app-header {
+        background: linear-gradient(135deg, var(--dark-color), #56ccf2);
+        color: white;
+        padding: 25px 0;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 16px rgba(74, 157, 233, 0.25);
+      }
+
+      /* Scrollbar personalizada */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: #cccccc;
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: #aaaaaa;
+      }
+    </style>
   </head>
-  <body class="bg-light">
-    <div class="container py-5">
-      <h1 class="text-center mb-4">Selecciona un Perfil</h1>
-      <!-- Mostrar perfiles en forma de tarjetas (cuadrados) -->
-      <div class="row">
+  <body>
+    <div class="container py-4">
+      <!-- Header con logo -->
+      <div class="app-header">
+        <div class="login-header">
+          <img
+            src="{{ url_for('static', filename='favicon.png', _external=True) }}"
+            alt="App Logo"
+            class="app-logo" />
+          <h1>Gestión de Dinero</h1>
+          <p class="text-white-50">Selecciona tu perfil para continuar</p>
+        </div>
+      </div>
+
+      <!-- Perfiles -->
+      <div class="row row-cols-1 row-cols-md-3 g-4">
         {% for profile in profiles %}
-        <div class="col-6 col-md-4 mb-4">
-          <div class="card h-100 text-center">
-            <div class="card-body d-flex flex-column justify-content-center">
-              <h5 class="card-title">{{ profile.name }}</h5>
-              <p class="card-text">PIN: ****</p>
-              <!-- Botón para seleccionar perfil: redirige a la ruta para ingresar el PIN -->
+        <div class="col">
+          <div class="card profile-card h-100">
+            <!-- Botones de acción (editar/borrar) -->
+            <div class="profile-actions">
+              <button
+                class="btn-profile-action btn-edit"
+                data-bs-toggle="modal"
+                data-bs-target="#editModal{{ profile.id }}">
+                <i class="fas fa-pencil-alt"></i>
+              </button>
+              <button
+                class="btn-profile-action btn-delete"
+                data-bs-toggle="modal"
+                data-bs-target="#deleteModal{{ profile.id }}">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
+
+            <div
+              class="card-body text-center d-flex flex-column justify-content-center">
+              <h2 class="profile-name">{{ profile.name }}</h2>
+              <p class="profile-pin">PIN: <span>••••</span></p>
               <a
                 href="{{ url_for('select_profile', profile_id=profile.id) }}"
-                class="btn btn-primary"
-                >Entrar</a
-              >
+                class="btn btn-enter">
+                <i class="fas fa-sign-in-alt me-2"></i>Acceder
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal para editar perfil -->
+        <div
+          class="modal fade"
+          id="editModal{{ profile.id }}"
+          tabindex="-1"
+          aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Editar Perfil</h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"></button>
+              </div>
+              <form
+                action="{{ url_for('edit_profile', profile_id=profile.id) }}"
+                method="post">
+                <div class="modal-body">
+                  <div class="mb-3">
+                    <label
+                      for="name{{ profile.id }}"
+                      class="form-label"
+                      >Nombre</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="name{{ profile.id }}"
+                      name="name"
+                      value="{{ profile.name }}"
+                      required />
+                  </div>
+                  <p class="text-muted small">
+                    Si olvidaste tu PIN, deberás crear un nuevo perfil.
+                  </p>
+                </div>
+                <div class="modal-footer">
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    class="btn btn-primary">
+                    Guardar cambios
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal para confirmar eliminación -->
+        <div
+          class="modal fade"
+          id="deleteModal{{ profile.id }}"
+          tabindex="-1"
+          aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Eliminar Perfil</h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <p>
+                  ¿Estás seguro de que deseas eliminar el perfil
+                  <strong>{{ profile.name }}</strong>?
+                </p>
+                <p class="text-danger fw-bold">
+                  Esta acción eliminará todos los datos asociados al perfil y no
+                  se puede deshacer.
+                </p>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-bs-dismiss="modal">
+                  Cancelar
+                </button>
+                <form
+                  action="{{ url_for('delete_profile', profile_id=profile.id) }}"
+                  method="post">
+                  <button
+                    type="submit"
+                    class="btn btn-danger">
+                    Eliminar
+                  </button>
+                </form>
+              </div>
             </div>
           </div>
         </div>
         {% endfor %}
-        <!-- Tarjeta para crear un nuevo perfil -->
-        <div class="col-6 col-md-4 mb-4">
-          <div class="card h-100 text-center border border-secondary">
-            <div class="card-body d-flex flex-column justify-content-center">
-              <h5 class="card-title">Nuevo Perfil</h5>
+
+        <!-- Tarjeta para crear perfil -->
+        <div class="col">
+          <div class="card profile-card new-profile-card h-100">
+            <div
+              class="card-body text-center d-flex flex-column justify-content-center">
+              <i class="fas fa-plus-circle new-profile-icon"></i>
+              <h2 class="profile-name">Nuevo Perfil</h2>
+              <p class="text-muted mb-4">Crea una nueva cuenta</p>
               <a
                 href="{{ url_for('create_profile') }}"
-                class="btn btn-outline-secondary"
-                >Crear</a
-              >
+                class="btn btn-create">
+                <i class="fas fa-user-plus me-2"></i>Crear
+              </a>
             </div>
           </div>
         </div>

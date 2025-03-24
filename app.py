@@ -119,6 +119,37 @@ def logout():
     session.pop('profile_id', None)  # Elimina el ID del perfil de la sesión
     return redirect(url_for('login'))
 
+# Ruta para editar perfil (solo nombre)
+@app.route('/edit_profile/<int:profile_id>', methods=['POST'])
+def edit_profile(profile_id):
+    profile = Profile.query.get_or_404(profile_id)
+    new_name = request.form.get('name')
+    
+    if new_name and len(new_name) <= 50:  # Validamos que no exceda el límite del campo
+        profile.name = new_name
+        db.session.commit()
+        flash("Perfil actualizado correctamente", "success")
+    else:
+        flash("Nombre inválido. Debe tener entre 1 y 50 caracteres.", "danger")
+    
+    return redirect(url_for('login'))
+
+# Ruta para eliminar perfil
+@app.route('/delete_profile/<int:profile_id>', methods=['POST'])
+def delete_profile(profile_id):
+    profile = Profile.query.get_or_404(profile_id)
+    
+    # Borra los gastos e ingresos asociados
+    Gasto.query.filter_by(profile_id=profile_id).delete()
+    Ingreso.query.filter_by(profile_id=profile_id).delete()
+    
+    # Borra el perfil
+    db.session.delete(profile)
+    db.session.commit()
+    
+    flash("Perfil eliminado correctamente", "success")
+    return redirect(url_for('login'))
+
 # ---------------------- RUTAS DE LA APLICACIÓN (GESTIÓN DE DINERO) ----------------------
 
 # Ruta para el dashboard: muestra la gestión de dinero (balance, ingresos, gastos) para el perfil logueado.
