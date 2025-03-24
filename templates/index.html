@@ -1,24 +1,28 @@
 <!DOCTYPE html>
 <html lang="es">
   <head>
+    <!-- Configuración básica de la página -->
     <meta charset="UTF-8" />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0" />
     <title>Gestión de Dinero</title>
-    <!-- Bootstrap 5 desde CDN -->
+
+    <!-- Carga de librerías externas -->
+    <!-- Bootstrap: para el diseño general y componentes -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet" />
-    <!-- Font Awesome para iconos -->
+    <!-- Font Awesome: para los íconos bonitos (flechas, símbolos, etc) -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-    <!-- Favicon - implementación optimizada para Render -->
+    <!-- Configuración del favicon (icono que aparece en la pestaña del navegador) -->
     <link
       rel="icon"
       href="{{ url_for('static', filename='favicon.png', _external=True) }}?v=2" />
+    <!-- Otras versiones del favicon para compatibilidad con diferentes dispositivos -->
     <link
       rel="shortcut icon"
       href="{{ url_for('static', filename='favicon.png', _external=True) }}?v=2"
@@ -39,31 +43,41 @@
       href="{{ url_for('static', filename='favicon.png', _external=True) }}?v=2" />
 
     <style>
+      /* Colores principales de la aplicación */
       :root {
-        --primary-color: #3a86ff;
-        --success-color: #38b000;
-        --danger-color: #ff595e;
-        --dark-color: #3f0f3f; /* Actualizado para combinar con el logo pixelado */
+        --primary-color: #3a86ff; /* Azul principal */
+        --success-color: #38b000; /* Verde para ingresos */
+        --danger-color: #ff595e; /* Rojo para gastos */
+        --dark-color: #4a9de9; /* Azul para barra superior */
         --light-color: #f8f9fa;
         --wallet-color: #ffe8d6; /* Color que combina con la billetera del logo */
         --coin-color: #ff9e00; /* Color que combina con la moneda del logo */
       }
 
+      /* Estilo general de la página */
       body {
-        background-color: #f5f7fa;
+        background-color: #f5f7fa; /* Fondo gris claro */
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       }
 
+      /* Barra de navegación superior */
       .navbar-brand {
-        font-weight: 700;
+        font-weight: 700; /* Texto en negrita */
         letter-spacing: 0.5px;
         display: flex;
         align-items: center;
+        font-size: 1.4rem; /* Texto "Hola, Miguel" más grande */
       }
 
       .app-logo {
-        height: 40px;
-        margin-right: 10px;
+        height: 50px; /* Logo de navbar más grande */
+        margin-right: 15px;
+      }
+
+      /* Aumentar altura de la navbar */
+      .navbar {
+        padding-top: 12px;
+        padding-bottom: 12px;
       }
 
       .top-card {
@@ -74,12 +88,17 @@
         overflow: hidden;
       }
 
+      /* Tarjetas para mostrar información */
       .balance-card {
-        background: linear-gradient(135deg, var(--dark-color), #6c3483);
-        color: white;
+        background: linear-gradient(
+          135deg,
+          #4a9de9,
+          #56ccf2
+        ); /* Gradiente azul */
+        color: white; /* Texto blanco */
         padding: 20px;
-        border-radius: 15px;
-        box-shadow: 0 8px 16px rgba(63, 15, 63, 0.2);
+        border-radius: 15px; /* Bordes redondeados */
+        box-shadow: 0 8px 16px rgba(74, 157, 233, 0.25);
       }
 
       .action-card {
@@ -100,8 +119,9 @@
         padding: 20px;
       }
 
+      /* Botones de acción */
       .btn-ingreso {
-        background-color: var(--success-color);
+        background-color: var(--success-color); /* Verde para ingresos */
         border: none;
         border-radius: 10px;
         padding: 10px;
@@ -111,7 +131,7 @@
       }
 
       .btn-gasto {
-        background-color: var(--danger-color);
+        background-color: var(--danger-color); /* Rojo para gastos */
         border: none;
         border-radius: 10px;
         padding: 10px;
@@ -162,9 +182,10 @@
         font-weight: 600;
       }
 
+      /* Listado de transacciones */
       .transaction-item {
-        padding: 15px 20px;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 15px 20px; /* Espacio interno */
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* Línea separadora */
         display: flex;
         align-items: center;
       }
@@ -315,9 +336,9 @@
       }
 
       .main-logo {
-        width: 80px;
-        height: 80px;
-        margin-bottom: 10px;
+        width: 130px; /* Aumentado de 100px */
+        height: auto; /* Cambiado de 10px para mantener proporción */
+        margin-bottom: 15px; /* Aumentado de 10px */
       }
 
       /* Paleta de colores actualizada basada en el logo pixelado */
@@ -331,7 +352,7 @@
     </style>
   </head>
   <body>
-    <!-- Navbar -->
+    <!-- Barra superior azul -->
     <nav
       class="navbar navbar-dark"
       style="background-color: var(--dark-color)">
@@ -342,12 +363,13 @@
             alt="Wallet Logo"
             class="app-logo" />
           Hola, Miguel
+          <!-- Saludo personalizado -->
         </span>
       </div>
     </nav>
 
     <div class="container py-4">
-      <!-- Logo principal centrado -->
+      <!-- Logo principal en el centro -->
       <div class="logo-container">
         <img
           src="{{ url_for('static', filename='favicon.png', _external=True) }}"
@@ -356,12 +378,13 @@
         <h1 class="h4 mb-3">Gestión de Dinero</h1>
       </div>
 
-      <!-- Balance Card -->
+      <!-- Tarjeta que muestra el balance actual -->
       <div class="balance-card mb-4">
         <div class="row align-items-center">
           <div class="col">
             <h6 class="mb-1 opacity-75">Balance Actual</h6>
             <h2 class="mb-0">${{ balance|format_money }}</h2>
+            <!-- Muestra el saldo actual -->
           </div>
           <div class="col-auto">
             <img
@@ -372,12 +395,13 @@
         </div>
       </div>
 
-      <!-- Tabs for actions -->
+      <!-- Pestañas para elegir entre Ingreso y Gasto -->
       <div class="mb-4">
         <ul
           class="nav nav-tabs"
           id="actionTabs"
           role="tablist">
+          <!-- Pestaña de Ingreso -->
           <li
             class="nav-item"
             role="presentation">
@@ -390,8 +414,10 @@
               role="tab"
               aria-selected="true">
               <i class="fas fa-plus-circle text-success me-2"></i>Ingreso
+              <!-- Icono + -->
             </button>
           </li>
+          <!-- Pestaña de Gasto -->
           <li
             class="nav-item"
             role="presentation">
@@ -404,14 +430,16 @@
               role="tab"
               aria-selected="false">
               <i class="fas fa-minus-circle text-danger me-2"></i>Gasto
+              <!-- Icono - -->
             </button>
           </li>
         </ul>
 
+        <!-- Contenido de las pestañas -->
         <div
           class="tab-content bg-white p-3 rounded-bottom shadow-sm"
           id="actionTabsContent">
-          <!-- Ingreso Tab -->
+          <!-- Formulario para agregar ingresos -->
           <div
             class="tab-pane fade show active"
             id="ingreso"
@@ -420,6 +448,7 @@
             <form
               action="{{ url_for('agregar_ingreso') }}"
               method="post">
+              <!-- Campo para el monto -->
               <div class="mb-3">
                 <label
                   for="monto_ingreso"
@@ -438,6 +467,7 @@
                     oninput="formatAsPesos(this)" />
                 </div>
               </div>
+              <!-- Campo para la descripción -->
               <div class="mb-3">
                 <label
                   for="descripcion_ingreso"
@@ -451,6 +481,7 @@
                   name="descripcion"
                   placeholder="Salario, venta, etc." />
               </div>
+              <!-- Botón para agregar -->
               <button
                 type="submit"
                 class="btn btn-ingreso w-100">
@@ -459,7 +490,7 @@
             </form>
           </div>
 
-          <!-- Gasto Tab -->
+          <!-- Formulario para agregar gastos (similar al de ingresos) -->
           <div
             class="tab-pane fade"
             id="gasto"
@@ -509,7 +540,7 @@
         </div>
       </div>
 
-      <!-- Transactions -->
+      <!-- Lista de movimientos recientes -->
       <div class="transactions-card">
         <div
           class="transactions-header d-flex justify-content-between align-items-center">
@@ -520,19 +551,24 @@
         </div>
 
         <div class="transactions-body">
+          <!-- Si no hay movimientos, muestra mensaje -->
           {% if gastos|length + ingresos|length == 0 %}
           <div class="no-transactions">
             <img
-              src="{{ url_for('static', filename='favicon.png', _external=True) }}"
+              src="..."
               alt="Wallet Logo"
               width="60"
               height="60"
               class="mb-3 opacity-50" />
             <p>No hay movimientos registrados</p>
           </div>
-          {% else %} {% set combined = (gastos +
-          ingresos)|sort(attribute='fecha', reverse=true) %} {% for item in
-          combined %} {% if item in gastos %}
+          {% else %}
+          <!-- Si hay movimientos, los muestra ordenados por fecha -->
+          {% set combined = (gastos + ingresos)|sort(attribute='fecha',
+          reverse=true) %} {% for item in combined %}
+
+          <!-- Si es un gasto, formato rojo con flecha hacia abajo -->
+          {% if item in gastos %}
           <div class="transaction-item">
             <div class="transaction-icon gasto-icon">
               <i class="fas fa-arrow-down"></i>
@@ -545,10 +581,12 @@
                 {{ item.descripcion or "Sin descripción" }}
               </div>
             </div>
+            <!-- Fecha del movimiento -->
             <div class="transaction-date">
               {{ item.fecha.strftime('%d/%m/%Y') }}<br />
               {{ item.fecha.strftime('%H:%M') }}
             </div>
+            <!-- Botón para eliminar el movimiento -->
             <div class="transaction-actions">
               <form
                 action="{{ url_for('deshacer_movimiento', tipo='gasto', mov_id=item.id) }}"
@@ -562,6 +600,8 @@
               </form>
             </div>
           </div>
+
+          <!-- Si es un ingreso, formato verde con flecha hacia arriba -->
           {% else %}
           <div class="transaction-item">
             <div class="transaction-icon ingreso-icon">
@@ -597,10 +637,10 @@
       </div>
     </div>
 
-    <!-- Bootstrap Bundle JS -->
+    <!-- Carga de JavaScript de Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Script para formatear el input en tiempo real -->
+    <!-- Función para dar formato a los números mientras se escriben -->
     <script>
       function formatAsPesos(input) {
         // Eliminar todo lo que no sea dígito
@@ -609,7 +649,7 @@
           input.value = '';
           return;
         }
-        // Formatear el número según la configuración de Colombia (sin decimales)
+        // Formatear el número con separadores de miles (ej: 10.000)
         let formatted = new Intl.NumberFormat('es-CO', {
           maximumFractionDigits: 0,
         }).format(parseInt(val));
