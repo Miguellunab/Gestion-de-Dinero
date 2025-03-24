@@ -114,7 +114,26 @@ def logout():
     session.pop('profile_id', None)
     return redirect(url_for('login'))
 
-# ---------------------- RUTAS DE LA APLICACIÓN (GESTI\u00d3N DE DINERO) ----------------------
+# ---------------------- RUTAS DE LA APLICACIÓN (GESTIÓN DE DINERO) ----------------------
+
+# Ruta principal: muestra la página de inicio
+@app.route('/')
+def index():
+    # Si no hay perfil en sesión, redirige a la pantalla de login
+    if 'profile_id' not in session:
+        return redirect(url_for('login'))
+    
+    profile_id = session['profile_id']
+    # Consulta los ingresos y gastos del perfil actual
+    gastos = Gasto.query.filter_by(profile_id=profile_id).order_by(Gasto.fecha.desc()).all()
+    ingresos = Ingreso.query.filter_by(profile_id=profile_id).order_by(Ingreso.fecha.desc()).all()
+    
+    # Calcula el balance
+    total_ingresos = sum(ingreso.monto for ingreso in ingresos)
+    total_gastos = sum(gasto.monto for gasto in gastos)
+    balance = total_ingresos - total_gastos
+    
+    return render_template('index.html', balance=balance, gastos=gastos, ingresos=ingresos)
 
 # Dashboard: muestra la gestion de dinero para el perfil logueado
 @app.route('/dashboard')
@@ -189,7 +208,7 @@ def deshacer_movimiento(tipo, mov_id):
     db.session.commit()
     return redirect(url_for('dashboard'))
 
-# ---------------------- ARRANQUE DE LA APLICACI\u00d3N ----------------------
+# ---------------------- ARRANQUE DE LA APLICACIÓN ----------------------
 if __name__ == '__main__':
     # Render inyecta la variable PORT, si no se define se usa 5000
     port = int(os.environ.get('PORT', 5000))
