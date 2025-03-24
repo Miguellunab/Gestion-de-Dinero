@@ -1,111 +1,170 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for  # Importa funciones básicas de Flask
-from flask_sqlalchemy import SQLAlchemy  # Importa SQLAlchemy para manejar la base de datos
-from flask_migrate import Migrate  # Importa Flask-Migrate para gestionar migraciones (cambios en la base de datos)
-from datetime import datetime  # Importa datetime para trabajar con fechas
+from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from datetime import datetime
 
-# Crea la aplicación Flask
 app = Flask(__name__)
 
-# Configuración de la clave secreta de la app.
-# Esto se usa para seguridad (por ejemplo, para firmar cookies). Se puede obtener de una variable de entorno o usar un valor por defecto.
+# Clave secreta para seguridad (para sesiones, etc.)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'super-secret-key')
 
-# Desactiva el caché para archivos estáticos (útil en desarrollo para ver cambios inmediatamente)
+# Desactivar caché para archivos estáticos (útil en desarrollo)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
-# Configuración de la conexión a la base de datos.
-# Si existe la variable DATABASE_URL (en producción, Render la define), se usará esa.
-# Si no, se usará la URL externa que se pasó, conectándose a PostgreSQL.
+# Configuración de la base de datos: si existe DATABASE_URL (Render) se usa esa,
+# de lo contrario, se usa el External Database URL.
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     'DATABASE_URL',
     'postgresql://gestiondinero_user:sbZYaGViuEdnEOoVl3OuvJgqBaJPOHym@dpg-cvg6fgdumphs73dem04g-a.oregon-postgres.render.com/gestiondinero'
 )
-# Evita que SQLAlchemy rastree cambios de forma innecesaria (ahorra memoria)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Inicializa la base de datos (SQLAlchemy) y el sistema de migraciones (Flask-Migrate)
+# Inicializar la base de datos y el sistema de migraciones
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-# Define un filtro personalizado para formatear números en formato de dinero.
-# Este filtro recibe un número y lo formatea con dos decimales y separadores de miles.
-def format_money(value):
-    # Primero formatea el número, por ejemplo, 10000 se convierte en "10,000.00"
-    s = "{:,.2f}".format(value)
-    # Luego, intercambia las comas y puntos para obtener el formato español: "10.000,00"
-    s = s.replace(",", "X").replace(".", ",").replace("X", ".")
-    return s
+# ---------------------- MODELOS ----------------------
 
-# Registra el filtro en el entorno de Jinja (el motor de plantillas de Flask)
-app.jinja_env.filters['format_money'] = format_money
+# Modelo para los perfiles (cada usuario tendrá un perfil con nombre y un pin de 4 dígitos)
+class Profile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)  # Nombre del perfil
+    pin = db.Column(db.String(4), nullable=False)  # Pin de 4 dígitos (en texto)
+    # Relaciones: cada perfil tiene sus ingresos y gastos
+    ingresos = db.relationship('Ingreso', backref='profile', lazy=True)
+    gastos = db.relationship('Gasto', backref='profile', lazy=True)
 
-# --- Definición de modelos (las tablas de la base de datos) ---
-
-# Modelo para los gastos. Cada gasto tiene un ID, un monto (entero), una descripción (opcional) y una fecha (por defecto la fecha actual).
+# Modelo para un gasto
 class Gasto(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    monto = db.Column(db.Integer, nullable=False)  # Se almacena como entero (sin decimales)
+    monto = db.Column(db.Integer, nullable=False)  # Se almacena como entero
     descripcion = db.Column(db.String(200), nullable=True)
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
+    profile_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)  # Relación con Profile
 
-# Modelo para los ingresos. Funciona de manera similar al de gastos.
+# Modelo para un ingreso
 class Ingreso(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     monto = db.Column(db.Integer, nullable=False)  # Se almacena como entero
     descripcion = db.Column(db.String(200), nullable=True)
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
+    profile_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)  # Relación con Profile
 
-# --- Rutas de la aplicación ---
+# ---------------------- FILTRO PERSONALIZADO ----------------------
 
-# Ruta principal ("/"): muestra el balance y la lista de movimientos (gastos e ingresos)
-@app.route('/')
-def index():
-    # Consulta todos los gastos e ingresos, ordenados de más recientes a más antiguos.
-    gastos = Gasto.query.order_by(Gasto.fecha.desc()).all()
-    ingresos = Ingreso.query.order_by(Ingreso.fecha.desc()).all()
-    # Suma todos los montos de ingresos y gastos respectivamente.
+def format_money(value):
+    # Formatea el número (ej: 10000 -> "10.000,00")
+    s = "{:,.2f}".format(value)
+    s = s.replace(",", "X").replace(".", ",").replace("X", ".")
+    return s
+
+app.jinja_env.filters['format_money'] = format_money
+
+# ---------------------- RUTAS DE PERFILES Y AUTENTICACIÓN ----------------------
+
+# Pantalla de login: muestra los perfiles existentes y opción de crear nuevo perfil.
+@app.route('/login')
+def login():
+    # Si ya hay un perfil en sesión, redirige al dashboard
+    if 'profile_id' in session:
+        return redirect(url_for('dashboard'))
+    # Consulta todos los perfiles para mostrarlos
+    profiles = Profile.query.all()
+    return render_template('login.html', profiles=profiles)
+
+# Ruta para seleccionar un perfil y pedir el PIN.
+@app.route('/select_profile/<int:profile_id>', methods=['GET', 'POST'])
+def select_profile(profile_id):
+    profile = Profile.query.get_or_404(profile_id)
+    if request.method == 'POST':
+        # Obtiene el PIN ingresado en el formulario
+        pin_input = request.form.get('pin')
+        if pin_input == profile.pin:
+            # Si el PIN es correcto, guarda el id del perfil en la sesión
+            session['profile_id'] = profile.id
+            return redirect(url_for('dashboard'))
+        else:
+            flash("PIN incorrecto. Inténtalo de nuevo.", "danger")
+            return redirect(url_for('select_profile', profile_id=profile_id))
+    # Renderiza un formulario para ingresar el PIN para el perfil seleccionado
+    return render_template('select_profile.html', profile=profile)
+
+# Ruta para crear un nuevo perfil
+@app.route('/create_profile', methods=['GET', 'POST'])
+def create_profile():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        pin = request.form.get('pin')
+        # Validar que el pin tenga 4 dígitos y que el nombre no esté vacío
+        if not name or not pin or len(pin) != 4 or not pin.isdigit():
+            flash("Por favor, ingresa un nombre y un PIN de 4 dígitos.", "warning")
+            return redirect(url_for('create_profile'))
+        # Crear el perfil y guardarlo en la base de datos
+        new_profile = Profile(name=name, pin=pin)
+        db.session.add(new_profile)
+        db.session.commit()
+        flash("Perfil creado exitosamente.", "success")
+        return redirect(url_for('login'))
+    return render_template('create_profile.html')
+
+# Ruta para cerrar sesión (salir del perfil actual)
+@app.route('/logout')
+def logout():
+    session.pop('profile_id', None)
+    return redirect(url_for('login'))
+
+# ---------------------- RUTAS DE LA APLICACIÓN (GESTI\u00d3N DE DINERO) ----------------------
+
+# Dashboard: muestra la gestion de dinero para el perfil logueado
+@app.route('/dashboard')
+def dashboard():
+    # Si no hay perfil en sesión, redirige a la pantalla de login
+    if 'profile_id' not in session:
+        return redirect(url_for('login'))
+    profile_id = session['profile_id']
+    # Consulta los ingresos y gastos del perfil actual, ordenados por fecha descendente
+    gastos = Gasto.query.filter_by(profile_id=profile_id).order_by(Gasto.fecha.desc()).all()
+    ingresos = Ingreso.query.filter_by(profile_id=profile_id).order_by(Ingreso.fecha.desc()).all()
     total_ingresos = sum(ingreso.monto for ingreso in ingresos)
     total_gastos = sum(gasto.monto for gasto in gastos)
-    # Calcula el balance restando los gastos de los ingresos.
     balance = total_ingresos - total_gastos
-    # Renderiza la plantilla 'index.html', pasando las variables balance, gastos e ingresos.
-    return render_template('index.html', balance=balance, gastos=gastos, ingresos=ingresos)
+    return render_template('dashboard.html', balance=balance, gastos=gastos, ingresos=ingresos)
 
-# Ruta para agregar un gasto. Se activa al enviar el formulario con método POST.
+# Ruta para agregar un gasto, asociándolo al perfil logueado
 @app.route('/agregar_gasto', methods=['POST'])
 def agregar_gasto():
-    # Obtiene los valores del formulario
+    if 'profile_id' not in session:
+        return redirect(url_for('login'))
     monto = request.form.get('monto')
     descripcion = request.form.get('descripcion')
+    profile_id = session['profile_id']
     if monto:
         try:
-            # Limpia el valor del monto eliminando puntos y comas para que solo queden dígitos
+            # Limpia el valor: quita puntos y comas para obtener solo dígitos
             monto_clean = monto.replace(".", "").replace(",", "")
-            # Crea una nueva instancia del modelo Gasto, convirtiendo el monto a entero.
-            nuevo_gasto = Gasto(monto=int(monto_clean), descripcion=descripcion)
-            # Agrega el nuevo gasto a la sesión de la base de datos y la guarda
+            nuevo_gasto = Gasto(monto=int(monto_clean), descripcion=descripcion, profile_id=profile_id)
             db.session.add(nuevo_gasto)
             db.session.commit()
         except Exception as e:
-            # Si ocurre un error, revierte la sesión y muestra el error por consola
             db.session.rollback()
             print("Error al agregar gasto:", e)
     else:
-        # Imprime mensaje en consola si el campo monto está vacío
         print("El campo monto es obligatorio.")
-    # Redirige al usuario a la página principal
-    return redirect(url_for('index'))
+    return redirect(url_for('dashboard'))
 
-# Ruta para agregar un ingreso, similar a la de gasto.
+# Ruta para agregar un ingreso, asociándolo al perfil logueado
 @app.route('/agregar_ingreso', methods=['POST'])
 def agregar_ingreso():
+    if 'profile_id' not in session:
+        return redirect(url_for('login'))
     monto = request.form.get('monto')
     descripcion = request.form.get('descripcion')
+    profile_id = session['profile_id']
     if monto:
         try:
             monto_clean = monto.replace(".", "").replace(",", "")
-            nuevo_ingreso = Ingreso(monto=int(monto_clean), descripcion=descripcion)
+            nuevo_ingreso = Ingreso(monto=int(monto_clean), descripcion=descripcion, profile_id=profile_id)
             db.session.add(nuevo_ingreso)
             db.session.commit()
         except Exception as e:
@@ -113,26 +172,25 @@ def agregar_ingreso():
             print("Error al agregar ingreso:", e)
     else:
         print("El campo monto es obligatorio.")
-    return redirect(url_for('index'))
+    return redirect(url_for('dashboard'))
 
-# Ruta para deshacer (eliminar) un movimiento.
-# Recibe dos parámetros: tipo (gasto o ingreso) y mov_id (ID del registro a eliminar).
+# Ruta para deshacer (eliminar) un movimiento (gasto o ingreso) del perfil actual
 @app.route('/deshacer/<tipo>/<int:mov_id>', methods=['POST'])
 def deshacer_movimiento(tipo, mov_id):
+    if 'profile_id' not in session:
+        return redirect(url_for('login'))
     if tipo == 'gasto':
-        mov = Gasto.query.get_or_404(mov_id)  # Busca el gasto por ID o devuelve 404 si no existe.
+        mov = Gasto.query.filter_by(id=mov_id, profile_id=session['profile_id']).first_or_404()
     elif tipo == 'ingreso':
-        mov = Ingreso.query.get_or_404(mov_id)  # Lo mismo para ingreso.
+        mov = Ingreso.query.filter_by(id=mov_id, profile_id=session['profile_id']).first_or_404()
     else:
-        # Si el tipo no es válido, redirige a la página principal sin hacer nada.
-        return redirect(url_for('index'))
-    # Elimina el registro y guarda el cambio en la base de datos.
+        return redirect(url_for('dashboard'))
     db.session.delete(mov)
     db.session.commit()
-    return redirect(url_for('index'))
+    return redirect(url_for('dashboard'))
 
-# Arranque de la aplicación.
-# Render inyecta la variable de entorno PORT en producción, y en caso de no existir, se usa el puerto 5000.
+# ---------------------- ARRANQUE DE LA APLICACI\u00d3N ----------------------
 if __name__ == '__main__':
+    # Render inyecta la variable PORT, si no se define se usa 5000
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)

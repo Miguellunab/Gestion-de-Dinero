@@ -5,150 +5,54 @@
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0" />
-    <title>Iniciar Sesión</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background: #f0f2f5;
-        margin: 0;
-        padding: 1rem;
-      }
-      .container {
-        max-width: 400px;
-        margin: 0 auto;
-        background: #fff;
-        padding: 2rem;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      }
-      h1 {
-        text-align: center;
-        color: #333;
-      }
-      label {
-        display: block;
-        margin-top: 1rem;
-        color: #555;
-      }
-      input[type='text'],
-      input[type='password'] {
-        width: 100%;
-        padding: 0.5rem;
-        margin-top: 0.5rem;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-      }
-      .checkbox-container {
-        display: flex;
-        align-items: center;
-        margin-top: 1rem;
-      }
-      .checkbox-container input[type='checkbox'] {
-        margin: 0;
-        margin-right: 0.5rem;
-        transform: scale(1.2); /* Para hacerlo más grande y bonito */
-        cursor: pointer;
-      }
-      .btn {
-        margin-top: 1rem;
-        background: #4caf50;
-        color: #fff;
-        border: none;
-        padding: 0.75rem;
-        width: 100%;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 1rem;
-      }
-      .btn:hover {
-        background: #45a049;
-      }
-      .link {
-        text-align: center;
-        margin-top: 1rem;
-      }
-      .link a {
-        color: #007bff;
-        text-decoration: none;
-      }
-      /* Estilos para mensajes flash */
-      .flash {
-        margin-top: 1rem;
-        padding: 0.75rem;
-        border-radius: 5px;
-      }
-      .flash-danger {
-        background: #f8d7da;
-        color: #721c24;
-      }
-      .flash-success {
-        background: #d4edda;
-        color: #155724;
-      }
-      .flash-warning {
-        background: #fff3cd;
-        color: #856404;
-      }
-      .flash-info {
-        background: #cce5ff;
-        color: #004085;
-      }
-    </style>
+    <title>Login - Gestión de Dinero</title>
+    <!-- Bootstrap 5 CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet" />
+    <!-- Font Awesome para iconos -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   </head>
-  <body>
-    <div class="container">
-      <h1>Iniciar Sesión</h1>
-
-      <!-- Sección de mensajes flash con filtro para NO repetir el mismo texto -->
-      {% with messages = get_flashed_messages(with_categories=true) %} {% if
-      messages %} {% set used_messages = [] %} {% for category, message in
-      messages %} {% if message not in used_messages %}
-      <div class="flash flash-{{ category }}">{{ message }}</div>
-      {% set used_messages = used_messages + [message] %} {% endif %} {% endfor
-      %} {% endif %} {% endwith %}
-
-      <form
-        action="{{ url_for('login') }}"
-        method="post">
-        <label for="username">Usuario:</label>
-        <input
-          type="text"
-          id="username"
-          name="username"
-          required />
-
-        <label for="password">Contraseña:</label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          required />
-
-        <div class="checkbox-container">
-          <input
-            type="checkbox"
-            id="remember"
-            name="remember"
-            value="1" />
-          <label
-            for="remember"
-            style="margin: 0"
-            >Mantener sesión iniciada</label
-          >
+  <body class="bg-light">
+    <div class="container py-5">
+      <h1 class="text-center mb-4">Selecciona un Perfil</h1>
+      <!-- Mostrar perfiles en forma de tarjetas (cuadrados) -->
+      <div class="row">
+        {% for profile in profiles %}
+        <div class="col-6 col-md-4 mb-4">
+          <div class="card h-100 text-center">
+            <div class="card-body d-flex flex-column justify-content-center">
+              <h5 class="card-title">{{ profile.name }}</h5>
+              <p class="card-text">PIN: ****</p>
+              <!-- Botón para seleccionar perfil: redirige a la ruta para ingresar el PIN -->
+              <a
+                href="{{ url_for('select_profile', profile_id=profile.id) }}"
+                class="btn btn-primary"
+                >Entrar</a
+              >
+            </div>
+          </div>
         </div>
-
-        <button
-          class="btn"
-          type="submit">
-          Entrar
-        </button>
-      </form>
-
-      <div class="link">
-        <p>
-          ¿No tienes cuenta? <a href="{{ url_for('register') }}">Regístrate</a>
-        </p>
+        {% endfor %}
+        <!-- Tarjeta para crear un nuevo perfil -->
+        <div class="col-6 col-md-4 mb-4">
+          <div class="card h-100 text-center border border-secondary">
+            <div class="card-body d-flex flex-column justify-content-center">
+              <h5 class="card-title">Nuevo Perfil</h5>
+              <a
+                href="{{ url_for('create_profile') }}"
+                class="btn btn-outline-secondary"
+                >Crear</a
+              >
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
