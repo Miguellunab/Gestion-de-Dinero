@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
+from datetime import timedelta
 
 # ---------------------- CONFIGURACIÓN INICIAL ----------------------
 
@@ -12,6 +13,8 @@ app = Flask(__name__)
 # Configura la clave secreta para la seguridad de las sesiones.
 # Se puede establecer mediante una variable de entorno o, si no, se usa 'super-secret-key'.
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'super-secret-key')
+# Configura la duración máxima de la sesión (15 minutos)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=15)
 # Desactiva el caché para archivos estáticos (útil durante el desarrollo)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
@@ -70,6 +73,38 @@ class Ingreso(db.Model):
 
 # ---------------------- RUTAS DE AUTENTICACIÓ(N) Y PERFILES ----------------------
 
+# Añadir este decorador antes de las rutas
+@app.before_request
+def check_session_timeout():
+    """Verifica si la sesión del usuario ha expirado por inactividad"""
+    if 'profile_id' in session:
+        # Asegura que la sesión sea permanente para que respete el límite de tiempo
+        session.permanent = True
+        
+        # Si hay una última actividad registrada, verificar el tiempo
+        if 'last_activity' in session:
+            now = datetime.utcnow()
+            # Convertir el string ISO a objeto datetime
+            # Esto asume que estás usando Python 3.7+ donde fromisoformat está disponible
+            try:
+                last = datetime.fromisoformat(session['last_activity'])
+            except:
+                # Compatibilidad con versiones anteriores de Python
+                from dateutil import parser
+                last = parser.parse(session['last_activity'])
+                
+            # Si han pasado más de 15 minutos, cerrar sesión
+            if (now - last).total_seconds() > 15 * 60:
+                session.clear()
+                flash("Tu sesión ha expirado por inactividad.", "info")
+                if (now - last).total_seconds() > 15 * 60:
+                    session.clear()
+                    flash("Tu sesión ha expirado por inactividad.", "info")
+                    return redirect(url_for('login'))
+        
+        # Actualizar el timestamp de última actividad
+        session['last_activity'] = datetime.utcnow().isoformat()
+
 # Ruta para la pantalla de login.
 # Muestra todos los perfiles (al estilo Netflix) y una opción para crear uno nuevo.
 @app.route('/login')
@@ -88,7 +123,9 @@ def select_profile(profile_id):
     if request.method == 'POST':
         pin_input = request.form.get('pin')
         if pin_input == profile.pin:
+            session.permanent = True  # Hace la sesión permanente
             session['profile_id'] = profile.id  # Guarda el ID del perfil en la sesión
+            session['last_activity'] = datetime.utcnow().isoformat()  # Registra tiempo inicial
             return redirect(url_for('dashboard'))
         else:
             flash("PIN incorrecto. Inténtalo de nuevo.", "danger")
