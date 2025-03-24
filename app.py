@@ -119,7 +119,7 @@ def logout():
     session.pop('profile_id', None)  # Elimina el ID del perfil de la sesión
     return redirect(url_for('login'))
 
-# ---------------------- RUTAS DE LA APLICACI\u00d3N (GESTI\u00d3N DE DINERO) ----------------------
+# ---------------------- RUTAS DE LA APLICACIÓN (GESTIÓN DE DINERO) ----------------------
 
 # Ruta para el dashboard: muestra la gestión de dinero (balance, ingresos, gastos) para el perfil logueado.
 @app.route('/dashboard')
@@ -195,25 +195,16 @@ def deshacer_movimiento(tipo, mov_id):
     return redirect(url_for('dashboard'))
 
 # ---------------------- RUTA "INDEX" ORIGINAL ----------------------
-# Esta ruta "index" muestra un resumen de todos los movimientos (sin filtrar por perfil)
-# Se puede usar para pruebas o para un resumen general si no se ha seleccionado un perfil.
+# Modificada para redirigir a la pantalla de login si no hay un perfil en sesión,
+# o al dashboard si ya se ha seleccionado uno.
 @app.route('/')
 def index():
-    # Consulta todos los gastos, ordenados de más recientes a más antiguos.
-    gastos = Gasto.query.order_by(Gasto.fecha.desc()).all()
-    # Consulta todos los ingresos, ordenados de más recientes a más antiguos.
-    ingresos = Ingreso.query.order_by(Ingreso.fecha.desc()).all()
-    # Suma todos los montos de ingresos.
-    total_ingresos = sum(ingreso.monto for ingreso in ingresos)
-    # Suma todos los montos de gastos.
-    total_gastos = sum(gasto.monto for gasto in gastos)
-    # Calcula el balance restando gastos de ingresos.
-    balance = total_ingresos - total_gastos
+    if 'profile_id' in session:
+        return redirect(url_for('dashboard'))
+    else:
+        return redirect(url_for('login'))
 
-    # Renderiza la plantilla index.html pasando los valores calculados.
-    return render_template('index.html', balance=balance, gastos=gastos, ingresos=ingresos)
-
-# ---------------------- ARRANQUE DE LA APLICACI\u00d3N ----------------------
+# ---------------------- ARRANQUE DE LA APLICACIÓN ----------------------
 if __name__ == '__main__':
     # Render inyecta la variable PORT en producción; si no está definida, se usa 5000.
     port = int(os.environ.get('PORT', 5000))
