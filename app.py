@@ -9,6 +9,9 @@ app = Flask(__name__)
 # Configuración de la SECRET_KEY (puedes configurarla desde una variable de entorno)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'super-secret-key')
 
+# Añade esta línea después de crear la app
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # Desactiva el caché para archivos estáticos
+
 # Configuración de la base de datos: utiliza DATABASE_URL si está definida; de lo contrario, usa el External Database URL.
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     'DATABASE_URL',

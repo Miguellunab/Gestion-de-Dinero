@@ -15,37 +15,28 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-    <!-- Favicon - Usando url_for para generar la ruta correctamente -->
+    <!-- Favicon - implementación optimizada para Render -->
     <link
       rel="icon"
-      href="{{ url_for('static', filename='Favicon_dinero.png') }}"
-      type="image/png" />
+      href="{{ url_for('static', filename='favicon.png', _external=True) }}?v=2" />
     <link
       rel="shortcut icon"
-      href="{{ url_for('static', filename='Favicon_dinero.png') }}"
-      type="image/png" />
-    <link
-      rel="apple-touch-icon"
-      href="{{ url_for('static', filename='Favicon_dinero.png') }}" />
-    <!-- Favicon con tamaños específicos -->
-    <link
-      rel="icon"
-      href="{{ url_for('static', filename='Favicon_dinero.png') }}"
-      sizes="32x32"
+      href="{{ url_for('static', filename='favicon.png', _external=True) }}?v=2"
       type="image/png" />
     <link
       rel="icon"
-      href="{{ url_for('static', filename='Favicon_dinero.png') }}"
+      type="image/png"
       sizes="16x16"
-      type="image/png" />
+      href="{{ url_for('static', filename='favicon.png', _external=True) }}?v=2" />
     <link
-      rel="shortcut icon"
-      href="{{ url_for('static', filename='Favicon_dinero.png') }}"
-      type="image/png" />
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="{{ url_for('static', filename='favicon.png', _external=True) }}?v=2" />
     <link
       rel="apple-touch-icon"
-      href="{{ url_for('static', filename='Favicon_dinero.png') }}"
-      sizes="180x180" />
+      sizes="180x180"
+      href="{{ url_for('static', filename='favicon.png', _external=True) }}?v=2" />
 
     <style>
       :root {
@@ -347,7 +338,7 @@
       <div class="container">
         <span class="navbar-brand mb-0">
           <img
-            src="{{ url_for('static', filename='Favicon_dinero.png') }}"
+            src="{{ url_for('static', filename='favicon.png', _external=True) }}"
             alt="Wallet Logo"
             class="app-logo" />
           Hola, Miguel
@@ -359,7 +350,7 @@
       <!-- Logo principal centrado -->
       <div class="logo-container">
         <img
-          src="{{ url_for('static', filename='Favicon_dinero.png') }}"
+          src="{{ url_for('static', filename='favicon.png', _external=True) }}"
           alt="Wallet Logo"
           class="main-logo" />
         <h1 class="h4 mb-3">Gestión de Dinero</h1>
@@ -374,7 +365,7 @@
           </div>
           <div class="col-auto">
             <img
-              src="{{ url_for('static', filename='Favicon_dinero.png') }}"
+              src="{{ url_for('static', filename='favicon.png', _external=True) }}"
               alt="Wallet Logo"
               class="balance-logo" />
           </div>
@@ -532,7 +523,7 @@
           {% if gastos|length + ingresos|length == 0 %}
           <div class="no-transactions">
             <img
-              src="{{ url_for('static', filename='Favicon_dinero.png') }}"
+              src="{{ url_for('static', filename='favicon.png', _external=True) }}"
               alt="Wallet Logo"
               width="60"
               height="60"
