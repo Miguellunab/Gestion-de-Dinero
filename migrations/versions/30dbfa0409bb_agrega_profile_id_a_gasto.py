@@ -24,8 +24,10 @@ def upgrade():
         sa.Column('pin', sa.String(length=4), nullable=False),
         sa.PrimaryKeyConstraint('id')
     )
-    
-    # Para la tabla gasto:
+    # Insertar un perfil por defecto con id=1 para que se cumpla la llave foránea
+    op.execute("INSERT INTO profile (id, name, pin) VALUES (1, 'Default', '0000')")
+
+    # Actualizar la tabla gasto:
     # 1. Agregar la columna profile_id como nullable y ajustar la columna monto
     with op.batch_alter_table('gasto', schema=None) as batch_op:
         batch_op.add_column(sa.Column('profile_id', sa.Integer(), nullable=True))
@@ -35,14 +37,14 @@ def upgrade():
             type_=sa.Integer(),
             existing_nullable=False
         )
-    # 2. Actualizar los registros existentes para asignar un valor (asegúrate de que exista un profile con id=1)
-    op.execute('UPDATE gasto SET profile_id = 1')
-    # 3. Alterar la columna profile_id para que sea NOT NULL y crear la llave foránea
+    # 2. Actualizar los registros existentes asignando profile_id = 1
+    op.execute("UPDATE gasto SET profile_id = 1")
+    # 3. Alterar la columna para que sea NOT NULL y crear la llave foránea
     with op.batch_alter_table('gasto', schema=None) as batch_op:
         batch_op.alter_column('profile_id', nullable=False)
         batch_op.create_foreign_key(None, 'profile', ['profile_id'], ['id'])
-    
-    # Para la tabla ingreso (proceso similar):
+
+    # Actualizar la tabla ingreso de forma similar:
     with op.batch_alter_table('ingreso', schema=None) as batch_op:
         batch_op.add_column(sa.Column('profile_id', sa.Integer(), nullable=True))
         batch_op.alter_column(
@@ -51,7 +53,7 @@ def upgrade():
             type_=sa.Integer(),
             existing_nullable=False
         )
-    op.execute('UPDATE ingreso SET profile_id = 1')
+    op.execute("UPDATE ingreso SET profile_id = 1")
     with op.batch_alter_table('ingreso', schema=None) as batch_op:
         batch_op.alter_column('profile_id', nullable=False)
         batch_op.create_foreign_key(None, 'profile', ['profile_id'], ['id'])
