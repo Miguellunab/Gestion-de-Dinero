@@ -18,126 +18,10 @@
     <link
       rel="icon"
       href="{{ url_for('static', filename='favicon.png', _external=True) }}?v=2" />
-    <style>
-      /* Colores consistentes con el dashboard */
-      :root {
-        --primary-color: #3a86ff;
-        --success-color: #38b000;
-        --danger-color: #ff595e;
-        --dark-color: #4a9de9;
-        --light-color: #f8f9fa;
-        --wallet-color: #ffe8d6;
-        --coin-color: #ff9e00;
-      }
-
-      body {
-        background-color: #f5f7fa;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        padding-top: 20px;
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .profile-card {
-        background-color: white;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-        width: 100%;
-        max-width: 450px;
-        margin: 0 auto;
-      }
-
-      .profile-header {
-        background: linear-gradient(135deg, var(--dark-color), #56ccf2);
-        padding: 30px 20px;
-        text-align: center;
-        color: white;
-      }
-
-      .app-logo {
-        width: 80px;
-        height: auto;
-        margin-bottom: 15px;
-      }
-
-      .profile-title {
-        font-size: 1.5rem;
-        font-weight: 600;
-        margin: 10px 0;
-      }
-
-      .profile-body {
-        padding: 30px;
-      }
-
-      .form-control {
-        padding: 12px;
-        font-size: 1rem;
-        border-radius: 10px;
-        border: 1px solid #e0e0e0;
-        transition: all 0.3s;
-      }
-
-      .form-control:focus {
-        box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.25);
-        border-color: var(--primary-color);
-      }
-
-      .input-group-text {
-        background-color: white;
-        border-color: #e0e0e0;
-        cursor: pointer;
-        color: #6c757d;
-        transition: all 0.2s;
-      }
-
-      .input-group-text:hover {
-        color: var(--primary-color);
-      }
-
-      .btn-create {
-        background-color: var(--success-color);
-        border: none;
-        border-radius: 10px;
-        padding: 12px;
-        color: white;
-        font-weight: 600;
-        transition: all 0.3s;
-        margin-top: 10px;
-      }
-
-      .btn-create:hover {
-        background-color: #2c9d00;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(56, 176, 0, 0.3);
-      }
-
-      .btn-back {
-        color: #6c757d;
-        text-decoration: none;
-        display: block;
-        text-align: center;
-        margin-top: 20px;
-        transition: all 0.2s;
-      }
-
-      .btn-back:hover {
-        color: var(--dark-color);
-      }
-
-      .form-label {
-        font-weight: 500;
-        color: #495057;
-      }
-
-      .form-text {
-        color: #6c757d;
-        font-size: 0.85rem;
-      }
-    </style>
+    <!-- CSS personalizado para crear perfil -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/create_profile.css') }}?v=2" />
   </head>
   <body>
     <div class="container py-4">
@@ -252,7 +136,7 @@
             toggleIcon.classList.remove('fa-eye-slash');
             toggleIcon.classList.add('fa-eye');
           } else {
-            pinInput.type = 'password'; // Cambiado de 'tel' a 'password'
+            pinInput.type = 'password';
             toggleIcon.classList.remove('fa-eye');
             toggleIcon.classList.add('fa-eye-slash');
           }

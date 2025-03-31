@@ -1,0 +1,109 @@
+/* Colores consistentes con el dashboard */
+:root {
+    --primary-color: #3a86ff;
+    --success-color: #38b000;
+    --danger-color: #ff595e;
+    --dark-color: #4a9de9;
+    --light-color: #f8f9fa;
+    --wallet-color: #ffe8d6;
+    --coin-color: #ff9e00;
+}
+
+body {
+    background-color: #f5f7fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding-top: 20px;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-card {
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    max-width: 400px;
+    width: 100%;
+}
+
+.login-header {
+    background: linear-gradient(135deg, var(--dark-color), #56ccf2);
+    padding: 30px 20px;
+    text-align: center;
+    color: white;
+}
+
+.app-logo {
+    width: 80px;
+    height: auto;
+    margin-bottom: 15px;
+}
+
+.profile-name {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 10px 0;
+}
+
+.login-body {
+    padding: 30px;
+}
+
+.pin-input {
+    font-size: 1.2rem;
+    letter-spacing: 3px;
+    text-align: center;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s;
+}
+
+.pin-input:focus {
+    box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.25);
+    border-color: var(--primary-color);
+}
+
+.input-group-text {
+    background-color: white;
+    border-color: #e0e0e0;
+    cursor: pointer;
+    color: #6c757d;
+    transition: all 0.2s;
+}
+
+.input-group-text:hover {
+    color: var(--primary-color);
+}
+
+.btn-enter {
+    background-color: var(--dark-color);
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s;
+    margin-top: 20px;
+}
+
+.btn-enter:hover {
+    background-color: #3b7ec3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(58, 134, 255, 0.3);
+}
+
+.btn-back {
+    color: #6c757d;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    transition: all 0.2s;
+}
+
+.btn-back:hover {
+    color: var(--dark-color);
+}

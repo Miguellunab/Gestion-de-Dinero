@@ -1,0 +1,387 @@
+/* Colores principales de la aplicación */
+:root {
+    --primary-color: #3a86ff;
+    /* Azul principal */
+    --success-color: #38b000;
+    /* Verde para ingresos */
+    --danger-color: #ff595e;
+    /* Rojo para gastos */
+    --dark-color: #4a9de9;
+    /* Azul para barra superior */
+    --light-color: #f8f9fa;
+    --wallet-color: #ffe8d6;
+    /* Color que combina con la billetera del logo */
+    --coin-color: #ff9e00;
+    /* Color que combina con la moneda del logo */
+}
+
+/* Estilo general de la página */
+body {
+    background-color: #f5f7fa;
+    /* Fondo gris claro */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Barra de navegación superior */
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    font-size: 1.4rem;
+}
+
+.app-logo {
+    height: 50px;
+    margin-right: 15px;
+}
+
+/* Aumentar altura de la navbar */
+.navbar {
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+/* Tarjetas superiores */
+.top-card {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s;
+    overflow: hidden;
+}
+
+/* Tarjeta de balance */
+.balance-card {
+    background: linear-gradient(135deg, #4a9de9, #56ccf2);
+    color: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(74, 157, 233, 0.25);
+}
+
+/* Tarjeta de acción */
+.action-card {
+    background: white;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    border: none;
+}
+
+.action-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 15px 20px;
+    font-weight: 600;
+}
+
+.action-body {
+    padding: 20px;
+}
+
+/* Botones de acción */
+.btn-ingreso {
+    background-color: var(--success-color);
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-gasto {
+    background-color: var(--danger-color);
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-ingreso:hover,
+.btn-ingreso:focus {
+    background-color: #2c9d00;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(56, 176, 0, 0.3);
+}
+
+.btn-gasto:hover,
+.btn-gasto:focus {
+    background-color: #e63946;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 89, 94, 0.3);
+}
+
+/* Formularios */
+.form-control {
+    border-radius: 10px;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.25);
+    border-color: var(--primary-color);
+}
+
+/* Tarjeta de transacciones */
+.transactions-card {
+    border-radius: 15px;
+    border: none;
+    background: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+}
+
+.transactions-header {
+    padding: 15px 20px;
+    background-color: white;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    font-weight: 600;
+}
+
+/* Listado de transacciones */
+.transaction-item {
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+}
+
+.transaction-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.ingreso-icon {
+    background-color: rgba(56, 176, 0, 0.1);
+    color: var(--success-color);
+}
+
+.gasto-icon {
+    background-color: rgba(255, 89, 94, 0.1);
+    color: var(--danger-color);
+}
+
+.transaction-details {
+    flex-grow: 1;
+}
+
+.transaction-amount {
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+
+.transaction-description {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-top: 3px;
+}
+
+.transaction-date {
+    font-size: 0.8rem;
+    color: #adb5bd;
+    text-align: right;
+}
+
+.transaction-actions {
+    flex-shrink: 0;
+    margin-left: 10px;
+}
+
+.btn-action {
+    border: none;
+    background: none;
+    color: #adb5bd;
+    transition: color 0.3s;
+}
+
+.btn-action:hover,
+.btn-action:focus {
+    color: var(--danger-color);
+}
+
+/* Modal */
+.modal-content {
+    border-radius: 15px;
+    border: none;
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 576px) {
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .transaction-item {
+        padding: 12px 15px;
+    }
+
+    .transaction-icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .transaction-amount {
+        font-size: 0.95rem;
+    }
+}
+
+.no-transactions {
+    padding: 40px 20px;
+    text-align: center;
+    color: #adb5bd;
+}
+
+/* Botón flotante */
+.btn-floating {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(58, 134, 255, 0.4);
+    transition: all 0.3s;
+    z-index: 1000;
+}
+
+.btn-floating:hover,
+.btn-floating:focus {
+    background-color: #2a75e8;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(58, 134, 255, 0.5);
+}
+
+/* Pestañas de acción */
+.nav-tabs .nav-link {
+    border: none;
+    color: #6c757d;
+    padding: 12px 16px;
+    font-weight: 500;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--dark-color);
+    border-bottom: 2px solid var(--dark-color);
+    background: none;
+}
+
+.tab-content {
+    padding-top: 20px;
+}
+
+/* Logo principal */
+.logo-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.main-logo {
+    width: 130px;
+    height: auto;
+    margin-bottom: 15px;
+}
+
+/* Balance */
+.balance-logo {
+    display: inline-block;
+    vertical-align: middle;
+    width: 30px;
+    height: 30px;
+    margin-right: 5px;
+}
+
+.btn-logout {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50px;
+    padding: 8px 15px;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s;
+    font-weight: 500;
+}
+
+.btn-logout:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-logout i {
+    margin-right: 6px;
+}
+
+@media (max-width: 576px) {
+    .btn-logout span {
+        display: none;
+    }
+
+    .btn-logout i {
+        margin-right: 0;
+        font-size: 1.1rem;
+    }
+
+    .btn-logout {
+        padding: 8px 10px;
+    }
+}
+
+/* Ocultar/mostrar balance */
+.btn-hide-balance {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: 12px;
+}
+
+.btn-hide-balance:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+.balance-amount {
+    display: flex;
+    align-items: center;
+}
+
+.balance-hidden {
+    filter: blur(8px);
+}
+
+.balance-hidden:hover {
+    filter: blur(8px);
+}
