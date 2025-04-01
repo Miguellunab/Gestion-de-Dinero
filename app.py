@@ -88,7 +88,7 @@ def create_profile():
         return redirect(url_for('login'))
     return render_template('create_profile.html')
 
-# Ruta para editar perfil (se utiliza en login.html)
+# Ruta para editar perfil
 @app.route('/edit_profile/<int:profile_id>', methods=['POST'])
 def edit_profile(profile_id):
     profile = Profile.query.get_or_404(profile_id)
@@ -99,6 +99,18 @@ def edit_profile(profile_id):
         flash("Perfil actualizado correctamente", "success")
     else:
         flash("Nombre inválido. Debe tener entre 1 y 50 caracteres.", "danger")
+    return redirect(url_for('login'))
+
+# Nueva ruta para eliminar perfil
+@app.route('/delete_profile/<int:profile_id>', methods=['POST'])
+def delete_profile(profile_id):
+    profile = Profile.query.get_or_404(profile_id)
+    # Si existen datos relacionados (ingresos, gastos) y no tienes configuración de cascada, elimínalos manualmente:
+    # Gasto.query.filter_by(profile_id=profile_id).delete()
+    # Ingreso.query.filter_by(profile_id=profile_id).delete()
+    db.session.delete(profile)
+    db.session.commit()
+    flash("Perfil eliminado correctamente.", "success")
     return redirect(url_for('login'))
 
 # Ruta para cerrar sesión
