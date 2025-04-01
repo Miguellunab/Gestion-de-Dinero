@@ -101,17 +101,74 @@ def edit_profile(profile_id):
         flash("Nombre inválido. Debe tener entre 1 y 50 caracteres.", "danger")
     return redirect(url_for('login'))
 
-# Nueva ruta para eliminar perfil
+# Ruta para eliminar perfil
 @app.route('/delete_profile/<int:profile_id>', methods=['POST'])
 def delete_profile(profile_id):
     profile = Profile.query.get_or_404(profile_id)
-    # Si existen datos relacionados (ingresos, gastos) y no tienes configuración de cascada, elimínalos manualmente:
+    # Si existen datos relacionados y no usas eliminación en cascada, elimínalos aquí:
     # Gasto.query.filter_by(profile_id=profile_id).delete()
     # Ingreso.query.filter_by(profile_id=profile_id).delete()
     db.session.delete(profile)
     db.session.commit()
     flash("Perfil eliminado correctamente.", "success")
     return redirect(url_for('login'))
+
+# Ruta para agregar ingreso
+@app.route('/agregar_ingreso', methods=['POST'])
+def agregar_ingreso():
+    if 'profile_id' not in session:
+        return redirect(url_for('login'))
+    monto = request.form.get('monto')
+    descripcion = request.form.get('descripcion')
+    profile_id = session['profile_id']
+    if monto:
+        try:
+            monto_clean = monto.replace(".", "").replace(",", "")
+            nuevo_ingreso = Ingreso(monto=int(monto_clean), descripcion=descripcion, profile_id=profile_id)
+            db.session.add(nuevo_ingreso)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print("Error al agregar ingreso:", e)
+    else:
+        print("El campo monto es obligatorio.")
+    return redirect(url_for('dashboard'))
+
+# Ruta para agregar gasto
+@app.route('/agregar_gasto', methods=['POST'])
+def agregar_gasto():
+    if 'profile_id' not in session:
+        return redirect(url_for('login'))
+    monto = request.form.get('monto')
+    descripcion = request.form.get('descripcion')
+    profile_id = session['profile_id']
+    if monto:
+        try:
+            monto_clean = monto.replace(".", "").replace(",", "")
+            nuevo_gasto = Gasto(monto=int(monto_clean), descripcion=descripcion, profile_id=profile_id)
+            db.session.add(nuevo_gasto)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print("Error al agregar gasto:", e)
+    else:
+        print("El campo monto es obligatorio.")
+    return redirect(url_for('dashboard'))
+
+# Ruta para deshacer (eliminar) un movimiento (gasto o ingreso)
+@app.route('/deshacer/<tipo>/<int:mov_id>', methods=['POST'])
+def deshacer_movimiento(tipo, mov_id):
+    if 'profile_id' not in session:
+        return redirect(url_for('login'))
+    if tipo == 'gasto':
+        mov = Gasto.query.filter_by(id=mov_id, profile_id=session['profile_id']).first_or_404()
+    elif tipo == 'ingreso':
+        mov = Ingreso.query.filter_by(id=mov_id, profile_id=session['profile_id']).first_or_404()
+    else:
+        return redirect(url_for('dashboard'))
+    db.session.delete(mov)
+    db.session.commit()
+    return redirect(url_for('dashboard'))
 
 # Ruta para cerrar sesión
 @app.route('/logout')
