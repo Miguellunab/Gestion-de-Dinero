@@ -1,9 +1,9 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from config import Config
 from models import db, Profile, Gasto, Ingreso
 from flask_migrate import Migrate
 from datetime import datetime, timedelta
-import os
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -12,7 +12,7 @@ app.config.from_object(Config)
 db.init_app(app)
 migrate = Migrate(app, db)
 
-# Filtro para formatear montos
+# ---------------------- FILTRO PERSONALIZADO ----------------------
 def format_money(value):
     s = "{:,.2f}".format(value)
     s = s.replace(",", "X").replace(".", ",").replace("X", ".")
@@ -20,15 +20,25 @@ def format_money(value):
 
 app.jinja_env.filters['format_money'] = format_money
 
-# Ruta raíz: redirige según la sesión
-@app.route('/')
-def index():
+# ---------------------- MIDDLEWARE PARA TIMEOUT DE SESIÓN ----------------------
+@app.before_request
+def check_session_timeout():
     if 'profile_id' in session:
-        return redirect(url_for('dashboard'))
-    else:
-        return redirect(url_for('login'))
+        session.permanent = True
+        if 'last_activity' in session:
+            now = datetime.utcnow()
+            try:
+                from dateutil import parser
+                last = parser.parse(session['last_activity'])
+                if (now - last).total_seconds() > 15 * 60:
+                    session.clear()
+                    flash("Tu sesión ha expirado por inactividad.", "info")
+                    return redirect(url_for('login'))
+            except Exception as e:
+                print(f"Error al procesar timestamp: {e}")
+        session['last_activity'] = datetime.utcnow().isoformat()
 
-# Ruta de login: muestra todos los perfiles
+# ---------------------- RUTAS DE AUTENTICACIÓN Y PERFILES ----------------------
 @app.route('/login')
 def login():
     if 'profile_id' in session:
@@ -36,27 +46,6 @@ def login():
     profiles = Profile.query.all()
     return render_template('login.html', profiles=profiles)
 
-# Ruta para el dashboard
-@app.route('/dashboard')
-def dashboard():
-    if 'profile_id' not in session:
-        return redirect(url_for('login'))
-    profile_id = session['profile_id']
-    profile = Profile.query.get(profile_id)
-    if not profile:
-        flash("Perfil no encontrado. Por favor, inicie sesión de nuevo.", "warning")
-        return redirect(url_for('login'))
-    
-    # Consultar gastos e ingresos y calcular balance
-    gastos = Gasto.query.filter_by(profile_id=profile_id).order_by(Gasto.fecha.desc()).all()
-    ingresos = Ingreso.query.filter_by(profile_id=profile_id).order_by(Ingreso.fecha.desc()).all()
-    total_ingresos = sum(ingreso.monto for ingreso in ingresos)
-    total_gastos = sum(gasto.monto for gasto in gastos)
-    balance = total_ingresos - total_gastos
-    
-    return render_template('dashboard.html', balance=balance, gastos=gastos, ingresos=ingresos, profile=profile)
-
-# Ruta para seleccionar perfil y validar PIN
 @app.route('/select_profile/<int:profile_id>', methods=['GET', 'POST'])
 def select_profile(profile_id):
     profile = Profile.query.get_or_404(profile_id)
@@ -72,7 +61,6 @@ def select_profile(profile_id):
             return redirect(url_for('select_profile', profile_id=profile_id))
     return render_template('select_profile.html', profile=profile)
 
-# Ruta para crear un nuevo perfil
 @app.route('/create_profile', methods=['GET', 'POST'])
 def create_profile():
     if request.method == 'POST':
@@ -88,7 +76,11 @@ def create_profile():
         return redirect(url_for('login'))
     return render_template('create_profile.html')
 
-# Ruta para editar perfil
+@app.route('/logout')
+def logout():
+    session.pop('profile_id', None)
+    return redirect(url_for('login'))
+
 @app.route('/edit_profile/<int:profile_id>', methods=['POST'])
 def edit_profile(profile_id):
     profile = Profile.query.get_or_404(profile_id)
@@ -101,40 +93,38 @@ def edit_profile(profile_id):
         flash("Nombre inválido. Debe tener entre 1 y 50 caracteres.", "danger")
     return redirect(url_for('login'))
 
-# Ruta para eliminar perfil
 @app.route('/delete_profile/<int:profile_id>', methods=['POST'])
 def delete_profile(profile_id):
     profile = Profile.query.get_or_404(profile_id)
-    # Si existen datos relacionados y no usas eliminación en cascada, elimínalos aquí:
-    # Gasto.query.filter_by(profile_id=profile_id).delete()
-    # Ingreso.query.filter_by(profile_id=profile_id).delete()
+    # Borra los gastos e ingresos asociados
+    Gasto.query.filter_by(profile_id=profile_id).delete()
+    Ingreso.query.filter_by(profile_id=profile_id).delete()
+    # Borra el perfil
     db.session.delete(profile)
     db.session.commit()
-    flash("Perfil eliminado correctamente.", "success")
+    flash("Perfil eliminado correctamente", "success")
     return redirect(url_for('login'))
 
-# Ruta para agregar ingreso
-@app.route('/agregar_ingreso', methods=['POST'])
-def agregar_ingreso():
+# ---------------------- RUTAS DE LA APLICACIÓN (GESTIÓN DE DINERO) ----------------------
+@app.route('/dashboard')
+def dashboard():
     if 'profile_id' not in session:
         return redirect(url_for('login'))
-    monto = request.form.get('monto')
-    descripcion = request.form.get('descripcion')
     profile_id = session['profile_id']
-    if monto:
-        try:
-            monto_clean = monto.replace(".", "").replace(",", "")
-            nuevo_ingreso = Ingreso(monto=int(monto_clean), descripcion=descripcion, profile_id=profile_id)
-            db.session.add(nuevo_ingreso)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print("Error al agregar ingreso:", e)
-    else:
-        print("El campo monto es obligatorio.")
-    return redirect(url_for('dashboard'))
+    profile = Profile.query.get(profile_id)
+    if not profile:
+        flash("Perfil no encontrado. Por favor, inicie sesión de nuevo.", "warning")
+        return redirect(url_for('login'))
+    
+    # Consulta gastos e ingresos y calcula el balance
+    gastos = Gasto.query.filter_by(profile_id=profile_id).order_by(Gasto.fecha.desc()).all()
+    ingresos = Ingreso.query.filter_by(profile_id=profile_id).order_by(Ingreso.fecha.desc()).all()
+    total_ingresos = sum(ingreso.monto for ingreso in ingresos)
+    total_gastos = sum(gasto.monto for gasto in gastos)
+    balance = total_ingresos - total_gastos
 
-# Ruta para agregar gasto
+    return render_template('dashboard.html', balance=balance, gastos=gastos, ingresos=ingresos, profile=profile)
+
 @app.route('/agregar_gasto', methods=['POST'])
 def agregar_gasto():
     if 'profile_id' not in session:
@@ -155,7 +145,26 @@ def agregar_gasto():
         print("El campo monto es obligatorio.")
     return redirect(url_for('dashboard'))
 
-# Ruta para deshacer (eliminar) un movimiento (gasto o ingreso)
+@app.route('/agregar_ingreso', methods=['POST'])
+def agregar_ingreso():
+    if 'profile_id' not in session:
+        return redirect(url_for('login'))
+    monto = request.form.get('monto')
+    descripcion = request.form.get('descripcion')
+    profile_id = session['profile_id']
+    if monto:
+        try:
+            monto_clean = monto.replace(".", "").replace(",", "")
+            nuevo_ingreso = Ingreso(monto=int(monto_clean), descripcion=descripcion, profile_id=profile_id)
+            db.session.add(nuevo_ingreso)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print("Error al agregar ingreso:", e)
+    else:
+        print("El campo monto es obligatorio.")
+    return redirect(url_for('dashboard'))
+
 @app.route('/deshacer/<tipo>/<int:mov_id>', methods=['POST'])
 def deshacer_movimiento(tipo, mov_id):
     if 'profile_id' not in session:
@@ -170,30 +179,15 @@ def deshacer_movimiento(tipo, mov_id):
     db.session.commit()
     return redirect(url_for('dashboard'))
 
-# Ruta para cerrar sesión
-@app.route('/logout')
-def logout():
-    session.pop('profile_id', None)
-    return redirect(url_for('login'))
-
-# Middleware para controlar el tiempo de inactividad en la sesión
-@app.before_request
-def check_session_timeout():
+# Ruta index: redirige a dashboard o login según la sesión
+@app.route('/')
+def index():
     if 'profile_id' in session:
-        session.permanent = True
-        if 'last_activity' in session:
-            now = datetime.utcnow()
-            try:
-                from dateutil import parser
-                last = parser.parse(session['last_activity'])
-                if (now - last).total_seconds() > 15 * 60:
-                    session.clear()
-                    flash("Tu sesión ha expirado por inactividad.", "info")
-                    return redirect(url_for('login'))
-            except Exception as e:
-                print(f"Error al procesar timestamp: {e}")
-        session['last_activity'] = datetime.utcnow().isoformat()
+        return redirect(url_for('dashboard'))
+    else:
+        return redirect(url_for('login'))
 
+# ---------------------- ARRANQUE DE LA APLICACIÓN ----------------------
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
