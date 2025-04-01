@@ -88,6 +88,19 @@ def create_profile():
         return redirect(url_for('login'))
     return render_template('create_profile.html')
 
+# Ruta para editar perfil (se utiliza en login.html)
+@app.route('/edit_profile/<int:profile_id>', methods=['POST'])
+def edit_profile(profile_id):
+    profile = Profile.query.get_or_404(profile_id)
+    new_name = request.form.get('name')
+    if new_name and len(new_name) <= 50:
+        profile.name = new_name
+        db.session.commit()
+        flash("Perfil actualizado correctamente", "success")
+    else:
+        flash("Nombre inválido. Debe tener entre 1 y 50 caracteres.", "danger")
+    return redirect(url_for('login'))
+
 # Ruta para cerrar sesión
 @app.route('/logout')
 def logout():
