@@ -1,9 +1,13 @@
 import os
+from dotenv import load_dotenv  # Añadir esta línea
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from config import Config
 from models import db, Profile, Gasto, Ingreso, Billetera
 from flask_migrate import Migrate
 from datetime import datetime, timedelta
+
+# Cargar variables de entorno del archivo .env
+load_dotenv()  # Añadir esta línea antes de crear la app
 
 app = Flask(__name__)
 app.config.from_object(Config)
