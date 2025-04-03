@@ -385,3 +385,54 @@ body {
 .balance-hidden:hover {
     filter: blur(8px);
 }
+
+/* Estilos para el botón de toggle de cuentas */
+.btn-toggle-accounts {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    padding: 0;
+    cursor: pointer;
+}
+
+.btn-toggle-accounts:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Estilos para el panel de desglose de cuentas */
+.account-details {
+    color: white;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.account-item {
+    font-size: 0.95rem;
+    padding: 5px 0;
+}
+
+.account-name {
+    font-weight: 500;
+}
+
+/* Estilos para la etiqueta de cuenta en transacciones */
+.transaction-account {
+    display: block;
+    font-size: 0.8rem;
+    margin-top: 3px;
+    color: #6c757d;
+}
+
+/* Estilos para los iconos de cuenta */
+.account-name i {
+    opacity: 0.9;
+    width: 20px;
+    text-align: center;
+}

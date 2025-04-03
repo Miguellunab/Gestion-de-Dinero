@@ -43,6 +43,51 @@
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/dashboard.css') }}?v=2" />
+    <style>
+      .btn-toggle-accounts {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+      }
+
+      .btn-toggle-accounts:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-1px);
+      }
+
+      .account-details {
+        color: white;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .account-item {
+        font-size: 0.95rem;
+      }
+
+      .account-name i {
+        opacity: 0.9;
+      }
+
+      /* Para la visualización de la cuenta en los movimientos */
+      .transaction-account {
+        display: block;
+        font-size: 0.8rem;
+        margin-top: 3px;
+        color: #6c757d;
+      }
+
+      /* Para el botón de configuración en los selectores */
+      .btn-outline-secondary {
+        border-color: #ced4da;
+      }
+    </style>
   </head>
   <body>
     <!-- Barra superior -->
@@ -95,6 +140,15 @@
                   class="fas fa-eye"
                   id="balanceIcon"></i>
               </button>
+              <!-- Agregar botón para mostrar desglose por cuentas -->
+              <button
+                class="btn-toggle-accounts ms-2"
+                id="toggleAccounts"
+                title="Ver saldos por cuenta">
+                <i
+                  class="fas fa-chevron-down"
+                  id="accountsIcon"></i>
+              </button>
             </div>
           </div>
           <div class="col-auto">
@@ -102,6 +156,38 @@
               src="{{ url_for('static', filename='images/favicon.png', _external=True) }}"
               alt="Wallet Logo"
               class="balance-logo" />
+          </div>
+        </div>
+
+        <!-- Modificar la cuenta en la tarjeta de balance para mostrar desglose -->
+        <div
+          id="accountDetails"
+          class="account-details mt-3 pt-2"
+          style="display: none">
+          <hr class="mb-2 opacity-25" />
+          <h6 class="opacity-75 mb-2">Desglose por cuentas</h6>
+
+          <div class="account-list">
+            {% for cuenta, monto in balance_por_cuenta.items() %}
+            <div
+              class="account-item d-flex justify-content-between align-items-center mb-2">
+              <div class="account-name d-flex align-items-center">
+                {% if cuenta in billeteras_dict %}
+                <i
+                  class="fas fa-{{ billeteras_dict[cuenta]['icono'] }} me-2"
+                  style="color: {{ billeteras_dict[cuenta]['color'] }}"></i>
+                {% else %}
+                <i class="fas fa-wallet me-2"></i>
+                {% endif %} {{ cuenta }}
+              </div>
+              <div class="account-balance">
+                <span
+                  class="{% if monto > 0 %}text-white{% else %}text-danger{% endif %}">
+                  ${{ monto|format_money }}
+                </span>
+              </div>
+            </div>
+            {% endfor %}
           </div>
         </div>
       </div>
@@ -186,6 +272,38 @@
                   name="descripcion"
                   placeholder="Salario, venta, etc." />
               </div>
+              <!-- Modificar el selector de cuentas para Ingreso -->
+              <div class="mb-3">
+                <label
+                  for="cuenta_ingreso"
+                  class="form-label"
+                  >¿Dónde ingresa el dinero?</label
+                >
+                <div class="input-group">
+                  <span class="input-group-text"
+                    ><i class="fas fa-wallet"></i
+                  ></span>
+                  <select
+                    class="form-select"
+                    id="cuenta_ingreso"
+                    name="cuenta"
+                    required>
+                    {% for billetera in billeteras %}
+                    <option
+                      value="{{ billetera.nombre }}"
+                      {% if billetera.nombre == 'Efectivo' %}selected{% endif %}>
+                      {{ billetera.nombre }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                  <a
+                    href="{{ url_for('listar_billeteras') }}"
+                    class="btn btn-outline-secondary"
+                    title="Gestionar billeteras">
+                    <i class="fas fa-cog"></i>
+                  </a>
+                </div>
+              </div>
               <button
                 type="submit"
                 class="btn btn-ingreso w-100">
@@ -235,6 +353,38 @@
                   name="descripcion"
                   placeholder="Comida, transporte, etc." />
               </div>
+              <!-- Modificar el selector de cuentas para Gasto -->
+              <div class="mb-3">
+                <label
+                  for="cuenta_gasto"
+                  class="form-label"
+                  >¿De dónde sale el dinero?</label
+                >
+                <div class="input-group">
+                  <span class="input-group-text"
+                    ><i class="fas fa-wallet"></i
+                  ></span>
+                  <select
+                    class="form-select"
+                    id="cuenta_gasto"
+                    name="cuenta"
+                    required>
+                    {% for billetera in billeteras %}
+                    <option
+                      value="{{ billetera.nombre }}"
+                      {% if billetera.nombre == 'Efectivo' %}selected{% endif %}>
+                      {{ billetera.nombre }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                  <a
+                    href="{{ url_for('listar_billeteras') }}"
+                    class="btn btn-outline-secondary"
+                    title="Gestionar billeteras">
+                    <i class="fas fa-cog"></i>
+                  </a>
+                </div>
+              </div>
               <button
                 type="submit"
                 class="btn btn-gasto w-100">
@@ -277,6 +427,17 @@
               </div>
               <div class="transaction-description">
                 {{ item.descripcion or "Sin descripción" }}
+                <!-- Modificar la visualización de transacciones para mostrar la cuenta con el icono correcto -->
+                <span class="transaction-account">
+                  {% if item.cuenta in billeteras_dict %}
+                  <i
+                    class="fas fa-{{ billeteras_dict[item.cuenta]['icono'] }} me-1"
+                    style="color: {{ billeteras_dict[item.cuenta]['color'] }}"></i>
+                  {% else %}
+                  <i class="fas fa-wallet me-1"></i>
+                  {% endif %}
+                  <small>{{ item.cuenta }}</small>
+                </span>
               </div>
             </div>
             <div class="transaction-date">
@@ -307,6 +468,17 @@
               </div>
               <div class="transaction-description">
                 {{ item.descripcion or "Sin descripción" }}
+                <!-- Modificar la visualización de transacciones para mostrar la cuenta con el icono correcto -->
+                <span class="transaction-account">
+                  {% if item.cuenta in billeteras_dict %}
+                  <i
+                    class="fas fa-{{ billeteras_dict[item.cuenta]['icono'] }} me-1"
+                    style="color: {{ billeteras_dict[item.cuenta]['color'] }}"></i>
+                  {% else %}
+                  <i class="fas fa-wallet me-1"></i>
+                  {% endif %}
+                  <small>{{ item.cuenta }}</small>
+                </span>
               </div>
             </div>
             <div class="transaction-date">
@@ -372,6 +544,39 @@
             balanceIcon.classList.remove('fa-eye-slash');
             balanceIcon.classList.add('fa-eye');
             localStorage.setItem('balanceHidden', 'false');
+          }
+        });
+      });
+    </script>
+    <!-- Agregar este script justo antes del cierre del body -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const toggleAccounts = document.getElementById('toggleAccounts');
+        const accountDetails = document.getElementById('accountDetails');
+        const accountsIcon = document.getElementById('accountsIcon');
+
+        // Cargar estado guardado
+        const accountsHidden =
+          localStorage.getItem('accountsHidden') !== 'false';
+
+        // Inicializar según el estado guardado
+        if (!accountsHidden) {
+          accountDetails.style.display = 'block';
+          accountsIcon.classList.remove('fa-chevron-down');
+          accountsIcon.classList.add('fa-chevron-up');
+        }
+
+        toggleAccounts.addEventListener('click', function () {
+          if (accountDetails.style.display === 'none') {
+            accountDetails.style.display = 'block';
+            accountsIcon.classList.remove('fa-chevron-down');
+            accountsIcon.classList.add('fa-chevron-up');
+            localStorage.setItem('accountsHidden', 'false');
+          } else {
+            accountDetails.style.display = 'none';
+            accountsIcon.classList.remove('fa-chevron-up');
+            accountsIcon.classList.add('fa-chevron-down');
+            localStorage.setItem('accountsHidden', 'true');
           }
         });
       });
