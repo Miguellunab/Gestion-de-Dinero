@@ -135,13 +135,58 @@ body {
     margin-bottom: 20px;
 }
 
+/* Agregar estos estilos para la sección colapsable */
+
 .transactions-header {
-    padding: 15px 20px;
-    background-color: white;
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 10px 10px 0 0;
+    cursor: pointer;
+}
+
+.transactions-header h5 {
+    margin: 0;
     font-weight: 600;
+}
+
+.transactions-toggle-icon {
+    transition: transform 0.3s;
+}
+
+.transactions-toggle-icon.collapsed {
+    transform: rotate(180deg);
+}
+
+.transactions-pagination {
+    display: flex;
+    justify-content: center;
+    padding: 15px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+.pagination-btn {
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    margin: 0 5px;
+    color: #6c757d;
+    text-decoration: none;
+}
+
+.pagination-btn:hover, 
+.pagination-btn.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.pagination-count {
+    font-size: 0.9rem;
+    color: #6c757d;
+    align-self: center;
+    margin: 0 10px;
 }
 
 /* Listado de transacciones */
@@ -197,18 +242,31 @@ body {
 .transaction-actions {
     flex-shrink: 0;
     margin-left: 10px;
+    display: flex;
 }
 
+/* Estilo para botones de acción */
 .btn-action {
     border: none;
     background: none;
-    color: #adb5bd;
-    transition: color 0.3s;
+    color: #6c757d;  /* Color más visible por defecto */
+    transition: transform 0.2s, color 0.2s;
+    margin-left: 8px;
+    padding: 4px 6px;
 }
 
-.btn-action:hover,
-.btn-action:focus {
-    color: var(--danger-color);
+/* Botón de eliminar en rojo al hover */
+.btn-action.delete:hover,
+.btn-action.delete:focus {
+    color: var(--danger-color, #dc3545);
+    transform: translateY(-2px);
+}
+
+/* Botón de editar en azul al hover */
+.btn-action.edit:hover,
+.btn-action.edit:focus {
+    color: var(--primary-color, #007bff);
+    transform: translateY(-2px);
 }
 
 /* Modal */

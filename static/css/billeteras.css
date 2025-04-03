@@ -96,14 +96,12 @@
 }
 
 .wallet-actions {
-    visibility: hidden;
-    opacity: 0;
-    transition: all 0.2s;
+    padding-top: 10px; /* Agregar padding para separar del contenido */
+    text-align: right;
 }
 
-.wallet-card:hover .wallet-actions {
-    visibility: visible;
-    opacity: 1;
+.wallet-actions .btn {
+    margin-left: 5px;
 }
 
 .default-wallet-badge {

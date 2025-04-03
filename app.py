@@ -118,6 +118,15 @@ def dashboard():
     gastos = Gasto.query.filter_by(profile_id=profile_id).order_by(Gasto.fecha.desc()).all()
     ingresos = Ingreso.query.filter_by(profile_id=profile_id).order_by(Ingreso.fecha.desc()).all()
     
+    # Normalizar cuentas "none" a "Efectivo"
+    for ingreso in ingresos:
+        if not ingreso.cuenta or ingreso.cuenta == 'none':
+            ingreso.cuenta = 'Efectivo'
+
+    for gasto in gastos:
+        if not gasto.cuenta or gasto.cuenta == 'none':
+            gasto.cuenta = 'Efectivo'
+    
     # Consulta billeteras
     billeteras = Billetera.query.filter_by(profile_id=profile_id).all()
     
@@ -244,6 +253,48 @@ def deshacer_movimiento(tipo, mov_id):
         return redirect(url_for('dashboard'))
     db.session.delete(mov)
     db.session.commit()
+    return redirect(url_for('dashboard'))
+
+@app.route('/editar_movimiento/<tipo>/<int:id>', methods=['POST'])
+def editar_movimiento(tipo, id):
+    if 'profile_id' not in session:
+        return redirect(url_for('login'))
+    
+    profile_id = session['profile_id']
+    
+    # Obtener los datos del formulario
+    monto = request.form.get('monto', '0')
+    descripcion = request.form.get('descripcion', '')
+    cuenta = request.form.get('cuenta', 'Efectivo')
+    
+    # Limpiar el monto
+    monto_clean = monto.replace(".", "").replace(",", "")
+    
+    try:
+        monto_int = int(monto_clean)
+        
+        # Actualizar según el tipo de movimiento
+        if tipo == 'ingreso':
+            movimiento = Ingreso.query.filter_by(id=id, profile_id=profile_id).first_or_404()
+            movimiento.monto = monto_int
+            movimiento.descripcion = descripcion
+            movimiento.cuenta = cuenta
+            mensaje = "Ingreso actualizado correctamente"
+            
+        elif tipo == 'gasto':
+            movimiento = Gasto.query.filter_by(id=id, profile_id=profile_id).first_or_404()
+            movimiento.monto = monto_int
+            movimiento.descripcion = descripcion
+            movimiento.cuenta = cuenta
+            mensaje = "Gasto actualizado correctamente"
+            
+        db.session.commit()
+        flash(mensaje, 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error al actualizar el movimiento: {str(e)}", 'danger')
+    
     return redirect(url_for('dashboard'))
 
 # Nuevas rutas para gestión de billeteras
