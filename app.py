@@ -326,11 +326,12 @@ def editar_billetera(id):
         flash('No tienes permiso para editar esta billetera', 'danger')
         return redirect(url_for('listar_billeteras'))
     
-    # Verificar si es una billetera predefinida
-    if billetera.nombre in ["Efectivo", "Bancolombia", "Nequi"]:
-        flash('No puedes modificar las billeteras predefinidas', 'warning')
+    # Verificar si es la billetera Efectivo (la única que no se puede editar)
+    if billetera.nombre == "Efectivo":
+        flash('No puedes modificar la billetera principal', 'warning')
         return redirect(url_for('listar_billeteras'))
     
+    nombre_anterior = billetera.nombre
     nombre = request.form.get('nombre')
     icono = request.form.get('icono')
     color = request.form.get('color', '#6c757d')
@@ -339,6 +340,11 @@ def editar_billetera(id):
     billetera.nombre = nombre
     billetera.icono = icono
     billetera.color = color
+    
+    # Actualizar también las transacciones si cambió el nombre
+    if nombre_anterior != nombre:
+        Gasto.query.filter_by(profile_id=session['profile_id'], cuenta=nombre_anterior).update({Gasto.cuenta: nombre})
+        Ingreso.query.filter_by(profile_id=session['profile_id'], cuenta=nombre_anterior).update({Ingreso.cuenta: nombre})
     
     db.session.commit()
     
@@ -357,9 +363,9 @@ def eliminar_billetera(id):
         flash('No tienes permiso para eliminar esta billetera', 'danger')
         return redirect(url_for('listar_billeteras'))
     
-    # Verificar si es una billetera predefinida
-    if billetera.nombre in ["Efectivo", "Bancolombia", "Nequi"]:
-        flash('No puedes eliminar las billeteras predefinidas', 'warning')
+    # Verificar si es la billetera Efectivo (la única que no se puede eliminar)
+    if billetera.nombre == "Efectivo":
+        flash('No puedes eliminar la billetera principal', 'warning')
         return redirect(url_for('listar_billeteras'))
     
     nombre_billetera = billetera.nombre

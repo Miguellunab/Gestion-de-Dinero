@@ -1,4 +1,3 @@
-templates\billeteras.html -->
 <!DOCTYPE html>
 <html lang="es">
   <head>
@@ -76,8 +75,11 @@ templates\billeteras.html -->
               </div>
               <div>
                 <div class="wallet-name">{{ billetera.nombre }}</div>
-                {% if billetera.nombre in ['Efectivo', 'Bancolombia', 'Nequi']
-                %}
+                {% if billetera.nombre == 'Efectivo' %}
+                <span class="default-wallet-badge"
+                  >Principal (No eliminable)</span
+                >
+                {% elif billetera.nombre in ['Bancolombia', 'Nequi'] %}
                 <span class="default-wallet-badge">Predeterminada</span>
                 {% endif %}
               </div>
@@ -85,8 +87,7 @@ templates\billeteras.html -->
 
             <!-- Acciones de billetera -->
             <div class="wallet-actions mt-3 text-end">
-              {% if billetera.nombre not in ['Efectivo', 'Bancolombia', 'Nequi']
-              %}
+              {% if billetera.nombre != 'Efectivo' %}
               <button
                 class="btn btn-sm btn-outline-primary"
                 data-bs-toggle="modal"
