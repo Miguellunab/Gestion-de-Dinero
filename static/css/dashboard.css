@@ -53,11 +53,14 @@ body {
 
 /* Tarjeta de balance */
 .balance-card {
-    background: linear-gradient(135deg, #4a9de9, #56ccf2);
-    color: white;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 8px 16px rgba(74, 157, 233, 0.25);
+  background: var(--primary-color) linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
+  color: white;
+  border-radius: 15px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Tarjeta de acción */
@@ -493,4 +496,310 @@ body {
     opacity: 0.9;
     width: 20px;
     text-align: center;
+}
+
+/* Añadir al final del archivo */
+
+/* Botón de cambio de tema */
+.btn-theme-toggle {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.btn-theme-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+.btn-informes {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.balance-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding-right: 10px;
+}
+
+/* Asegurar que el verde del balance se adapte al tema */
+.balance-amount h3.text-success {
+  color: #2dce89 !important; /* Verde claro para ambos modos */
+}
+
+/* Corregir la inversión de colores en dark-mode.css */
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .input-group-text {
+  background-color: #2d2d2d !important;
+  border-color: var(--border-color);
+  color: white !important;
+}
+
+[data-theme="dark"] .card,
+[data-theme="dark"] .action-card,
+[data-theme="dark"] .transactions-card {
+  background-color: #1e1e1e !important;
+  color: white !important;
+}
+
+[data-theme="dark"] body {
+  background-color: #0d1117 !important; /* Azul oscuro estilo GitHub */
+  color: white !important;
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .input-group-text,
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background-color: #2d2d2d !important;
+  border-color: #333 !important;
+  color: white !important;
+}
+
+[data-theme="dark"] .modal-content,
+[data-theme="dark"] .card,
+[data-theme="dark"] .action-card,
+[data-theme="dark"] .action-header,
+[data-theme="dark"] .transactions-card,
+[data-theme="dark"] .transactions-header {
+  background-color: #1e1e1e !important;
+  color: white !important;
+  border-color: #333 !important;
+}
+
+[data-theme="dark"] .nav-tabs .nav-link.active {
+  color: #4a9de9 !important;
+  border-bottom: 2px solid #4a9de9;
+}
+
+[data-theme="dark"] .dropdown-menu {
+  background-color: #1e1e1e !important;
+  border-color: #333 !important;
+}
+
+[data-theme="dark"] .dropdown-item {
+  color: white !important;
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+  background-color: #2d2d2d !important;
+}
+
+[data-theme="dark"] .action-header,
+[data-theme="dark"] .transactions-header {
+  background-color: #161b22 !important; /* Ligeramente más claro */
+  border-color: #30363d !important;
+}
+
+/* Añadir al final de dashboard.css */
+[data-theme="dark"] .mb-4,
+[data-theme="dark"] .col-md-6 {
+  color: white !important;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder,
+[data-theme="dark"] .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+[data-theme="dark"] .form-select {
+  background-color: #2d2d2d !important;
+  color: white !important;
+  border-color: #333 !important;
+}
+
+/* Asegurar que todos los textos sean visibles en modo oscuro */
+[data-theme="dark"] label,
+[data-theme="dark"] .form-label,
+[data-theme="dark"] .input-group-text,
+[data-theme="dark"] h1, 
+[data-theme="dark"] h2, 
+[data-theme="dark"] h3, 
+[data-theme="dark"] h4, 
+[data-theme="dark"] h5, 
+[data-theme="dark"] h6,
+[data-theme="dark"] .card-title,
+[data-theme="dark"] .modal-title {
+  color: white !important;
+}
+
+/* Corregir color de texto en los campos de formulario */
+[data-theme="dark"] .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Asegurar que los valores en los inputs sean visibles */
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea,
+[data-theme="dark"] .form-control {
+  color: white !important;
+}
+
+/* Corregir colores en modales */
+[data-theme="dark"] .modal-content {
+  background-color: #1e1e1e !important;
+  border-color: #333 !important;
+}
+
+[data-theme="dark"] .modal-header,
+[data-theme="dark"] .modal-footer {
+  border-color: #333 !important;
+}
+
+/* Mejorar visibilidad de los placeholders */
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+  opacity: 1 !important; /* Algunos navegadores aplican opacidad adicional */
+}
+
+/* Asegurar que los selects también tengan buen contraste */
+[data-theme="dark"] .form-select {
+  background-color: #2d2d2d !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+  color: white !important;
+}
+
+/* Mejorar visibilidad de los separadores */
+[data-theme="dark"] hr {
+  border-color: #333 !important;
+}
+
+/* Mejorar contraste de botones disabled */
+[data-theme="dark"] .btn:disabled {
+  background-color: #3d3d3d !important;
+  color: #aaa !important;
+}
+
+/* Corregir texto de saludo en la barra de navegación */
+[data-theme="dark"] .navbar-brand,
+[data-theme="dark"] .navbar-dark .navbar-brand {
+  color: white !important;
+}
+
+/* Corregir botón de cerrar sesión */
+[data-theme="dark"] .btn-logout,
+[data-theme="dark"] .btn-logout span,
+[data-theme="dark"] .btn-back,
+[data-theme="dark"] .btn-back span {
+  color: white !important;
+}
+
+/* Asegurar que todos los textos sean visibles en el dashboard */
+[data-theme="dark"] .container h1,
+[data-theme="dark"] .container h2,
+[data-theme="dark"] .container h3,
+[data-theme="dark"] .container h4,
+[data-theme="dark"] .container h5,
+[data-theme="dark"] .container p,
+[data-theme="dark"] .card-header,
+[data-theme="dark"] .card-title {
+  color: white !important;
+}
+
+/* Mejorar contraste de elementos secundarios */
+[data-theme="dark"] .account-name,
+[data-theme="dark"] .transaction-account,
+[data-theme="dark"] .transaction-date,
+[data-theme="dark"] .transaction-description {
+  color: #ccc !important;
+}
+
+/* Asegurar que las etiquetas en formularios sean visibles */
+[data-theme="dark"] .action-card label,
+[data-theme="dark"] .form-label,
+[data-theme="dark"] .input-group-text {
+  color: white !important;
+}
+
+/* Asegurar visibilidad en encabezados de tarjetas */
+[data-theme="dark"] .action-header h4,
+[data-theme="dark"] .transactions-header h4 {
+  color: white !important;
+}
+
+/* Asegurar que el ícono de cerrar sesión sea blanco */
+[data-theme="dark"] .btn-logout i {
+  color: white !important;
+}
+
+/* Asegurar que todos los íconos en botones sean blancos */
+[data-theme="dark"] .btn i {
+  color: white !important;
+}
+
+/* Asegurar que el botón de informes tenga texto e ícono blancos */
+[data-theme="dark"] .btn-informes {
+  color: white !important;
+}
+
+[data-theme="dark"] .btn-informes i {
+  color: white !important;
+}
+
+/* Hacer que el valor del balance sea blanco en ambos modos (no verde) */
+.balance-amount h3 {
+  color: white !important;
+}
+
+/* Eliminar o sobrescribir la regla específica para el texto verde del balance */
+.balance-amount h3.text-success {
+  color: white !important; /* Sobrescribe el verde claro para que sea blanco */
+}
+
+/* Asegurar que sea blanco incluso en modo oscuro */
+[data-theme="dark"] .balance-amount h3,
+[data-theme="dark"] .balance-amount h3.text-success {
+  color: white !important;
+}
+
+/* Solo para el texto negativo (en rojo), mantener un color destacado */
+.balance-amount h3.text-danger {
+  color: #ff595e !important; /* Mantener el rojo para valores negativos */
+}
+
+[data-theme="dark"] .balance-amount h3.text-danger {
+  color: #ff595e !important; /* Mantener el rojo para valores negativos en modo oscuro */
+}
+
+/* Garantizar que todos los íconos en modo oscuro sean visibles */
+[data-theme="dark"] .btn-toggle-accounts i,
+[data-theme="dark"] .btn-hide-balance i,
+[data-theme="dark"] .btn-theme-toggle i,
+[data-theme="dark"] .transaction-icon i {
+  color: white !important;
+}
+
+/* Para los íconos de la tarjeta de transacciones */
+[data-theme="dark"] .ingreso-icon i {
+  color: var(--success-color) !important;
+}
+
+[data-theme="dark"] .gasto-icon i {
+  color: var(--danger-color) !important;
 }

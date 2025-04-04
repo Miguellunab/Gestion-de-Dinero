@@ -168,3 +168,109 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: #aaaaaa;
 }
+
+/* Añadir a login.css */
+[data-theme="dark"] body {
+  background-color: #0d1117 !important;
+  color: white !important;
+}
+
+[data-theme="dark"] .login-container,
+[data-theme="dark"] .login-form {
+  background-color: #161b22 !important;
+  border-color: #30363d !important;
+}
+
+[data-theme="dark"] .login-header {
+  color: white !important;
+}
+
+[data-theme="dark"] .form-control {
+  background-color: #2d2d2d !important;
+  color: white !important;
+  border-color: #333 !important;
+}
+
+[data-theme="dark"] .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Mejorar visibilidad de los placeholders */
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+  opacity: 1 !important; /* Algunos navegadores aplican opacidad adicional */
+}
+
+/* Asegurar que los selects también tengan buen contraste */
+[data-theme="dark"] .form-select {
+  background-color: #2d2d2d !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+  color: white !important;
+}
+
+/* Botón de tema en login */
+.btn-theme-toggle {
+  color: #333;
+  background-color: rgba(0, 0, 0, 0.1);
+  border: none;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+[data-theme="dark"] .btn-theme-toggle {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-theme-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+[data-theme="dark"] .btn-theme-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Corregir botón de acceder en modo oscuro */
+[data-theme="dark"] .btn-enter,
+[data-theme="dark"] .btn-primary,
+[data-theme="dark"] button[type="submit"] {
+  color: white !important;
+  background-color: var(--dark-color) !important;
+}
+
+/* Asegurar que todos los textos importantes sean visibles */
+[data-theme="dark"] h1, 
+[data-theme="dark"] h2, 
+[data-theme="dark"] h3, 
+[data-theme="dark"] h4, 
+[data-theme="dark"] h5,
+[data-theme="dark"] p,
+[data-theme="dark"] label,
+[data-theme="dark"] .profile-name,
+[data-theme="dark"] .card-title {
+  color: white !important;
+}
+
+/* Corregir nombres de usuarios y otras tarjetas */
+[data-theme="dark"] .profile-card {
+  background-color: #1e1e1e !important;
+  border-color: #30363d !important;
+}
+
+[data-theme="dark"] .new-profile-card {
+  background-color: #1e1e1e !important;
+  border: 2px dashed #3d444c !important;
+}
+
+[data-theme="dark"] .new-profile-icon {
+  color: #6c757d !important;
+}

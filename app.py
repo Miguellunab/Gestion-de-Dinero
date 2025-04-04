@@ -4,8 +4,11 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from config import Config
 from models import db, Profile, Gasto, Ingreso, Billetera
 from flask_migrate import Migrate
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date  # Añadir importación de funciones para manipular fechas
+import calendar
 from flask_wtf.csrf import CSRFProtect  # Añadir esta importación al principio del archivo
+import json
+from markupsafe import Markup
 
 # Cargar variables de entorno del archivo .env
 load_dotenv()  # Añadir esta línea antes de crear la app
@@ -65,6 +68,20 @@ def format_money(value):
     return s
 
 app.jinja_env.filters['format_money'] = format_money
+
+# Registrar filtros de template
+@app.template_filter('tojson')
+def _tojson(obj):
+    return Markup(json.dumps(obj))
+
+@app.template_filter('format_money')
+def format_money(value):
+    """Formatea valores monetarios correctamente."""
+    try:
+        # Usar el valor directamente sin dividir por 100
+        return f"{value:,.0f}".replace(",", ".")
+    except (TypeError, ValueError):
+        return "0"
 
 # ---------------------- MIDDLEWARE PARA TIMEOUT DE SESIÓN ----------------------
 @app.before_request
@@ -560,6 +577,112 @@ def eliminar_billetera(id):
     
     flash(f'Billetera "{nombre_billetera}" eliminada correctamente', 'success')
     return redirect(url_for('listar_billeteras'))
+
+@app.route('/informes')
+def informes():
+    if 'profile_id' not in session:
+        return redirect(url_for('login'))
+    
+    profile_id = session['profile_id']
+    profile = Profile.query.get_or_404(profile_id)
+    
+    # Obtener período de tiempo (por defecto: último mes)
+    periodo = request.args.get('periodo', 'mes')
+    
+    # Calcular fechas
+    hoy = date.today()
+    
+    if periodo == 'año':
+        inicio = date(hoy.year, 1, 1)
+        fin = date(hoy.year, 12, 31)
+    elif periodo == 'trimestre':
+        mes_actual = hoy.month
+        trimestre_actual = (mes_actual - 1) // 3 + 1
+        mes_inicio = (trimestre_actual - 1) * 3 + 1
+        mes_fin = mes_inicio + 2
+        
+        inicio = date(hoy.year, mes_inicio, 1)
+        ultimo_dia = calendar.monthrange(hoy.year, mes_fin)[1]
+        fin = date(hoy.year, mes_fin, ultimo_dia)
+    else:  # mes por defecto
+        inicio = date(hoy.year, hoy.month, 1)
+        ultimo_dia = calendar.monthrange(hoy.year, hoy.month)[1]
+        fin = date(hoy.year, hoy.month, ultimo_dia)
+    
+    # Convertir a datetime para consulta
+    fecha_inicio = datetime.combine(inicio, datetime.min.time())
+    fecha_fin = datetime.combine(fin, datetime.max.time())
+    
+    # Consultar gastos e ingresos en el periodo
+    gastos = Gasto.query.filter(
+        Gasto.profile_id == profile_id,
+        Gasto.fecha.between(fecha_inicio, fecha_fin)
+    ).order_by(Gasto.fecha).all()
+    
+    ingresos = Ingreso.query.filter(
+        Ingreso.profile_id == profile_id,
+        Ingreso.fecha.between(fecha_inicio, fecha_fin)
+    ).order_by(Ingreso.fecha).all()
+    
+    # Preparar datos para gráficos
+    # 1. Datos por fecha (línea temporal)
+    fecha_dict = {}
+    
+    for gasto in gastos:
+        fecha_str = gasto.fecha.strftime('%Y-%m-%d')
+        if fecha_str not in fecha_dict:
+            fecha_dict[fecha_str] = {'gastos': 0, 'ingresos': 0}
+        fecha_dict[fecha_str]['gastos'] += gasto.monto
+    
+    for ingreso in ingresos:
+        fecha_str = ingreso.fecha.strftime('%Y-%m-%d')
+        if fecha_str not in fecha_dict:
+            fecha_dict[fecha_str] = {'gastos': 0, 'ingresos': 0}
+        fecha_dict[fecha_str]['ingresos'] += ingreso.monto
+    
+    # Convertir a lista de tuplas ordenada por fecha
+    fechas = []
+    for fecha_str, valores in sorted(fecha_dict.items()):
+        fechas.append([fecha_str, valores])
+    
+    # 2. Datos por cuenta (gráfico circular)
+    gastos_por_cuenta = {}
+    for gasto in gastos:
+        cuenta = gasto.cuenta or "Efectivo"
+        if cuenta not in gastos_por_cuenta:
+            gastos_por_cuenta[cuenta] = 0
+        gastos_por_cuenta[cuenta] += gasto.monto
+    
+    ingresos_por_cuenta = {}
+    for ingreso in ingresos:
+        cuenta = ingreso.cuenta or "Efectivo"
+        if cuenta not in ingresos_por_cuenta:
+            ingresos_por_cuenta[cuenta] = 0
+        ingresos_por_cuenta[cuenta] += ingreso.monto
+    
+    # Consultar billeteras para colores consistentes
+    billeteras = Billetera.query.filter_by(profile_id=profile_id).all()
+    billeteras_dict = {b.nombre: {"icono": b.icono, "color": b.color} for b in billeteras}
+    
+    # Calcular totales
+    total_gastos = sum(gasto.monto for gasto in gastos)
+    total_ingresos = sum(ingreso.monto for ingreso in ingresos)
+    balance_periodo = total_ingresos - total_gastos
+    
+    return render_template(
+        'informes.html',
+        profile=profile,
+        periodo=periodo,
+        fechas=fechas,
+        gastos_por_cuenta=gastos_por_cuenta,
+        ingresos_por_cuenta=ingresos_por_cuenta,
+        billeteras_dict=billeteras_dict,
+        total_gastos=total_gastos,
+        total_ingresos=total_ingresos,
+        balance_periodo=balance_periodo,
+        fecha_inicio=inicio,
+        fecha_fin=fin
+    )
 
 # Ruta index: redirige a dashboard o login según la sesión
 @app.route('/')

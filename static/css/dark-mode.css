@@ -1,0 +1,174 @@
+:root {
+    /* Variables para tema claro (default) */
+    --bg-color: #f5f7fa;
+    --card-bg: #ffffff;
+    --text-color: #212529;
+    --text-muted: #6c757d;
+    --border-color: #e0e0e0;
+    --shadow-color: rgba(0, 0, 0, 0.05);
+    
+    /* Las variables de colores primarios permanecen igual */
+}
+
+/* Tema oscuro */
+[data-theme="dark"] {
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --text-color: #f8f9fa;
+    --text-muted: #adb5bd;
+    --border-color: #2d2d2d;
+    --shadow-color: rgba(0, 0, 0, 0.2);
+    
+    /* Ajustar colores de tarjetas en tema oscuro */
+    --primary-dark: #2a75e8;
+    --success-dark: #2c9d00;
+    --danger-dark: #e63946;
+}
+
+/* Aplicar a los elementos principales */
+[data-theme="dark"] body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .card,
+[data-theme="dark"] .modal-content,
+[data-theme="dark"] .action-card,
+[data-theme="dark"] .transactions-card {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .input-group-text {
+    background-color: #2d2d2d;
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .form-control:focus {
+    background-color: #333;
+    border-color: var(--primary-color);
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .transaction-item {
+    border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .transaction-description,
+[data-theme="dark"] .transaction-account,
+[data-theme="dark"] .transaction-date {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .btn-action {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .nav-tabs .nav-link {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .nav-tabs .nav-link.active {
+    color: var(--text-color);
+    border-bottom-color: var(--primary-color);
+}
+
+/* Ajustes para gráficos en modo oscuro */
+[data-theme="dark"] .chart-container {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+/* Ajustes para encabezados */
+[data-theme="dark"] .transactions-header,
+[data-theme="dark"] .action-header {
+    background-color: #252525;
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+/* Estilos para login en modo oscuro */
+[data-theme="dark"] .login-container {
+  background-color: #161b22 !important;
+  color: white !important;
+  border-color: #30363d !important;
+}
+
+[data-theme="dark"] .login-header,
+[data-theme="dark"] .login-title,
+[data-theme="dark"] .form-label,
+[data-theme="dark"] label,
+[data-theme="dark"] p {
+  color: white !important;
+}
+
+[data-theme="dark"] a {
+  color: #58a6ff !important;
+}
+
+[data-theme="dark"] .form-control {
+  background-color: #2d2d2d !important;
+  color: white !important;
+  border-color: #333 !important;
+}
+
+/* Corregir colores en la página de login */
+[data-theme="dark"] .login-form h1,
+[data-theme="dark"] .login-form h2,
+[data-theme="dark"] .login-form h3,
+[data-theme="dark"] .login-form h4,
+[data-theme="dark"] .login-form label,
+[data-theme="dark"] .login-form .form-label,
+[data-theme="dark"] .login-form p {
+    color: white !important;
+}
+
+/* Asegurar que el botón de acceso sea visible */
+[data-theme="dark"] .btn-primary,
+[data-theme="dark"] .btn-success,
+[data-theme="dark"] #btnLogin {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: white !important;
+}
+
+/* Corregir nombres de usuario en selección de perfil */
+[data-theme="dark"] .profile-card,
+[data-theme="dark"] .profile-name,
+[data-theme="dark"] .profile-card .card-title,
+[data-theme="dark"] .profile-card .card-text,
+[data-theme="dark"] .user-card .username {
+    color: white !important;
+}
+
+/* Corregir colores en tarjetas de perfil */
+[data-theme="dark"] .profile-card,
+[data-theme="dark"] .user-card {
+    background-color: #1e1e1e !important;
+    border-color: #333 !important;
+}
+
+/* Asegurar que todos los textos sean visibles en modo oscuro */
+[data-theme="dark"] .btn-link,
+[data-theme="dark"] a:not(.btn),
+[data-theme="dark"] span,
+[data-theme="dark"] small {
+    color: #58a6ff !important;
+}
+
+/* Asegurar que los textos en botones permanezcan con el color correcto */
+[data-theme="dark"] .btn:not(.btn-link) span {
+    color: inherit !important;
+}
+
+/* Corregir enlaces de color claro en modo oscuro */
+[data-theme="dark"] .text-muted {
+    color: #adb5bd !important;
+}
+
+/* Asegurar que los textos en campos de formulario son visibles */
+[data-theme="dark"] .form-control {
+    color: white !important;
+}

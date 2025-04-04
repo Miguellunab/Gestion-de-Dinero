@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0" />
+    <title>Informes - Dinero App</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet" />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="{{ url_for('static', filename='images/favicon.png', _external=True) }}?v=2" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="{{ url_for('static', filename='images/favicon.png', _external=True) }}?v=2" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="{{ url_for('static', filename='images/favicon.png', _external=True) }}?v=2" />
+
+    <!-- CSS personalizado -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/dashboard.css') }}?v=2" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/dark-mode.css') }}?v=1" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/informes.css') }}?v=1" />
+  </head>
+  <body>
+    <!-- Barra de navegación -->
+    <nav
+      class="navbar navbar-dark"
+      style="background-color: var(--dark-color)">
+      <div class="container d-flex justify-content-between align-items-center">
+        <span class="navbar-brand mb-0">
+          <img
+            src="{{ url_for('static', filename='images/favicon.png', _external=True) }}"
+            alt="Wallet Logo"
+            class="app-logo" />
+          Hola, {{ profile.name }}
+        </span>
+        <div class="d-flex align-items-center">
+          <button
+            id="theme-toggle"
+            class="btn-theme-toggle me-3">
+            <i
+              id="theme-icon"
+              class="fas fa-moon"></i>
+          </button>
+          <a
+            href="{{ url_for('dashboard') }}"
+            class="btn-back me-3">
+            <i class="fas fa-chart-line"></i>
+            <span>Dashboard</span>
+          </a>
+          <a
+            href="{{ url_for('logout') }}"
+            class="btn-logout">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Cerrar sesión</span>
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container py-4">
+      <!-- Logo principal -->
+      <div class="logo-container">
+        <img
+          src="{{ url_for('static', filename='images/favicon.png', _external=True) }}"
+          alt="Wallet Logo"
+          class="main-logo" />
+        <h1 class="h4 mb-3">Informes Financieros</h1>
+      </div>
+
+      <!-- Selector de período -->
+      <div class="period-selector mb-4">
+        <div
+          class="btn-group"
+          role="group">
+          <a
+            href="{{ url_for('informes', periodo='mes') }}"
+            class="btn btn-outline-primary {{ 'active' if periodo == 'mes' else '' }}"
+            >Mes actual</a
+          >
+          <a
+            href="{{ url_for('informes', periodo='trimestre') }}"
+            class="btn btn-outline-primary {{ 'active' if periodo == 'trimestre' else '' }}"
+            >Trimestre</a
+          >
+          <a
+            href="{{ url_for('informes', periodo='año') }}"
+            class="btn btn-outline-primary {{ 'active' if periodo == 'año' else '' }}"
+            >Año {{ fecha_inicio.year }}</a
+          >
+        </div>
+        <div class="period-info">
+          {{ fecha_inicio.strftime('%d/%m/%Y') }} - {{
+          fecha_fin.strftime('%d/%m/%Y') }}
+        </div>
+      </div>
+
+      <!-- Tarjetas de resumen -->
+      <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+          <div class="summary-card income">
+            <div class="summary-icon">
+              <i class="fas fa-arrow-up"></i>
+            </div>
+            <div class="summary-details">
+              <h5>Ingresos</h5>
+              <h3>${{ total_ingresos|format_money }}</h3>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="summary-card expense">
+            <div class="summary-icon">
+              <i class="fas fa-arrow-down"></i>
+            </div>
+            <div class="summary-details">
+              <h5>Gastos</h5>
+              <h3>${{ total_gastos|format_money }}</h3>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="summary-card balance">
+            <div class="summary-icon">
+              <i class="fas fa-wallet"></i>
+            </div>
+            <div class="summary-details">
+              <h5>Balance</h5>
+              <h3
+                class="{{ 'text-success' if balance_periodo >= 0 else 'text-danger' }}">
+                ${{ balance_periodo|format_money }}
+              </h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gráficos -->
+      <div class="row">
+        <!-- Gráfico de línea temporal -->
+        <div class="col-lg-8 mb-4">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h4>Flujo de Dinero</h4>
+              <div class="chart-legend">
+                <span class="legend-item"
+                  ><i class="fas fa-circle text-success"></i> Ingresos</span
+                >
+                <span class="legend-item"
+                  ><i class="fas fa-circle text-danger"></i> Gastos</span
+                >
+              </div>
+            </div>
+            <div class="chart-body">
+              <canvas id="timelineChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gráfico de balance acumulado -->
+        <div class="col-lg-4 mb-4">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h4>Balance acumulado</h4>
+            </div>
+            <div class="chart-body">
+              <canvas id="balanceChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gráficos circulares -->
+        <div class="col-md-6 mb-4">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h4>Distribución de Gastos</h4>
+            </div>
+            <div class="chart-body">
+              <canvas id="expensePieChart"></canvas>
+              <div
+                id="expenseLegend"
+                class="chart-legend-container mt-3"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h4>Distribución de Ingresos</h4>
+            </div>
+            <div class="chart-body">
+              <canvas id="incomePieChart"></canvas>
+              <div
+                id="incomeLegend"
+                class="chart-legend-container mt-3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="{{ url_for('static', filename='js/theme-switcher.js') }}?v=1"></script>
+
+    <script>
+      // Crear datos como variables globales usando el formato correcto para Jinja
+      var datosJson = {
+        fechas: JSON.parse('{{ fechas|tojson|safe }}'),
+        gastosPorCuenta: JSON.parse('{{ gastos_por_cuenta|tojson|safe }}'),
+        ingresosPorCuenta: JSON.parse('{{ ingresos_por_cuenta|tojson|safe }}'),
+        billeterasColores: JSON.parse('{{ billeteras_dict|tojson|safe }}'),
+      };
+
+      document.addEventListener('DOMContentLoaded', function () {
+        // Obtener datos de la variable global
+        const fechasData = datosJson.fechas || [];
+        const gastosPorCuenta = datosJson.gastosPorCuenta || {};
+        const ingresosPorCuenta = datosJson.ingresosPorCuenta || {};
+        const billeterasColores = datosJson.billeterasColores || {};
+
+        // Verificar si hay datos para mostrar
+        if (fechasData.length === 0) {
+          document.querySelectorAll('.chart-body').forEach((el) => {
+            el.innerHTML =
+              '<div class="text-center text-muted p-5">No hay datos disponibles para este periodo</div>';
+          });
+          return; // Salir si no hay datos
+        }
+
+        // Configurar tema del Chart.js según el modo actual
+        const isDarkMode =
+          document.documentElement.getAttribute('data-theme') === 'dark';
+        const textColor = isDarkMode ? '#f8f9fa' : '#212529';
+        const gridColor = isDarkMode
+          ? 'rgba(255, 255, 255, 0.1)'
+          : 'rgba(0, 0, 0, 0.1)';
+
+        Chart.defaults.color = textColor;
+        Chart.defaults.scale.grid.color = gridColor;
+
+        // Configurar gráfico de línea temporal
+        const timelineLabels = [];
+        const incomeData = [];
+        const expenseData = [];
+
+        for (const [date, amounts] of fechasData) {
+          // Formatear fecha para mostrar
+          const dateParts = date.split('-');
+          const formattedDate = `${dateParts[2]}/${dateParts[1]}`;
+
+          timelineLabels.push(formattedDate);
+          incomeData.push(amounts.ingresos); // Quitar el /100
+          expenseData.push(amounts.gastos); // Quitar el /100
+        }
+
+        // Gráfico de línea temporal
+        new Chart(document.getElementById('timelineChart'), {
+          type: 'line',
+          data: {
+            labels: timelineLabels,
+            datasets: [
+              {
+                label: 'Ingresos',
+                data: incomeData,
+                borderColor: '#38b000',
+                backgroundColor: 'rgba(56, 176, 0, 0.1)',
+                tension: 0.4,
+                fill: true,
+              },
+              {
+                label: 'Gastos',
+                data: expenseData,
+                borderColor: '#ff595e',
+                backgroundColor: 'rgba(255, 89, 94, 0.1)',
+                tension: 0.4,
+                fill: true,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false,
+              },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    return (
+                      context.dataset.label +
+                      ': $' +
+                      context.raw.toLocaleString('es-CO')
+                    );
+                  },
+                },
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  callback: function (value) {
+                    return '$' + value.toLocaleString('es-CO');
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        // Gráfico de balance acumulado
+        const balanceData = [];
+        let runningBalance = 0;
+
+        for (let i = 0; i < timelineLabels.length; i++) {
+          runningBalance += incomeData[i] - expenseData[i];
+          balanceData.push(runningBalance);
+        }
+
+        new Chart(document.getElementById('balanceChart'), {
+          type: 'line',
+          data: {
+            labels: timelineLabels,
+            datasets: [
+              {
+                label: 'Balance',
+                data: balanceData,
+                borderColor: '#4a9de9',
+                backgroundColor: 'rgba(74, 157, 233, 0.1)',
+                tension: 0.4,
+                fill: true,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false,
+              },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    return 'Balance: $' + context.raw.toLocaleString('es-CO');
+                  },
+                },
+              },
+            },
+            scales: {
+              y: {
+                ticks: {
+                  callback: function (value) {
+                    return '$' + value.toLocaleString('es-CO');
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        // Funciones auxiliares para los gráficos circulares
+        function getDefaultColor(index) {
+          const defaultColors = [
+            '#4a9de9',
+            '#38b000',
+            '#ff595e',
+            '#ff9e00',
+            '#6f42c1',
+            '#20c997',
+            '#6c757d',
+            '#e83e8c',
+            '#fd7e14',
+            '#17a2b8',
+          ];
+          return defaultColors[index % defaultColors.length];
+        }
+
+        function createPieChart(elementId, data, legendId) {
+          const labels = Object.keys(data);
+          const amounts = Object.values(data).map((v) => v / 100);
+          const colors = labels.map(
+            (label, index) => billeterasColores[label] || getDefaultColor(index)
+          );
+
+          new Chart(document.getElementById(elementId), {
+            type: 'doughnut',
+            data: {
+              labels: labels,
+              datasets: [
+                {
+                  data: amounts,
+                  backgroundColor: colors,
+                  borderColor: isDarkMode ? '#1e1e1e' : '#ffffff',
+                  borderWidth: 2,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: false,
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function (context) {
+                      const label = context.label || '';
+                      const value = context.raw.toLocaleString('es-CO');
+                      const total = context.chart.data.datasets[0].data.reduce(
+                        (a, b) => a + b,
+                        0
+                      );
+                      const percentage = Math.round(
+                        (context.raw / total) * 100
+                      );
+                      return `${label}: $${value} (${percentage}%)`;
+                    },
+                  },
+                },
+              },
+            },
+          });
+
+          // Crear leyenda personalizada
+          const legendContainer = document.getElementById(legendId);
+          labels.forEach((label, index) => {
+            const item = document.createElement('div');
+            item.className = 'legend-item';
+            item.innerHTML = `
+                      <span class="legend-color" style="background-color: ${
+                        colors[index]
+                      }"></span>
+                      <span class="legend-label">${label}</span>
+                      <span class="legend-value">$${amounts[
+                        index
+                      ].toLocaleString('es-CO')}</span>
+                  `;
+            legendContainer.appendChild(item);
+          });
+        }
+
+        // Crear los gráficos circulares
+        createPieChart('expensePieChart', gastosPorCuenta, 'expenseLegend');
+        createPieChart('incomePieChart', ingresosPorCuenta, 'incomeLegend');
+      });
+    </script>
+  </body>
+</html>

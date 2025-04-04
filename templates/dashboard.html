@@ -43,6 +43,7 @@
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/dashboard.css') }}?v=2" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}?v=1" />
     <style>
       .btn-toggle-accounts {
         background-color: rgba(255, 255, 255, 0.2);
@@ -102,12 +103,15 @@
             class="app-logo" />
           Hola, {{ profile.name }}
         </span>
-        <a
-          href="{{ url_for('logout') }}"
-          class="btn-logout">
-          <i class="fas fa-sign-out-alt"></i>
-          <span>Cerrar sesión</span>
-        </a>
+        <div class="d-flex align-items-center">
+          <button id="theme-toggle" class="btn-theme-toggle me-3">
+            <i id="theme-icon" class="fas fa-moon"></i>
+          </button>
+          <a href="{{ url_for('logout') }}" class="btn-logout">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Cerrar sesión</span>
+          </a>
+        </div>
       </div>
     </nav>
 
@@ -122,73 +126,47 @@
       </div>
 
       <!-- Tarjeta de balance -->
-      <div class="balance-card mb-4">
-        <div class="row align-items-center">
-          <div class="col">
-            <h6 class="mb-1 opacity-75">Balance Actual</h6>
-            <div class="d-flex align-items-center balance-amount">
-              <h2
-                class="mb-0"
-                id="balanceAmount">
-                ${{ balance|format_money }}
-              </h2>
-              <button
-                class="btn-hide-balance"
-                id="toggleBalance"
-                title="Mostrar/Ocultar Balance">
-                <i
-                  class="fas fa-eye"
-                  id="balanceIcon"></i>
-              </button>
-              <!-- Agregar botón para mostrar desglose por cuentas -->
-              <button
-                class="btn-toggle-accounts ms-2"
-                id="toggleAccounts"
-                title="Ver saldos por cuenta">
-                <i
-                  class="fas fa-chevron-down"
-                  id="accountsIcon"></i>
-              </button>
-            </div>
+      <div class="balance-card">
+        <div class="balance-info">
+          <h5>Balance</h5>
+          <div class="balance-amount">
+            <h3 class="{{ 'text-success' if balance >= 0 else 'text-danger' }} {{ 'balance-hidden' if hide_balance else '' }}">
+              ${{ balance|format_money }}
+            </h3>
+            <button class="btn-hide-balance" onclick="toggleBalance()">
+              <i class="fas fa-eye{{ '-slash' if hide_balance else '' }}"></i>
+            </button>
           </div>
-          <div class="col-auto">
-            <img
-              src="{{ url_for('static', filename='images/favicon.png', _external=True) }}"
-              alt="Wallet Logo"
-              class="balance-logo" />
-          </div>
-        </div>
-
-        <!-- Modificar la cuenta en la tarjeta de balance para mostrar desglose -->
-        <div
-          id="accountDetails"
-          class="account-details mt-3 pt-2"
-          style="display: none">
-          <hr class="mb-2 opacity-25" />
-          <h6 class="opacity-75 mb-2">Desglose por cuentas</h6>
-
-          <div class="account-list">
-            {% for cuenta, monto in balance_por_cuenta.items() %}
-            <div
-              class="account-item d-flex justify-content-between align-items-center mb-2">
-              <div class="account-name d-flex align-items-center">
-                {% if cuenta in billeteras_dict %}
-                <i
-                  class="fas fa-{{ billeteras_dict[cuenta]['icono'] }} me-2"
-                  style="color: {{ billeteras_dict[cuenta]['color'] }}"></i>
-                {% else %}
-                <i class="fas fa-wallet me-2"></i>
-                {% endif %} {{ cuenta }}
-              </div>
-              <div class="account-balance">
-                <span
-                  class="{% if monto > 0 %}text-white{% else %}text-danger{% endif %}">
-                  ${{ monto|format_money }}
-                </span>
-              </div>
+          <!-- Si hay cuentas para mostrar -->
+          {% if balance_por_cuenta %}
+          <div id="accountDetails" class="account-details mt-3" style="{{ 'display: none;' if not show_accounts else '' }}">
+            {% for cuenta, saldo in balance_por_cuenta.items() %}
+            <div class="account-item">
+              <span class="account-name">
+                {% if billeteras_dict.get(cuenta) %}
+                <i class="{{ billeteras_dict[cuenta]['icono'] }}" style="color: {{ billeteras_dict[cuenta]['color'] }};"></i>
+                {% endif %}
+                {{ cuenta }}:
+              </span>
+              <strong class="{{ 'balance-hidden' if hide_balance else '' }}">
+                ${{ saldo|format_money }}
+              </strong>
             </div>
             {% endfor %}
           </div>
+          {% endif %}
+        </div>
+        <div class="balance-actions">
+          <!-- Botón para mostrar/ocultar el desglose de cuentas -->
+          {% if balance_por_cuenta %}
+          <button class="btn-toggle-accounts" onclick="toggleAccounts()" title="Ver detalles por cuenta">
+            <i class="fas fa-list{{ '-ul' if show_accounts else '' }}"></i>
+          </button>
+          {% endif %}
+          <!-- Botón de informes (posicionado a la derecha) -->
+          <a href="{{ url_for('informes') }}" class="btn-informes" title="Informes y gráficos">
+            <i class="fas fa-chart-line"></i>
+          </a>
         </div>
       </div>
 
@@ -705,6 +683,37 @@
           }
         });
       });
+    </script>
+    <script src="{{ url_for('static', filename='js/theme-switcher.js') }}?v=1"></script>
+    <script>
+      // Añadir este script en dashboard.html (o asegurarte que exista)
+      function toggleBalance() {
+        const balanceElements = document.querySelectorAll('.balance-amount h3, .account-item strong');
+        balanceElements.forEach(el => {
+          el.classList.toggle('balance-hidden');
+        });
+        
+        const eyeIcon = document.querySelector('.btn-hide-balance i');
+        eyeIcon.classList.toggle('fa-eye');
+        eyeIcon.classList.toggle('fa-eye-slash');
+      }
+    </script>
+    <script>
+      // Añadir este script en dashboard.html (o asegurarte que exista)
+      function toggleAccounts() {
+        const accountDetails = document.getElementById('accountDetails');
+        const accountsIcon = document.querySelector('.btn-toggle-accounts i');
+        
+        if (accountDetails.style.display === 'none') {
+          accountDetails.style.display = 'block';
+          accountsIcon.classList.remove('fa-list');
+          accountsIcon.classList.add('fa-list-ul');
+        } else {
+          accountDetails.style.display = 'none';
+          accountsIcon.classList.remove('fa-list-ul');
+          accountsIcon.classList.add('fa-list');
+        }
+      }
     </script>
   </body>
 </html>
