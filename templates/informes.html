@@ -188,35 +188,6 @@
             </div>
           </div>
         </div>
-
-        <!-- Gráficos circulares -->
-        <div class="col-md-6 mb-4">
-          <div class="chart-card">
-            <div class="chart-header">
-              <h4>Distribución de Gastos</h4>
-            </div>
-            <div class="chart-body">
-              <canvas id="expensePieChart"></canvas>
-              <div
-                id="expenseLegend"
-                class="chart-legend-container mt-3"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-6 mb-4">
-          <div class="chart-card">
-            <div class="chart-header">
-              <h4>Distribución de Ingresos</h4>
-            </div>
-            <div class="chart-body">
-              <canvas id="incomePieChart"></canvas>
-              <div
-                id="incomeLegend"
-                class="chart-legend-container mt-3"></div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -235,22 +206,21 @@
       };
 
       // Variables globales para las referencias de los gráficos
-      var timelineChart, balanceChart, expensePieChart, incomePieChart;
+      var timelineChart, balanceChart; // Eliminar expensePieChart, incomePieChart
 
       // Variables globales para los datos procesados
       var timelineLabels = [],
         incomeData = [],
         expenseData = [],
         balanceData = [];
-      var gastosPorCuenta = {},
-        ingresosPorCuenta = {};
+      // Eliminar: var gastosPorCuenta = {}, ingresosPorCuenta = {};
 
       document.addEventListener('DOMContentLoaded', function () {
         // Obtener datos de la variable global
         const fechasData = datosJson.fechas || [];
-        gastosPorCuenta = datosJson.gastosPorCuenta || {};
-        ingresosPorCuenta = datosJson.ingresosPorCuenta || {};
-        const billeterasColores = datosJson.billeterasColores || {};
+        // Eliminar: gastosPorCuenta = datosJson.gastosPorCuenta || {};
+        // Eliminar: ingresosPorCuenta = datosJson.ingresosPorCuenta || {};
+        // Eliminar: const billeterasColores = datosJson.billeterasColores || {};
 
         // Verificar si hay datos para mostrar
         if (fechasData.length === 0) {
@@ -267,7 +237,7 @@
         // Aplicar el tema correcto a los gráficos
         applyChartTheme();
 
-        // Inicializar todos los gráficos
+        // Inicializar solo los gráficos necesarios
         createAllCharts();
       });
 
@@ -313,20 +283,20 @@
       function createAllCharts() {
         createTimelineChart();
         createBalanceChart();
-        createPieChart('expensePieChart', gastosPorCuenta, 'expenseLegend');
-        createPieChart('incomePieChart', ingresosPorCuenta, 'incomeLegend');
+        // Eliminar: createPieChart('expensePieChart', gastosPorCuenta, 'expenseLegend');
+        // Eliminar: createPieChart('incomePieChart', ingresosPorCuenta, 'incomeLegend');
       }
 
       // Función para destruir todos los gráficos existentes
       function destroyAllCharts() {
         if (timelineChart) timelineChart.destroy();
         if (balanceChart) balanceChart.destroy();
-        if (expensePieChart) expensePieChart.destroy();
-        if (incomePieChart) incomePieChart.destroy();
+        // Eliminar: if (expensePieChart) expensePieChart.destroy();
+        // Eliminar: if (incomePieChart) incomePieChart.destroy();
 
-        // También limpiar las leyendas personalizadas
-        document.getElementById('expenseLegend').innerHTML = '';
-        document.getElementById('incomeLegend').innerHTML = '';
+        // Eliminar: // También limpiar las leyendas personalizadas
+        // Eliminar: document.getElementById('expenseLegend').innerHTML = '';
+        // Eliminar: document.getElementById('incomeLegend').innerHTML = '';
       }
 
       // Función para crear el gráfico de línea temporal
@@ -431,100 +401,6 @@
               },
             },
           },
-        });
-      }
-
-      // Funciones auxiliares para los gráficos circulares
-      function getDefaultColor(index) {
-        const defaultColors = [
-          '#4a9de9',
-          '#38b000',
-          '#ff595e',
-          '#ff9e00',
-          '#6f42c1',
-          '#20c997',
-          '#6c757d',
-          '#e83e8c',
-          '#fd7e14',
-          '#17a2b8',
-        ];
-        return defaultColors[index % defaultColors.length];
-      }
-
-      function createPieChart(elementId, data, legendId) {
-        const labels = Object.keys(data);
-        const amounts = Object.values(data);
-        const billeterasColores = datosJson.billeterasColores || {};
-        const isDarkMode =
-          document.documentElement.getAttribute('data-theme') === 'dark';
-
-        const colors = labels.map(
-          (label, index) => billeterasColores[label] || getDefaultColor(index)
-        );
-
-        const ctx = document.getElementById(elementId).getContext('2d');
-        const chart = new Chart(ctx, {
-          type: 'doughnut',
-          data: {
-            labels: labels,
-            datasets: [
-              {
-                data: amounts,
-                backgroundColor: colors,
-                borderColor: isDarkMode ? '#1e1e1e' : '#ffffff',
-                borderWidth: 2,
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                display: false,
-              },
-              tooltip: {
-                callbacks: {
-                  label: function (context) {
-                    const label = context.label || '';
-                    const value = context.raw.toLocaleString('es-CO');
-                    const total = context.chart.data.datasets[0].data.reduce(
-                      (a, b) => a + b,
-                      0
-                    );
-                    const percentage = Math.round((context.raw / total) * 100);
-                    return `${label}: $${value} (${percentage}%)`;
-                  },
-                },
-              },
-            },
-          },
-        });
-
-        // Guardar la referencia en la variable adecuada
-        if (elementId === 'expensePieChart') {
-          expensePieChart = chart;
-        } else if (elementId === 'incomePieChart') {
-          incomePieChart = chart;
-        }
-
-        // Crear leyenda personalizada
-        const legendContainer = document.getElementById(legendId);
-        legendContainer.innerHTML = ''; // Limpiar leyendas anteriores
-
-        labels.forEach((label, index) => {
-          const item = document.createElement('div');
-          item.className = 'legend-item';
-          item.innerHTML = `
-            <span class="legend-color" style="background-color: ${
-              colors[index]
-            }"></span>
-            <span class="legend-label">${label}</span>
-            <span class="legend-value">$${amounts[index].toLocaleString(
-              'es-CO'
-            )}</span>
-          `;
-          legendContainer.appendChild(item);
         });
       }
 
