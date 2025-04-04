@@ -2,9 +2,7 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gestión de Dinero</title>
 
     <!-- Bootstrap 5 CDN -->
@@ -39,12 +37,15 @@
       sizes="180x180"
       href="{{ url_for('static', filename='images/favicon.png', _external=True) }}?v=2" />
 
-    <!-- CSS personalizado para dashboard -->
+    <!-- CSS personalizado para dashboard y modo oscuro -->
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/dashboard.css') }}?v=2" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}?v=1" />
+
+    <!-- Estilos adicionales en línea -->
     <style>
+      /* Botón para toggle de cuentas y detalles */
       .btn-toggle-accounts {
         background-color: rgba(255, 255, 255, 0.2);
         color: white;
@@ -57,34 +58,29 @@
         justify-content: center;
         transition: all 0.2s;
       }
-
       .btn-toggle-accounts:hover {
         background-color: rgba(255, 255, 255, 0.3);
         transform: translateY(-1px);
       }
-
+      /* Detalles de cuentas */
       .account-details {
         color: white;
         border-top: 1px solid rgba(255, 255, 255, 0.1);
       }
-
       .account-item {
         font-size: 0.95rem;
       }
-
       .account-name i {
         opacity: 0.9;
       }
-
-      /* Para la visualización de la cuenta en los movimientos */
+      /* Visualización de la cuenta en movimientos */
       .transaction-account {
         display: block;
         font-size: 0.8rem;
         margin-top: 3px;
         color: #6c757d;
       }
-
-      /* Para el botón de configuración en los selectores */
+      /* Configuración en selectores */
       .btn-outline-secondary {
         border-color: #ced4da;
       }
@@ -92,9 +88,7 @@
   </head>
   <body>
     <!-- Barra superior -->
-    <nav
-      class="navbar navbar-dark"
-      style="background-color: var(--dark-color)">
+    <nav class="navbar navbar-dark" style="background-color: var(--dark-color)">
       <div class="container d-flex justify-content-between align-items-center">
         <span class="navbar-brand mb-0">
           <img
@@ -172,202 +166,91 @@
 
       <!-- Pestañas de acción: Ingreso y Gasto -->
       <div class="mb-4">
-        <ul
-          class="nav nav-tabs"
-          id="actionTabs"
-          role="tablist">
-          <li
-            class="nav-item"
-            role="presentation">
-            <button
-              class="nav-link active"
-              id="ingreso-tab"
-              data-bs-toggle="tab"
-              data-bs-target="#ingreso"
-              type="button"
-              role="tab"
-              aria-selected="true">
+        <ul class="nav nav-tabs" id="actionTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="ingreso-tab" data-bs-toggle="tab" data-bs-target="#ingreso" type="button" role="tab" aria-selected="true">
               <i class="fas fa-plus-circle text-success me-2"></i>Ingreso
             </button>
           </li>
-          <li
-            class="nav-item"
-            role="presentation">
-            <button
-              class="nav-link"
-              id="gasto-tab"
-              data-bs-toggle="tab"
-              data-bs-target="#gasto"
-              type="button"
-              role="tab"
-              aria-selected="false">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="gasto-tab" data-bs-toggle="tab" data-bs-target="#gasto" type="button" role="tab" aria-selected="false">
               <i class="fas fa-minus-circle text-danger me-2"></i>Gasto
             </button>
           </li>
         </ul>
 
-        <div
-          class="tab-content bg-white p-3 rounded-bottom shadow-sm"
-          id="actionTabsContent">
+        <div class="tab-content bg-white p-3 rounded-bottom shadow-sm" id="actionTabsContent">
           <!-- Formulario de Ingreso -->
-          <div
-            class="tab-pane fade show active"
-            id="ingreso"
-            role="tabpanel"
-            aria-labelledby="ingreso-tab">
-            <form
-              action="{{ url_for('agregar_ingreso') }}"
-              method="post">
+          <div class="tab-pane fade show active" id="ingreso" role="tabpanel" aria-labelledby="ingreso-tab">
+            <form action="{{ url_for('agregar_ingreso') }}" method="post">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <div class="mb-3">
-                <label
-                  for="monto_ingreso"
-                  class="form-label"
-                  >Monto (COP):</label
-                >
+                <label for="monto_ingreso" class="form-label">Monto (COP):</label>
                 <div class="input-group">
                   <span class="input-group-text">$</span>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="monto_ingreso"
-                    name="monto"
-                    placeholder="10000"
-                    inputmode="numeric"
-                    required
-                    oninput="formatAsPesos(this)" />
+                  <input type="text" class="form-control" id="monto_ingreso" name="monto" placeholder="10000" inputmode="numeric" required oninput="formatAsPesos(this)" />
                 </div>
               </div>
               <div class="mb-3">
-                <label
-                  for="descripcion_ingreso"
-                  class="form-label"
-                  >Descripción (opcional):</label
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  id="descripcion_ingreso"
-                  name="descripcion"
-                  placeholder="Salario, venta, etc." />
+                <label for="descripcion_ingreso" class="form-label">Descripción (opcional):</label>
+                <input type="text" class="form-control" id="descripcion_ingreso" name="descripcion" placeholder="Salario, venta, etc." />
               </div>
-              <!-- Modificar el selector de cuentas para Ingreso -->
+              <!-- Selector de cuentas para Ingreso -->
               <div class="mb-3">
-                <label
-                  for="cuenta_ingreso"
-                  class="form-label"
-                  >¿Dónde ingresa el dinero?</label
-                >
+                <label for="cuenta_ingreso" class="form-label">¿Dónde ingresa el dinero?</label>
                 <div class="input-group">
-                  <span class="input-group-text"
-                    ><i class="fas fa-wallet"></i
-                  ></span>
-                  <select
-                    class="form-select"
-                    id="cuenta_ingreso"
-                    name="cuenta"
-                    required>
+                  <span class="input-group-text"><i class="fas fa-wallet"></i></span>
+                  <select class="form-select" id="cuenta_ingreso" name="cuenta" required>
                     {% for billetera in billeteras %}
-                    <option
-                      value="{{ billetera.nombre }}"
-                      {% if billetera.nombre == 'Efectivo' %}selected{% endif %}>
+                    <option value="{{ billetera.nombre }}" {% if billetera.nombre == 'Efectivo' %}selected{% endif %}>
                       {{ billetera.nombre }}
                     </option>
                     {% endfor %}
                   </select>
-                  <a
-                    href="{{ url_for('listar_billeteras') }}"
-                    class="btn btn-outline-secondary"
-                    title="Gestionar billeteras">
+                  <a href="{{ url_for('listar_billeteras') }}" class="btn btn-outline-secondary" title="Gestionar billeteras">
                     <i class="fas fa-cog"></i>
                   </a>
                 </div>
               </div>
-              <button
-                type="submit"
-                class="btn btn-ingreso w-100">
+              <button type="submit" class="btn btn-ingreso w-100">
                 <i class="fas fa-check me-2"></i>Agregar Ingreso
               </button>
             </form>
           </div>
 
           <!-- Formulario de Gasto -->
-          <div
-            class="tab-pane fade"
-            id="gasto"
-            role="tabpanel"
-            aria-labelledby="gasto-tab">
-            <form
-              action="{{ url_for('agregar_gasto') }}"
-              method="post">
+          <div class="tab-pane fade" id="gasto" role="tabpanel" aria-labelledby="gasto-tab">
+            <form action="{{ url_for('agregar_gasto') }}" method="post">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <div class="mb-3">
-                <label
-                  for="monto_gasto"
-                  class="form-label"
-                  >Monto (COP):</label
-                >
+                <label for="monto_gasto" class="form-label">Monto (COP):</label>
                 <div class="input-group">
                   <span class="input-group-text">$</span>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="monto_gasto"
-                    name="monto"
-                    placeholder="10000"
-                    inputmode="numeric"
-                    required
-                    oninput="formatAsPesos(this)" />
+                  <input type="text" class="form-control" id="monto_gasto" name="monto" placeholder="10000" inputmode="numeric" required oninput="formatAsPesos(this)" />
                 </div>
               </div>
               <div class="mb-3">
-                <label
-                  for="descripcion_gasto"
-                  class="form-label"
-                  >Descripción (opcional):</label
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  id="descripcion_gasto"
-                  name="descripcion"
-                  placeholder="Comida, transporte, etc." />
+                <label for="descripcion_gasto" class="form-label">Descripción (opcional):</label>
+                <input type="text" class="form-control" id="descripcion_gasto" name="descripcion" placeholder="Comida, transporte, etc." />
               </div>
-              <!-- Modificar el selector de cuentas para Gasto -->
+              <!-- Selector de cuentas para Gasto -->
               <div class="mb-3">
-                <label
-                  for="cuenta_gasto"
-                  class="form-label"
-                  >¿De dónde sale el dinero?</label
-                >
+                <label for="cuenta_gasto" class="form-label">¿De dónde sale el dinero?</label>
                 <div class="input-group">
-                  <span class="input-group-text"
-                    ><i class="fas fa-wallet"></i
-                  ></span>
-                  <select
-                    class="form-select"
-                    id="cuenta_gasto"
-                    name="cuenta"
-                    required>
+                  <span class="input-group-text"><i class="fas fa-wallet"></i></span>
+                  <select class="form-select" id="cuenta_gasto" name="cuenta" required>
                     {% for billetera in billeteras %}
-                    <option
-                      value="{{ billetera.nombre }}"
-                      {% if billetera.nombre == 'Efectivo' %}selected{% endif %}>
+                    <option value="{{ billetera.nombre }}" {% if billetera.nombre == 'Efectivo' %}selected{% endif %}>
                       {{ billetera.nombre }}
                     </option>
                     {% endfor %}
                   </select>
-                  <a
-                    href="{{ url_for('listar_billeteras') }}"
-                    class="btn btn-outline-secondary"
-                    title="Gestionar billeteras">
+                  <a href="{{ url_for('listar_billeteras') }}" class="btn btn-outline-secondary" title="Gestionar billeteras">
                     <i class="fas fa-cog"></i>
                   </a>
                 </div>
               </div>
-              <button
-                type="submit"
-                class="btn btn-gasto w-100">
+              <button type="submit" class="btn btn-gasto w-100">
                 <i class="fas fa-check me-2"></i>Agregar Gasto
               </button>
             </form>
@@ -381,9 +264,8 @@
           <h5>Movimientos Recientes</h5>
           <i class="fas fa-chevron-down transactions-toggle-icon"></i>
         </div>
-        
         <div class="transactions-body" id="transactionsBody" style="display: none;">
-          <!-- Usar la nueva variable page para controlar la paginación -->
+          <!-- Paginación de movimientos -->
           {% set items_per_page = 10 %}
           {% set page = request.args.get('page', 1) | int %}
           {% set start_index = (page - 1) * items_per_page %}
@@ -391,7 +273,6 @@
           {% set all_transactions = (ingresos + gastos) | sort(attribute='fecha', reverse=True) %}
           {% set transactions_page = all_transactions[start_index:end_index] %}
           {% set total_pages = ((all_transactions | length) / items_per_page) | round(0, 'ceil') | int %}
-          
           {% if all_transactions %}
             {% for item in transactions_page %}
               <div class="transaction-item">
@@ -441,7 +322,6 @@
                 </div>
               </div>
             {% endfor %}
-            
             <!-- Paginación -->
             {% if total_pages > 1 %}
               <div class="transactions-pagination">
@@ -450,9 +330,7 @@
                     <i class="fas fa-chevron-left"></i> Anterior
                   </a>
                 {% endif %}
-                
                 <span class="pagination-count">Página {{ page }} de {{ total_pages }}</span>
-                
                 {% if page < total_pages %}
                   <a href="{{ url_for('dashboard', page=page+1) }}" class="pagination-btn">
                     Siguiente <i class="fas fa-chevron-right"></i>
@@ -460,7 +338,6 @@
                 {% endif %}
               </div>
             {% endif %}
-            
           {% else %}
             <div class="no-transactions">
               <div class="text-center p-4">
@@ -473,10 +350,10 @@
       </div>
     </div>
 
-    <!-- Bootstrap Bundle JS -->
+    <!-- Scripts agrupados -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Formato en vivo para montos -->
     <script>
+      // Formato en vivo para montos
       function formatAsPesos(input) {
         let val = input.value.replace(/\D/g, '');
         if (val === '') {
@@ -489,23 +366,20 @@
         input.value = formatted;
       }
     </script>
-    <!-- Script para mostrar/ocultar balance -->
     <script>
+      // Balance toggle
       document.addEventListener('DOMContentLoaded', function () {
         const toggleBalance = document.getElementById('toggleBalance');
         const balanceAmount = document.getElementById('balanceAmount');
         const balanceIcon = document.getElementById('balanceIcon');
-
         const balanceHidden = localStorage.getItem('balanceHidden') === 'true';
         if (balanceHidden) {
           balanceAmount.classList.add('balance-hidden');
           balanceIcon.classList.remove('fa-eye');
           balanceIcon.classList.add('fa-eye-slash');
         }
-
         toggleBalance.addEventListener('click', function () {
           balanceAmount.classList.toggle('balance-hidden');
-
           if (balanceAmount.classList.contains('balance-hidden')) {
             balanceIcon.classList.remove('fa-eye');
             balanceIcon.classList.add('fa-eye-slash');
@@ -518,24 +392,18 @@
         });
       });
     </script>
-    <!-- Agregar este script justo antes del cierre del body -->
     <script>
+      // Toggle de cuentas
       document.addEventListener('DOMContentLoaded', function () {
         const toggleAccounts = document.getElementById('toggleAccounts');
         const accountDetails = document.getElementById('accountDetails');
         const accountsIcon = document.getElementById('accountsIcon');
-
-        // Cargar estado guardado
-        const accountsHidden =
-          localStorage.getItem('accountsHidden') !== 'false';
-
-        // Inicializar según el estado guardado
+        const accountsHidden = localStorage.getItem('accountsHidden') !== 'false';
         if (!accountsHidden) {
           accountDetails.style.display = 'block';
           accountsIcon.classList.remove('fa-chevron-down');
           accountsIcon.classList.add('fa-chevron-up');
         }
-
         toggleAccounts.addEventListener('click', function () {
           if (accountDetails.style.display === 'none') {
             accountDetails.style.display = 'block';
@@ -552,24 +420,17 @@
       });
     </script>
     <script>
-      // Script para colapsar/expandir los movimientos
+      // Colapsar/expandir movimientos
       document.addEventListener('DOMContentLoaded', function() {
         const transactionsHeader = document.getElementById('transactionsHeader');
         const transactionsBody = document.getElementById('transactionsBody');
         const toggleIcon = document.querySelector('.transactions-toggle-icon');
-        
-        // Configuración predeterminada - ocultos por defecto
         let isCollapsed = true;
-        
-        // Comprobar si hay preferencia guardada
         if(localStorage.getItem('transactionsCollapsed') !== null) {
           isCollapsed = localStorage.getItem('transactionsCollapsed') === 'true';
         } else {
-          // Si no hay preferencia, establecer como colapsado por defecto
           localStorage.setItem('transactionsCollapsed', 'true');
         }
-        
-        // Inicializar basado en la preferencia
         if (isCollapsed) {
           transactionsBody.style.display = 'none';
           toggleIcon.classList.add('collapsed');
@@ -577,8 +438,6 @@
           transactionsBody.style.display = 'block';
           toggleIcon.classList.remove('collapsed');
         }
-        
-        // Funcionalidad de alternar
         transactionsHeader.addEventListener('click', function() {
           if (transactionsBody.style.display === 'none') {
             transactionsBody.style.display = 'block';
@@ -592,69 +451,10 @@
         });
       });
     </script>
-    <!-- Modal para editar movimiento -->
-    <div class="modal fade" id="editMovimientoModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Editar Movimiento</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <form id="editMovimientoForm" action="" method="post">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <div class="modal-body">
-              <div class="mb-3">
-                <label for="edit_monto" class="form-label">Monto (COP):</label>
-                <div class="input-group">
-                  <span class="input-group-text">$</span>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="edit_monto"
-                    name="monto"
-                    placeholder="10000"
-                    inputmode="numeric"
-                    required
-                    oninput="formatAsPesos(this)" />
-                </div>
-              </div>
-              
-              <div class="mb-3">
-                <label for="edit_descripcion" class="form-label">Descripción (opcional):</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="edit_descripcion"
-                  name="descripcion"
-                  placeholder="Descripción del movimiento" />
-              </div>
-              
-              <div class="mb-3">
-                <label for="edit_cuenta" class="form-label">Billetera:</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="fas fa-wallet"></i></span>
-                  <select class="form-select" id="edit_cuenta" name="cuenta" required>
-                    {% for billetera in billeteras %}
-                    <option value="{{ billetera.nombre }}">{{ billetera.nombre }}</option>
-                    {% endfor %}
-                  </select>
-                </div>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-              <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-    <!-- Añadir este script dentro del bloque de scripts existente -->
     <script>
-      // Modal para editar movimientos
+      // Modal para editar movimiento
       document.addEventListener('DOMContentLoaded', function() {
         const editModal = document.getElementById('editMovimientoModal');
-        
         editModal.addEventListener('show.bs.modal', function(event) {
           const button = event.relatedTarget;
           const id = button.getAttribute('data-id');
@@ -662,18 +462,12 @@
           const monto = button.getAttribute('data-monto');
           const descripcion = button.getAttribute('data-descripcion');
           const cuenta = button.getAttribute('data-cuenta');
-          
-          // Formatear el monto para mostrar
           const montoFormatted = new Intl.NumberFormat('es-CO', {
             maximumFractionDigits: 0
           }).format(parseInt(monto));
-          
-          // Configurar el formulario
           document.getElementById('editMovimientoForm').action = `/editar_movimiento/${tipo}/${id}`;
           document.getElementById('edit_monto').value = montoFormatted;
           document.getElementById('edit_descripcion').value = descripcion;
-          
-          // Seleccionar la cuenta correcta
           const cuentaSelect = document.getElementById('edit_cuenta');
           for (let i = 0; i < cuentaSelect.options.length; i++) {
             if (cuentaSelect.options[i].value === cuenta) {
@@ -686,24 +480,19 @@
     </script>
     <script src="{{ url_for('static', filename='js/theme-switcher.js') }}?v=1"></script>
     <script>
-      // Añadir este script en dashboard.html (o asegurarte que exista)
+      // Funciones toggle para balance y cuentas
       function toggleBalance() {
         const balanceElements = document.querySelectorAll('.balance-amount h3, .account-item strong');
         balanceElements.forEach(el => {
           el.classList.toggle('balance-hidden');
         });
-        
         const eyeIcon = document.querySelector('.btn-hide-balance i');
         eyeIcon.classList.toggle('fa-eye');
         eyeIcon.classList.toggle('fa-eye-slash');
       }
-    </script>
-    <script>
-      // Añadir este script en dashboard.html (o asegurarte que exista)
       function toggleAccounts() {
         const accountDetails = document.getElementById('accountDetails');
         const accountsIcon = document.querySelector('.btn-toggle-accounts i');
-        
         if (accountDetails.style.display === 'none') {
           accountDetails.style.display = 'block';
           accountsIcon.classList.remove('fa-list');

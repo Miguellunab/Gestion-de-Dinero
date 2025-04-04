@@ -1,5 +1,4 @@
 /* Estilos para la página de informes */
-
 .period-selector {
     display: flex;
     align-items: center;
@@ -13,42 +12,53 @@
     color: var(--text-muted);
 }
 
+/* Mejorar el estilo de los botones del selector de período */
 .btn-group .btn-outline-primary {
     border-color: var(--dark-color);
     color: var(--dark-color);
+    transition: all 0.2s;
 }
 
-.btn-group .btn-outline-primary:hover,
+.btn-group .btn-outline-primary:hover {
+    background-color: rgba(var(--dark-color-rgb), 0.1);
+    color: var(--dark-color);
+}
+
 .btn-group .btn-outline-primary.active {
     background-color: var(--dark-color);
     border-color: var(--dark-color);
-    color: white;
+    color: white !important;
+    font-weight: 500;
 }
 
 [data-theme="dark"] .btn-group .btn-outline-primary {
-    border-color: var(--primary-color);
-    color: var(--text-color);
+    border-color: #4a9de9;
+    color: #a0aec0;
 }
 
-[data-theme="dark"] .btn-group .btn-outline-primary:hover,
+[data-theme="dark"] .btn-group .btn-outline-primary:hover {
+    background-color: rgba(74, 157, 233, 0.1);
+}
+
 [data-theme="dark"] .btn-group .btn-outline-primary.active {
-    background-color: var(--primary-dark, #2a75e8);
-    border-color: var(--primary-dark, #2a75e8);
-    color: white;
+    background-color: #2a75e8;
+    border-color: #2a75e8;
+    color: white !important;
+    font-weight: 500;
 }
 
 /* Mejorar visibilidad de los placeholders */
 [data-theme="dark"] input::placeholder,
 [data-theme="dark"] textarea::placeholder {
-  color: rgba(255, 255, 255, 0.5) !important;
-  opacity: 1 !important; /* Algunos navegadores aplican opacidad adicional */
+    color: rgba(255, 255, 255, 0.5) !important;
+    opacity: 1 !important;
 }
 
 /* Asegurar que los selects también tengan buen contraste */
 [data-theme="dark"] .form-select {
-  background-color: #2d2d2d !important;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
-  color: white !important;
+    background-color: #2d2d2d !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+    color: white !important;
 }
 
 /* Tarjetas de resumen */
@@ -133,9 +143,9 @@
 }
 
 /* Leyendas de gráficos */
-.chart-legend {
-    display: flex;
-    gap: 15px;
+.chart-legend-container {
+    max-height: 150px;
+    overflow-y: auto;
 }
 
 .legend-item {
@@ -162,14 +172,10 @@
     font-weight: 500;
 }
 
-.chart-legend-container {
-    max-height: 150px;
-    overflow-y: auto;
-}
-
 /* Botón para regresar al dashboard */
-.btn-back {
-    color: white;
+.btn-back,
+.btn-dashboard {
+    color: white !important; /* Asegurar que el texto sea blanco */
     background-color: rgba(255, 255, 255, 0.2);
     border: none;
     border-radius: 50px;
@@ -179,17 +185,68 @@
     transition: all 0.3s;
     font-weight: 500;
     text-decoration: none;
+    gap: 6px;
 }
 
-.btn-back:hover {
+.btn-back:hover,
+.btn-dashboard:hover {
     background-color: rgba(255, 255, 255, 0.3);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    color: white;
 }
 
-.btn-back i {
-    margin-right: 6px;
+/* Asegurar que los íconos hereden el color del texto */
+.btn-back i,
+.btn-dashboard i {
+    color: inherit !important; /* Heredar el color del texto */
+}
+
+/* Asegurar que el texto sea blanco incluso en modo oscuro */
+[data-theme="dark"] .btn-back,
+[data-theme="dark"] .btn-dashboard {
+    color: white !important; /* Forzar el color blanco para el texto */
+}
+
+/* SOLUCIÓN DEFINITIVA para botones en la barra de navegación */
+.navbar .btn-back,
+.navbar .btn-dashboard,
+.navbar .btn-logout {
+    color: white !important;
+    text-decoration: none !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin-left: 10px !important;
+}
+
+/* Asegurar que los iconos sean blancos */
+.navbar .btn-back i,
+.navbar .btn-dashboard i,
+.navbar .btn-logout i {
+    color: white !important;
+}
+
+/* Reglas para modo oscuro (aunque deberían heredar lo anterior) */
+[data-theme="dark"] .navbar .btn-back,
+[data-theme="dark"] .navbar .btn-dashboard,
+[data-theme="dark"] .navbar .btn-logout {
+    color: white !important;
+}
+
+[data-theme="dark"] .navbar .btn-back i,
+[data-theme="dark"] .navbar .btn-dashboard i, 
+[data-theme="dark"] .navbar .btn-logout i {
+    color: white !important;
+}
+
+/* Estilos para el texto específicamente */
+.navbar .btn-back span,
+.navbar .btn-dashboard span,
+.navbar .btn-logout span,
+.navbar .btn-back,
+.navbar .btn-dashboard,
+.navbar .btn-logout {
+    color: white !important;
 }
 
 /* Estilos responsive */
@@ -197,20 +254,20 @@
     .summary-card {
         margin-bottom: 15px;
     }
-    
+
     .chart-body {
         min-height: 250px;
     }
-    
+
     .period-selector {
         flex-direction: column;
         align-items: flex-start;
     }
-    
+
     .btn-group {
         width: 100%;
     }
-    
+
     .btn-group .btn {
         flex: 1;
     }

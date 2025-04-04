@@ -18,7 +18,7 @@
     <link
       rel="icon"
       href="{{ url_for('static', filename='images/favicon.png', _external=True) }}?v=2" />
-    <!-- CSS personalizado para select_profile -->
+    <!-- CSS personalizado para select_profile y modo oscuro -->
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/select_profile.css') }}?v=2" />
@@ -27,6 +27,13 @@
       href="{{ url_for('static', filename='css/dark-mode.css') }}?v=3" />
   </head>
   <body>
+    <button
+      id="theme-toggle"
+      class="btn-theme-toggle position-absolute top-0 end-0 m-3">
+      <i
+        id="theme-icon"
+        class="fas fa-moon"></i>
+    </button>
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-md-6 col-lg-5">
@@ -39,7 +46,6 @@
               <h2 class="profile-name">{{ profile.name }}</h2>
               <p class="mb-0">Ingresa tu PIN para continuar</p>
             </div>
-
             <div class="login-body">
               {% with messages = get_flashed_messages(with_categories=true) %}
               {% if messages %} {% for category, message in messages %}
@@ -49,7 +55,6 @@
                 {{ message }}
               </div>
               {% endfor %} {% endif %} {% endwith %}
-
               <form
                 action="{{ url_for('select_profile', profile_id=profile.id) }}"
                 method="post">
@@ -80,14 +85,12 @@
                   </div>
                   <div class="form-text text-center">PIN de 4 dígitos</div>
                 </div>
-
                 <button
                   type="submit"
                   class="btn btn-enter w-100">
                   <i class="fas fa-lock-open me-2"></i>Acceder
                 </button>
               </form>
-
               <a
                 href="{{ url_for('login') }}"
                 class="btn-back">
@@ -122,5 +125,6 @@
         });
       });
     </script>
+    <script src="{{ url_for('static', filename='js/theme-switcher.js') }}?v=1"></script>
   </body>
 </html>

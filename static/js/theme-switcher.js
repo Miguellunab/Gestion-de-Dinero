@@ -27,6 +27,12 @@ document.addEventListener('DOMContentLoaded', function() {
             document.documentElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
             
+            // Disparar evento personalizado para notificar cambio de tema
+            const event = new CustomEvent('themeChanged', { 
+              detail: { theme: newTheme } 
+            });
+            document.dispatchEvent(event);
+            
             // Actualizar el icono
             if (newTheme === 'dark') {
                 themeIcon.classList.remove('fa-moon');

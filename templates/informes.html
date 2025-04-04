@@ -66,15 +66,13 @@
           </button>
           <a
             href="{{ url_for('dashboard') }}"
-            class="btn-back me-3">
-            <i class="fas fa-chart-line"></i>
-            <span>Dashboard</span>
+            class="btn-back btn-dashboard">
+            <i class="fas fa-chart-line"></i> <span>Dashboard</span>
           </a>
           <a
             href="{{ url_for('logout') }}"
-            class="btn-logout">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Cerrar sesión</span>
+            class="btn-back btn-logout">
+            <i class="fas fa-sign-out-alt"></i> <span>Cerrar sesión</span>
           </a>
         </div>
       </div>
@@ -236,11 +234,22 @@
         billeterasColores: JSON.parse('{{ billeteras_dict|tojson|safe }}'),
       };
 
+      // Variables globales para las referencias de los gráficos
+      var timelineChart, balanceChart, expensePieChart, incomePieChart;
+
+      // Variables globales para los datos procesados
+      var timelineLabels = [],
+        incomeData = [],
+        expenseData = [],
+        balanceData = [];
+      var gastosPorCuenta = {},
+        ingresosPorCuenta = {};
+
       document.addEventListener('DOMContentLoaded', function () {
         // Obtener datos de la variable global
         const fechasData = datosJson.fechas || [];
-        const gastosPorCuenta = datosJson.gastosPorCuenta || {};
-        const ingresosPorCuenta = datosJson.ingresosPorCuenta || {};
+        gastosPorCuenta = datosJson.gastosPorCuenta || {};
+        ingresosPorCuenta = datosJson.ingresosPorCuenta || {};
         const billeterasColores = datosJson.billeterasColores || {};
 
         // Verificar si hay datos para mostrar
@@ -252,7 +261,43 @@
           return; // Salir si no hay datos
         }
 
-        // Configurar tema del Chart.js según el modo actual
+        // Procesar los datos para los gráficos
+        processChartData(fechasData);
+
+        // Aplicar el tema correcto a los gráficos
+        applyChartTheme();
+
+        // Inicializar todos los gráficos
+        createAllCharts();
+      });
+
+      // Función para procesar los datos de los gráficos
+      function processChartData(fechasData) {
+        timelineLabels = [];
+        incomeData = [];
+        expenseData = [];
+        balanceData = [];
+
+        for (const [date, amounts] of fechasData) {
+          // Formatear fecha para mostrar
+          const dateParts = date.split('-');
+          const formattedDate = `${dateParts[2]}/${dateParts[1]}`;
+
+          timelineLabels.push(formattedDate);
+          incomeData.push(amounts.ingresos);
+          expenseData.push(amounts.gastos);
+        }
+
+        // Calcular datos de balance acumulado
+        let runningBalance = 0;
+        for (let i = 0; i < timelineLabels.length; i++) {
+          runningBalance += incomeData[i] - expenseData[i];
+          balanceData.push(runningBalance);
+        }
+      }
+
+      // Función para aplicar el tema correcto a los gráficos
+      function applyChartTheme() {
         const isDarkMode =
           document.documentElement.getAttribute('data-theme') === 'dark';
         const textColor = isDarkMode ? '#f8f9fa' : '#212529';
@@ -262,24 +307,32 @@
 
         Chart.defaults.color = textColor;
         Chart.defaults.scale.grid.color = gridColor;
+      }
 
-        // Configurar gráfico de línea temporal
-        const timelineLabels = [];
-        const incomeData = [];
-        const expenseData = [];
+      // Función para crear todos los gráficos
+      function createAllCharts() {
+        createTimelineChart();
+        createBalanceChart();
+        createPieChart('expensePieChart', gastosPorCuenta, 'expenseLegend');
+        createPieChart('incomePieChart', ingresosPorCuenta, 'incomeLegend');
+      }
 
-        for (const [date, amounts] of fechasData) {
-          // Formatear fecha para mostrar
-          const dateParts = date.split('-');
-          const formattedDate = `${dateParts[2]}/${dateParts[1]}`;
+      // Función para destruir todos los gráficos existentes
+      function destroyAllCharts() {
+        if (timelineChart) timelineChart.destroy();
+        if (balanceChart) balanceChart.destroy();
+        if (expensePieChart) expensePieChart.destroy();
+        if (incomePieChart) incomePieChart.destroy();
 
-          timelineLabels.push(formattedDate);
-          incomeData.push(amounts.ingresos); // Quitar el /100
-          expenseData.push(amounts.gastos); // Quitar el /100
-        }
+        // También limpiar las leyendas personalizadas
+        document.getElementById('expenseLegend').innerHTML = '';
+        document.getElementById('incomeLegend').innerHTML = '';
+      }
 
-        // Gráfico de línea temporal
-        new Chart(document.getElementById('timelineChart'), {
+      // Función para crear el gráfico de línea temporal
+      function createTimelineChart() {
+        const ctx = document.getElementById('timelineChart').getContext('2d');
+        timelineChart = new Chart(ctx, {
           type: 'line',
           data: {
             labels: timelineLabels,
@@ -333,17 +386,12 @@
             },
           },
         });
+      }
 
-        // Gráfico de balance acumulado
-        const balanceData = [];
-        let runningBalance = 0;
-
-        for (let i = 0; i < timelineLabels.length; i++) {
-          runningBalance += incomeData[i] - expenseData[i];
-          balanceData.push(runningBalance);
-        }
-
-        new Chart(document.getElementById('balanceChart'), {
+      // Función para crear el gráfico de balance acumulado
+      function createBalanceChart() {
+        const ctx = document.getElementById('balanceChart').getContext('2d');
+        balanceChart = new Chart(ctx, {
           type: 'line',
           data: {
             labels: timelineLabels,
@@ -384,92 +432,112 @@
             },
           },
         });
+      }
 
-        // Funciones auxiliares para los gráficos circulares
-        function getDefaultColor(index) {
-          const defaultColors = [
-            '#4a9de9',
-            '#38b000',
-            '#ff595e',
-            '#ff9e00',
-            '#6f42c1',
-            '#20c997',
-            '#6c757d',
-            '#e83e8c',
-            '#fd7e14',
-            '#17a2b8',
-          ];
-          return defaultColors[index % defaultColors.length];
-        }
+      // Funciones auxiliares para los gráficos circulares
+      function getDefaultColor(index) {
+        const defaultColors = [
+          '#4a9de9',
+          '#38b000',
+          '#ff595e',
+          '#ff9e00',
+          '#6f42c1',
+          '#20c997',
+          '#6c757d',
+          '#e83e8c',
+          '#fd7e14',
+          '#17a2b8',
+        ];
+        return defaultColors[index % defaultColors.length];
+      }
 
-        function createPieChart(elementId, data, legendId) {
-          const labels = Object.keys(data);
-          const amounts = Object.values(data).map((v) => v / 100);
-          const colors = labels.map(
-            (label, index) => billeterasColores[label] || getDefaultColor(index)
-          );
+      function createPieChart(elementId, data, legendId) {
+        const labels = Object.keys(data);
+        const amounts = Object.values(data);
+        const billeterasColores = datosJson.billeterasColores || {};
+        const isDarkMode =
+          document.documentElement.getAttribute('data-theme') === 'dark';
 
-          new Chart(document.getElementById(elementId), {
-            type: 'doughnut',
-            data: {
-              labels: labels,
-              datasets: [
-                {
-                  data: amounts,
-                  backgroundColor: colors,
-                  borderColor: isDarkMode ? '#1e1e1e' : '#ffffff',
-                  borderWidth: 2,
-                },
-              ],
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: {
-                  display: false,
-                },
-                tooltip: {
-                  callbacks: {
-                    label: function (context) {
-                      const label = context.label || '';
-                      const value = context.raw.toLocaleString('es-CO');
-                      const total = context.chart.data.datasets[0].data.reduce(
-                        (a, b) => a + b,
-                        0
-                      );
-                      const percentage = Math.round(
-                        (context.raw / total) * 100
-                      );
-                      return `${label}: $${value} (${percentage}%)`;
-                    },
+        const colors = labels.map(
+          (label, index) => billeterasColores[label] || getDefaultColor(index)
+        );
+
+        const ctx = document.getElementById(elementId).getContext('2d');
+        const chart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                data: amounts,
+                backgroundColor: colors,
+                borderColor: isDarkMode ? '#1e1e1e' : '#ffffff',
+                borderWidth: 2,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false,
+              },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    const label = context.label || '';
+                    const value = context.raw.toLocaleString('es-CO');
+                    const total = context.chart.data.datasets[0].data.reduce(
+                      (a, b) => a + b,
+                      0
+                    );
+                    const percentage = Math.round((context.raw / total) * 100);
+                    return `${label}: $${value} (${percentage}%)`;
                   },
                 },
               },
             },
-          });
+          },
+        });
 
-          // Crear leyenda personalizada
-          const legendContainer = document.getElementById(legendId);
-          labels.forEach((label, index) => {
-            const item = document.createElement('div');
-            item.className = 'legend-item';
-            item.innerHTML = `
-                      <span class="legend-color" style="background-color: ${
-                        colors[index]
-                      }"></span>
-                      <span class="legend-label">${label}</span>
-                      <span class="legend-value">$${amounts[
-                        index
-                      ].toLocaleString('es-CO')}</span>
-                  `;
-            legendContainer.appendChild(item);
-          });
+        // Guardar la referencia en la variable adecuada
+        if (elementId === 'expensePieChart') {
+          expensePieChart = chart;
+        } else if (elementId === 'incomePieChart') {
+          incomePieChart = chart;
         }
 
-        // Crear los gráficos circulares
-        createPieChart('expensePieChart', gastosPorCuenta, 'expenseLegend');
-        createPieChart('incomePieChart', ingresosPorCuenta, 'incomeLegend');
+        // Crear leyenda personalizada
+        const legendContainer = document.getElementById(legendId);
+        legendContainer.innerHTML = ''; // Limpiar leyendas anteriores
+
+        labels.forEach((label, index) => {
+          const item = document.createElement('div');
+          item.className = 'legend-item';
+          item.innerHTML = `
+            <span class="legend-color" style="background-color: ${
+              colors[index]
+            }"></span>
+            <span class="legend-label">${label}</span>
+            <span class="legend-value">$${amounts[index].toLocaleString(
+              'es-CO'
+            )}</span>
+          `;
+          legendContainer.appendChild(item);
+        });
+      }
+
+      // Escuchar cambios en el tema y actualizar gráficas
+      document.addEventListener('themeChanged', function (e) {
+        // Destruir los gráficos existentes
+        destroyAllCharts();
+
+        // Aplicar el nuevo tema
+        applyChartTheme();
+
+        // Recrear todos los gráficos con el nuevo tema
+        createAllCharts();
       });
     </script>
   </body>
