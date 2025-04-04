@@ -16,6 +16,45 @@ app.config.from_object(Config)
 db.init_app(app)
 migrate = Migrate(app, db)
 
+# ---------------------- ENCABEZADOS DE SEGURIDAD HTTP ----------------------
+# Cachear la política CSP para no reconstruirla en cada solicitud
+_csp_policy = None
+
+@app.after_request
+def add_security_headers(response):
+    # Solo aplicar encabezados a respuestas HTML
+    if not response.mimetype.startswith('text/html'):
+        return response
+    
+    # Encabezados básicos siempre rápidos de añadir
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['Referrer-Policy'] = 'same-origin'
+    
+    # Política CSP más costosa - cachear
+    global _csp_policy
+    if _csp_policy is None:
+        _csp_policy = (
+            "default-src 'self'; "
+            "script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com 'unsafe-inline'; "
+            "style-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com 'unsafe-inline'; "
+            "font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
+            "img-src 'self' data:; "
+            "connect-src 'self'; "
+            "media-src 'self'; "
+            "object-src 'none'; "
+            "form-action 'self';"
+        )
+    
+    response.headers['Content-Security-Policy'] = _csp_policy
+    
+    # Solo añadir HSTS en producción
+    if not app.debug:
+        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    
+    return response
+
 # ---------------------- FILTRO PERSONALIZADO ----------------------
 def format_money(value):
     s = "{:,.2f}".format(value)
@@ -27,20 +66,21 @@ app.jinja_env.filters['format_money'] = format_money
 # ---------------------- MIDDLEWARE PARA TIMEOUT DE SESIÓN ----------------------
 @app.before_request
 def check_session_timeout():
-    if 'profile_id' in session:
-        session.permanent = True
+    if 'profile_id' in session and request.endpoint != 'static':  # No verificar para archivos estáticos
         if 'last_activity' in session:
             now = datetime.utcnow()
             try:
-                from dateutil import parser
-                last = parser.parse(session['last_activity'])
+                last = datetime.fromisoformat(session['last_activity'])  # Usar fromisoformat en vez de parser
                 if (now - last).total_seconds() > 15 * 60:
                     session.clear()
                     flash("Tu sesión ha expirado por inactividad.", "info")
                     return redirect(url_for('login'))
-            except Exception as e:
-                print(f"Error al procesar timestamp: {e}")
-        session['last_activity'] = datetime.utcnow().isoformat()
+            except Exception:
+                pass  # Silenciosamente ignorar errores de formato
+        
+        # Solo actualizar timestamp en solicitudes no frecuentes
+        if not request.path.startswith('/static/'):
+            session['last_activity'] = datetime.utcnow().isoformat()
 
 # ---------------------- RUTAS DE AUTENTICACIÓN Y PERFILES ----------------------
 @app.route('/login')
@@ -53,16 +93,43 @@ def login():
 @app.route('/select_profile/<int:profile_id>', methods=['GET', 'POST'])
 def select_profile(profile_id):
     profile = Profile.query.get_or_404(profile_id)
+    
+    # Verificación rápida de bloqueo sin llamadas adicionales a la base de datos
+    if profile.lockout_until and profile.lockout_until > datetime.now():
+        minutes_remaining = round((profile.lockout_until - datetime.now()).total_seconds() / 60)
+        flash(f"Este perfil está bloqueado por {minutes_remaining} minutos debido a múltiples intentos incorrectos.", "danger")
+        return redirect(url_for('login'))
+    
     if request.method == 'POST':
         pin_input = request.form.get('pin')
+        
+        # Verificación rápida del PIN (sin consultas adicionales)
         if pin_input == profile.pin:
+            # PIN correcto - resetear intentos solo si hubo intentos fallidos previos
+            if profile.login_attempts > 0:
+                profile.login_attempts = 0
+                db.session.commit()
+            
+            # Configurar sesión
             session.permanent = True
             session['profile_id'] = profile.id
             session['last_activity'] = datetime.utcnow().isoformat()
             return redirect(url_for('dashboard'))
         else:
-            flash("PIN incorrecto. Inténtalo de nuevo.", "danger")
+            # PIN incorrecto - actualizar contador y posiblemente bloquear
+            profile.login_attempts += 1
+            
+            if profile.login_attempts >= 5:
+                profile.lockout_until = datetime.now() + timedelta(minutes=30)
+                db.session.commit()
+                flash("Has excedido el número máximo de intentos. Tu cuenta ha sido bloqueada por 30 minutos.", "danger")
+            else:
+                db.session.commit()
+                remaining_attempts = 5 - profile.login_attempts
+                flash(f"PIN incorrecto. Te quedan {remaining_attempts} intentos.", "danger")
+            
             return redirect(url_for('select_profile', profile_id=profile_id))
+            
     return render_template('select_profile.html', profile=profile)
 
 @app.route('/create_profile', methods=['GET', 'POST'])
@@ -196,25 +263,51 @@ def agregar_gasto():
     if 'profile_id' not in session:
         return redirect(url_for('login'))
     
-    monto = request.form.get('monto')
-    descripcion = request.form.get('descripcion')
-    cuenta = request.form.get('cuenta', 'Efectivo')
     profile_id = session['profile_id']
+    monto = request.form.get('monto', '')
+    descripcion = request.form.get('descripcion', '')
+    cuenta = request.form.get('cuenta', 'Efectivo')
     
-    if monto:
-        try:
-            monto_clean = monto.replace(".", "").replace(",", "")
-            nuevo_gasto = Gasto(
-                monto=int(monto_clean),
-                descripcion=descripcion,
-                profile_id=profile_id,
-                cuenta=cuenta  # Guardar la cuenta seleccionada
-            )
-            db.session.add(nuevo_gasto)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            flash(f"Error al agregar gasto: {str(e)}", "danger")
+    # Validaciones estrictas
+    if not monto or not monto.strip():
+        flash("El monto es obligatorio", "danger")
+        return redirect(url_for('dashboard'))
+    
+    # Validar que la descripción no exceda cierto límite
+    if descripcion and len(descripcion) > 200:
+        flash("La descripción no puede exceder los 200 caracteres", "danger")
+        return redirect(url_for('dashboard'))
+        
+    # Validar que la cuenta exista para este usuario
+    billetera = Billetera.query.filter_by(profile_id=profile_id, nombre=cuenta).first()
+    if not billetera:
+        flash(f"La billetera {cuenta} no existe o no te pertenece", "danger")
+        return redirect(url_for('dashboard'))
+    
+    try:
+        # Limpieza y validación del monto
+        monto_clean = monto.replace(".", "").replace(",", "")
+        monto_int = int(monto_clean)
+        
+        # Verificar que el monto sea positivo
+        if monto_int <= 0:
+            flash("El monto debe ser mayor que cero", "danger")
+            return redirect(url_for('dashboard'))
+            
+        nuevo_gasto = Gasto(
+            monto=monto_int,
+            descripcion=descripcion,
+            profile_id=profile_id,
+            cuenta=cuenta
+        )
+        db.session.add(nuevo_gasto)
+        db.session.commit()
+        flash("Gasto registrado correctamente", "success")
+    except ValueError:
+        flash("El monto debe ser un valor numérico válido", "danger")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error al agregar gasto: {str(e)}", "danger")
     
     return redirect(url_for('dashboard'))
 
@@ -223,25 +316,51 @@ def agregar_ingreso():
     if 'profile_id' not in session:
         return redirect(url_for('login'))
     
-    monto = request.form.get('monto')
-    descripcion = request.form.get('descripcion')
-    cuenta = request.form.get('cuenta', 'Efectivo')
     profile_id = session['profile_id']
+    monto = request.form.get('monto', '')
+    descripcion = request.form.get('descripcion', '')
+    cuenta = request.form.get('cuenta', 'Efectivo')
     
-    if monto:
-        try:
-            monto_clean = monto.replace(".", "").replace(",", "")
-            nuevo_ingreso = Ingreso(
-                monto=int(monto_clean),
-                descripcion=descripcion,
-                profile_id=profile_id,
-                cuenta=cuenta  # Guardar la cuenta seleccionada
-            )
-            db.session.add(nuevo_ingreso)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            flash(f"Error al agregar ingreso: {str(e)}", "danger")
+    # Validaciones estrictas
+    if not monto or not monto.strip():
+        flash("El monto es obligatorio", "danger")
+        return redirect(url_for('dashboard'))
+    
+    # Validar que la descripción no exceda cierto límite
+    if descripcion and len(descripcion) > 200:
+        flash("La descripción no puede exceder los 200 caracteres", "danger")
+        return redirect(url_for('dashboard'))
+        
+    # Validar que la cuenta exista para este usuario
+    billetera = Billetera.query.filter_by(profile_id=profile_id, nombre=cuenta).first()
+    if not billetera:
+        flash(f"La billetera {cuenta} no existe o no te pertenece", "danger")
+        return redirect(url_for('dashboard'))
+    
+    try:
+        # Limpieza y validación del monto
+        monto_clean = monto.replace(".", "").replace(",", "")
+        monto_int = int(monto_clean)
+        
+        # Verificar que el monto sea positivo
+        if monto_int <= 0:
+            flash("El monto debe ser mayor que cero", "danger")
+            return redirect(url_for('dashboard'))
+            
+        nuevo_ingreso = Ingreso(
+            monto=monto_int,
+            descripcion=descripcion,
+            profile_id=profile_id,
+            cuenta=cuenta
+        )
+        db.session.add(nuevo_ingreso)
+        db.session.commit()
+        flash("Ingreso registrado correctamente", "success")
+    except ValueError:
+        flash("El monto debe ser un valor numérico válido", "danger")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error al agregar ingreso: {str(e)}", "danger")
     
     return redirect(url_for('dashboard'))
 

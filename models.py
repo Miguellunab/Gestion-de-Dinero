@@ -10,6 +10,19 @@ class Profile(db.Model):
     ingresos = db.relationship('Ingreso', backref='profile', lazy=True)
     gastos = db.relationship('Gasto', backref='profile', lazy=True)
     billeteras = db.relationship('Billetera', backref='profile', lazy=True)
+    login_attempts = db.Column(db.Integer, default=0, index=True)  # Añadir índice
+    lockout_until = db.Column(db.DateTime, nullable=True, index=True)  # Añadir índice
+    
+    def is_locked(self):
+        if self.lockout_until and self.lockout_until > datetime.now():
+            return True
+        return False
+    
+    def get_remaining_lockout_minutes(self):
+        if not self.is_locked():
+            return 0
+        remaining = (self.lockout_until - datetime.now()).total_seconds() / 60
+        return round(remaining)
 
 class Billetera(db.Model):
     id = db.Column(db.Integer, primary_key=True)
