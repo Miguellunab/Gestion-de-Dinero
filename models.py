@@ -1,12 +1,14 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from passlib.hash import pbkdf2_sha256
 
 db = SQLAlchemy()
 
 class Profile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
-    pin = db.Column(db.String(4), nullable=False)
+    # Cambiar la longitud máxima del PIN para permitir el hash
+    pin = db.Column(db.String(128), nullable=False)  # Cambiar de 4 a 128
     ingresos = db.relationship('Ingreso', backref='profile', lazy=True)
     gastos = db.relationship('Gasto', backref='profile', lazy=True)
     billeteras = db.relationship('Billetera', backref='profile', lazy=True)
@@ -23,6 +25,29 @@ class Profile(db.Model):
             return 0
         remaining = (self.lockout_until - datetime.now()).total_seconds() / 60
         return round(remaining)
+    
+    def set_pin(self, pin):
+        self.pin = pbkdf2_sha256.hash(pin)
+        
+    def check_pin(self, pin):
+        # Verificar si es un PIN en texto plano (probablemente solo 4 dígitos)
+        if len(self.pin) == 4:
+            # Si es texto plano, comparar directamente
+            is_valid = (self.pin == pin)
+            
+            # Si coincide, actualizar a formato hasheado para futuras verificaciones
+            if is_valid:
+                self.pin = pbkdf2_sha256.hash(pin)
+                db.session.commit()
+            
+            return is_valid
+        else:
+            # Si parece ser un hash, verificar con el método seguro
+            try:
+                return pbkdf2_sha256.verify(pin, self.pin)
+            except ValueError:
+                # Si hay error al verificar el hash, regresar False
+                return False
 
 class Billetera(db.Model):
     id = db.Column(db.Integer, primary_key=True)

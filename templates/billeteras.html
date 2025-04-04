@@ -146,6 +146,10 @@
           <form
             action="{{ url_for('crear_billetera') }}"
             method="post">
+            <input
+              type="hidden"
+              name="csrf_token"
+              value="{{ csrf_token() }}" />
             <div class="modal-body">
               <div class="mb-3">
                 <label
@@ -239,6 +243,10 @@
             id="editWalletForm"
             action=""
             method="post">
+            <input
+              type="hidden"
+              name="csrf_token"
+              value="{{ csrf_token() }}" />
             <div class="modal-body">
               <div class="mb-3">
                 <label
@@ -353,6 +361,10 @@
               id="deleteWalletForm"
               action=""
               method="post">
+              <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token() }}" />
               <button
                 type="submit"
                 class="btn btn-danger">

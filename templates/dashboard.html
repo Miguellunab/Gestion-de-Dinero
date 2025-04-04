@@ -240,6 +240,7 @@
             <form
               action="{{ url_for('agregar_ingreso') }}"
               method="post">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <div class="mb-3">
                 <label
                   for="monto_ingreso"
@@ -321,6 +322,7 @@
             <form
               action="{{ url_for('agregar_gasto') }}"
               method="post">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <div class="mb-3">
                 <label
                   for="monto_gasto"
@@ -453,6 +455,7 @@
                     <i class="fas fa-edit"></i>
                   </button>
                   <form action="{{ url_for('deshacer_movimiento', tipo='gasto' if item in gastos else 'ingreso', mov_id=item.id) }}" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="btn-action delete" title="Eliminar movimiento">
                       <i class="fas fa-times"></i>
                     </button>
@@ -620,6 +623,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <form id="editMovimientoForm" action="" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="modal-body">
               <div class="mb-3">
                 <label for="edit_monto" class="form-label">Monto (COP):</label>

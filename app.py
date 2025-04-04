@@ -5,12 +5,15 @@ from config import Config
 from models import db, Profile, Gasto, Ingreso, Billetera
 from flask_migrate import Migrate
 from datetime import datetime, timedelta
+from flask_wtf.csrf import CSRFProtect  # Añadir esta importación al principio del archivo
 
 # Cargar variables de entorno del archivo .env
 load_dotenv()  # Añadir esta línea antes de crear la app
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
+csrf = CSRFProtect(app)  # Añadir esta línea justo después de crear la app
 
 # Inicializa la base de datos y las migraciones
 db.init_app(app)
@@ -103,8 +106,8 @@ def select_profile(profile_id):
     if request.method == 'POST':
         pin_input = request.form.get('pin')
         
-        # Verificación rápida del PIN (sin consultas adicionales)
-        if pin_input == profile.pin:
+        # Verificar PIN con el método secure
+        if profile.check_pin(pin_input):
             # PIN correcto - resetear intentos solo si hubo intentos fallidos previos
             if profile.login_attempts > 0:
                 profile.login_attempts = 0
@@ -527,8 +530,12 @@ def editar_billetera(id):
 
 @app.route('/billetera/<int:id>/eliminar', methods=['POST'])
 def eliminar_billetera(id):
-    if 'profile_id' not in session:
-        return redirect(url_for('login'))
+    # Asegurar que id sea un entero (SQLAlchemy ya lo hace, esto es redundante pero explícito)
+    try:
+        id = int(id)
+    except ValueError:
+        flash("ID de billetera inválido", "danger")
+        return redirect(url_for('listar_billeteras'))
     
     billetera = Billetera.query.get_or_404(id)
     
