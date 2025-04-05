@@ -803,3 +803,8 @@ body {
 [data-theme="dark"] .gasto-icon i {
   color: var(--danger-color) !important;
 }
+
+/* Configuración en selectores */
+.btn-outline-secondary {
+  border-color: #ced4da;
+}
