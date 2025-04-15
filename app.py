@@ -594,27 +594,43 @@ def informes():
     hoy = date.today()
 
     # Determinar rango de fechas según periodo o rango personalizado
-    if periodo == 'rango' and fecha_desde and fecha_hasta:
-        inicio = datetime.strptime(fecha_desde, '%Y-%m-%d').date()
-        fin = datetime.strptime(fecha_hasta, '%Y-%m-%d').date()
+    if periodo == 'rango' and fecha_desde and fecha_hasta and fecha_desde != 'None' and fecha_hasta != 'None':
+        try:
+            inicio = datetime.strptime(fecha_desde, '%Y-%m-%d').date()
+            fin = datetime.strptime(fecha_hasta, '%Y-%m-%d').date()
+        except ValueError:
+            # Si hay un error de formato, usar el mes actual como fallback
+            inicio = date(hoy.year, hoy.month, 1)
+            ultimo_dia = calendar.monthrange(inicio.year, inicio.month)[1]
+            fin = date(inicio.year, inicio.month, ultimo_dia)
     elif periodo == 'dia':
-        if fecha_str and len(fecha_str) == 10:
-            inicio = datetime.strptime(fecha_str, '%Y-%m-%d').date()
+        if fecha_str and len(str(fecha_str)) == 10 and fecha_str != 'None':
+            try:
+                inicio = datetime.strptime(fecha_str, '%Y-%m-%d').date()
+            except ValueError:
+                inicio = hoy
         else:
             inicio = hoy
         fin = inicio
     elif periodo == 'año':
-        if fecha_str and len(fecha_str) == 4:
-            year = int(fecha_str)
-            inicio = date(year, 1, 1)
-            fin = date(year, 12, 31)
+        if fecha_str and fecha_str != 'None':
+            try:
+                year = int(fecha_str)
+                inicio = date(year, 1, 1)
+                fin = date(year, 12, 31)
+            except (ValueError, TypeError):
+                inicio = date(hoy.year, 1, 1)
+                fin = date(hoy.year, 12, 31)
         else:
             inicio = date(hoy.year, 1, 1)
             fin = date(hoy.year, 12, 31)
     else:  # mes por defecto
-        if fecha_str and len(fecha_str) == 7:
-            year, month = map(int, fecha_str.split('-'))
-            inicio = date(year, month, 1)
+        if fecha_str and len(str(fecha_str)) == 7 and fecha_str != 'None':
+            try:
+                year, month = map(int, fecha_str.split('-'))
+                inicio = date(year, month, 1)
+            except (ValueError, TypeError):
+                inicio = date(hoy.year, hoy.month, 1)
         else:
             inicio = date(hoy.year, hoy.month, 1)
         ultimo_dia = calendar.monthrange(inicio.year, inicio.month)[1]
@@ -622,7 +638,8 @@ def informes():
 
     fecha_inicio = datetime.combine(inicio, datetime.min.time())
     fecha_fin = datetime.combine(fin, datetime.max.time())
-
+    
+    # Resto de la función sigue igual...
     # Consultar billeteras
     billeteras = Billetera.query.filter_by(profile_id=profile_id).all()
     billeteras_dict = {b.nombre: {"icono": b.icono, "color": b.color} for b in billeteras}

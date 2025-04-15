@@ -105,6 +105,108 @@
           height: 300px;
         }
       }
+
+      /* Estilos para las pestañas */
+      .nav-tabs {
+        border-bottom: 2px solid var(--border-color);
+        margin-bottom: 20px;
+        display: flex;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      .nav-tabs .nav-item {
+        margin-bottom: -2px;
+        white-space: nowrap;
+      }
+      
+      .nav-tabs .nav-link {
+        border: none;
+        color: var(--text-color);
+        padding: 12px 20px;
+        font-weight: 500;
+        border-bottom: 2px solid transparent;
+        background: transparent;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .nav-tabs .nav-link:hover {
+        color: var(--primary-color);
+        border-color: rgba(74, 157, 233, 0.3);
+      }
+      
+      .nav-tabs .nav-link.active {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+        background-color: transparent;
+      }
+      
+      /* Estilos para los filtros visuales */
+      .visual-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+        align-items: center;
+      }
+      
+      .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      
+      .filter-label {
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: var(--text-muted);
+      }
+      
+      .filter-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+      
+      .filter-btn {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        border-radius: 50px;
+        padding: 8px 15px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      
+      .filter-btn:hover {
+        background-color: rgba(74, 157, 233, 0.1);
+      }
+      
+      .filter-btn.active {
+        background-color: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+      }
+      
+      .filter-input {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        border-radius: 50px;
+        padding: 8px 15px;
+        font-size: 0.85rem;
+      }
+      
+      /* Tarjeta para gráfica de barras */
+      .bar-chart-container {
+        max-width: 100%;
+        margin: 0 auto 20px auto;
+      }
     </style>
   </head>
   <body>
@@ -142,119 +244,6 @@
         <h1 class="h4">Informes Financieros</h1>
       </div>
 
-      <!-- FORMULARIO DE FILTROS -->
-      <form
-        id="filtrosInformes"
-        class="row g-3 align-items-end mb-4"
-        method="get"
-        action="{{ url_for('informes') }}">
-        <!-- Periodo -->
-        <div class="col-auto">
-          <label for="periodo" class="form-label mb-1">Periodo</label>
-          <select
-            class="form-select"
-            id="periodo"
-            name="periodo"
-            onchange="this.form.submit()">
-            <option value="dia" {% if periodo == 'dia' %}selected{% endif %}>Día</option>
-            <option value="mes" {% if periodo == 'mes' %}selected{% endif %}>Mes</option>
-            <option value="año" {% if periodo == 'año' %}selected{% endif %}>Año</option>
-            <option value="rango" {% if periodo == 'rango' %}selected{% endif %}>Rango</option>
-          </select>
-        </div>
-        <!-- Día -->
-        <div class="col-auto" id="filtro-dia" {% if periodo != 'dia' %}style="display:none"{% endif %}>
-          <label for="fecha-dia" class="form-label mb-1">Fecha</label>
-          <input
-            type="date"
-            class="form-control"
-            id="fecha-dia"
-            name="fecha"
-            value="{{ fecha_str if periodo == 'dia' else hoy.strftime('%Y-%m-%d') }}"
-            onchange="this.form.submit()" />
-        </div>
-        <!-- Mes -->
-        <div class="col-auto" id="filtro-mes" {% if periodo != 'mes' %}style="display:none"{% endif %}>
-          <label for="fecha-mes" class="form-label mb-1">Mes</label>
-          <select
-            class="form-select"
-            id="fecha-mes"
-            name="fecha"
-            onchange="this.form.submit()">
-            {% for a in anios %}
-              {% for m in meses %}
-                <option
-                  value="{{ a }}-{{ '%02d' % m }}"
-                  {% if fecha_str == a|string + '-' + '%02d' % m %}selected{% endif %}>
-                  {{ a }}-{{ '%02d' % m }}
-                </option>
-              {% endfor %}
-            {% endfor %}
-          </select>
-        </div>
-        <!-- Año -->
-        <div class="col-auto" id="filtro-anio" {% if periodo != 'año' %}style="display:none"{% endif %}>
-          <label for="fecha-anio" class="form-label mb-1">Año</label>
-          <select
-            class="form-select"
-            id="fecha-anio"
-            name="fecha"
-            onchange="this.form.submit()">
-            {% for a in anios %}
-              <option value="{{ a }}" {% if fecha_str == a|string %}selected{% endif %}>{{ a }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <!-- Rango -->
-        <div class="col-auto" id="filtro-rango" {% if periodo != 'rango' %}style="display:none"{% endif %}>
-          <label class="form-label mb-1">Desde</label>
-          <input
-            type="date"
-            class="form-control mb-1"
-            name="fecha_desde"
-            value="{{ fecha_desde or hoy.strftime('%Y-%m-%d') }}" />
-          <label class="form-label mb-1">Hasta</label>
-          <input
-            type="date"
-            class="form-control"
-            name="fecha_hasta"
-            value="{{ fecha_hasta or hoy.strftime('%Y-%m-%d') }}"
-            onchange="this.form.submit()" />
-        </div>
-        <!-- Billetera -->
-        <div class="col-auto">
-          <label for="billetera" class="form-label mb-1">Billetera</label>
-          <select
-            class="form-select"
-            id="billetera"
-            name="billetera"
-            onchange="this.form.submit()">
-            <option value="Todas" {% if billetera_sel == 'Todas' %}selected{% endif %}>Todas</option>
-            {% for b in billeteras_nombres %}
-              <option value="{{ b }}" {% if billetera_sel == b %}selected{% endif %}>{{ b }}</option>
-            {% endfor %}
-          </select>
-        </div>
-      </form>
-
-      <script>
-        document.addEventListener('DOMContentLoaded', function() {
-          const periodo = document.getElementById('periodo');
-          const filtroDia = document.getElementById('filtro-dia');
-          const filtroMes = document.getElementById('filtro-mes');
-          const filtroAnio = document.getElementById('filtro-anio');
-          const filtroRango = document.getElementById('filtro-rango');
-          function updateFiltros() {
-            filtroDia.style.display = periodo.value === 'dia' ? '' : 'none';
-            filtroMes.style.display = periodo.value === 'mes' ? '' : 'none';
-            filtroAnio.style.display = periodo.value === 'año' ? '' : 'none';
-            filtroRango.style.display = periodo.value === 'rango' ? '' : 'none';
-          }
-          periodo.addEventListener('change', updateFiltros);
-          updateFiltros();
-        });
-      </script>
-
       <!-- Tarjetas de resumen -->
       <div class="row mb-4">
         <div class="col-md-4 mb-3">
@@ -288,50 +277,385 @@
         </div>
       </div>
 
-      <!-- CONTENEDOR CENTRALIZADO DE GRÁFICAS -->
-      <div class="charts-container">
-        <div class="chart-card">
-          <div class="chart-header">
-            <h4>Flujo de Dinero</h4>
-            <div class="chart-legend">
-              {% if billetera_sel == 'Todas' %}
-                {% for b in billeteras_nombres %}
-                  {% if billeteras_dict[b].color %}
-                    <span class="legend-item">
-                      <i class="fas fa-circle" style="color: {{ billeteras_dict[b].color }}"></i>
-                      {{ b }}
-                    </span>
-                  {% endif %}
-                {% endfor %}
-              {% else %}
-                <span class="legend-item"><i class="fas fa-circle text-success"></i> Ingresos</span>
-                <span class="legend-item"><i class="fas fa-circle text-danger"></i> Gastos</span>
-              {% endif %}
+      <!-- FORMULARIO DE FILTROS (Oculto, solo usado por JavaScript) -->
+      <form
+        id="filtrosInformes"
+        method="get"
+        action="{{ url_for('informes') }}"
+        class="d-none">
+        <input type="hidden" id="periodo" name="periodo" value="{{ periodo }}">
+        <input type="hidden" id="billetera" name="billetera" value="{{ billetera_sel }}">
+        <input type="hidden" id="fecha" name="fecha" value="{{ fecha_str }}">
+        <input type="hidden" id="fecha_desde" name="fecha_desde" value="{{ fecha_desde }}">
+        <input type="hidden" id="fecha_hasta" name="fecha_hasta" value="{{ fecha_hasta }}">
+      </form>
+
+      <!-- Sistema de pestañas para diferentes análisis -->
+    <ul class="nav nav-tabs" id="informesTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+          <i class="fas fa-chart-line"></i> Visión General
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="categories-tab" data-bs-toggle="tab" data-bs-target="#categories" type="button" role="tab">
+          <i class="fas fa-tags"></i> Por Categorías
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="comparison-tab" data-bs-toggle="tab" data-bs-target="#comparison" type="button" role="tab">
+          <i class="fas fa-exchange-alt"></i> Comparativa
+        </button>
+      </li>
+    </ul>
+
+    <!-- Contenido de las pestañas -->
+    <div class="tab-content" id="informesTabsContent">
+      <!-- Pestaña de Visión General -->
+      <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+        <!-- Filtros visuales -->
+        <div class="visual-filters">
+          <div class="filter-group">
+            <span class="filter-label">Período</span>
+            <div class="filter-buttons">
+              <button type="button" class="filter-btn js-periodo-btn {{ 'active' if periodo == 'dia' else '' }}" data-value="dia">Día</button>
+              <button type="button" class="filter-btn js-periodo-btn {{ 'active' if periodo == 'mes' else '' }}" data-value="mes">Mes</button>
+              <button type="button" class="filter-btn js-periodo-btn {{ 'active' if periodo == 'año' else '' }}" data-value="año">Año</button>
+              <button type="button" class="filter-btn js-periodo-btn {{ 'active' if periodo == 'rango' else '' }}" data-value="rango">Rango</button>
             </div>
           </div>
-          <div class="chart-body">
-            <canvas id="timelineChart"></canvas>
+          
+          <div class="filter-group ms-3">
+            <span class="filter-label">Billetera</span>
+            <div class="filter-buttons">
+              <button type="button" class="filter-btn js-billetera-btn {{ 'active' if billetera_sel == 'Todas' else '' }}" data-value="Todas">Todas</button>
+              {% for b in billeteras_nombres %}
+                <button type="button" class="filter-btn js-billetera-btn {{ 'active' if billetera_sel == b else '' }}" data-value="{{ b }}">{{ b }}</button>
+              {% endfor %}
+            </div>
           </div>
         </div>
         
-        <div class="chart-card">
+        <!-- Controles de fecha según el período seleccionado -->
+        <div class="date-controls mb-4">
+          <!-- Control para día -->
+          {% if periodo == 'dia' %}
+          <div class="date-control-group">
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+              <input type="date" id="fecha_dia" class="form-control" value="{{ fecha_str }}" 
+                     onchange="document.getElementById('fecha').value=this.value; document.getElementById('filtrosInformes').submit();">
+            </div>
+          </div>
+          {% endif %}
+          
+          <!-- Control para mes -->
+          {% if periodo == 'mes' %}
+          <div class="date-control-group">
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+              <input type="month" id="fecha_mes" class="form-control" value="{{ fecha_str }}" 
+                     onchange="document.getElementById('fecha').value=this.value; document.getElementById('filtrosInformes').submit();">
+            </div>
+          </div>
+          {% endif %}
+          
+          <!-- Control para año -->
+          {% if periodo == 'año' %}
+          <div class="date-control-group">
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+              <select id="fecha_anio" class="form-select" 
+                      onchange="document.getElementById('fecha').value=this.value; document.getElementById('filtrosInformes').submit();">
+                {% for anio in anios %}
+                <option value="{{ anio }}" {% if fecha_str == anio|string %}selected{% endif %}>{{ anio }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          {% endif %}
+          
+          <!-- Control para rango de fechas -->
+          {% if periodo == 'rango' %}
+          <div class="row">
+            <div class="col-md-5">
+              <div class="date-control-group">
+                <label class="form-label">Desde:</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                  <input type="date" id="fecha_desde_input" class="form-control" value="{{ fecha_desde }}"
+                         onchange="document.getElementById('fecha_desde').value=this.value; checkRangeDates();">
+                </div>
+              </div>
+            </div>
+            <div class="col-md-5">
+              <div class="date-control-group">
+                <label class="form-label">Hasta:</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                  <input type="date" id="fecha_hasta_input" class="form-control" value="{{ fecha_hasta }}"
+                         onchange="document.getElementById('fecha_hasta').value=this.value; checkRangeDates();">
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="date-control-group mt-4">
+                <button class="btn btn-primary w-100" id="btnFiltrar">
+                  <i class="fas fa-search"></i> Filtrar
+                </button>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- CONTENEDOR CENTRALIZADO DE GRÁFICAS DE LÍNEA -->
+        <div class="charts-container">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h4>Flujo de Dinero</h4>
+              <div class="chart-legend">
+                {% if billetera_sel == 'Todas' %}
+                  {% for b in billeteras_nombres %}
+                    {% if billeteras_dict[b].color %}
+                      <span class="legend-item">
+                        <i class="fas fa-circle" style="color: {{ billeteras_dict[b].color }}"></i>
+                        {{ b }}
+                      </span>
+                    {% endif %}
+                  {% endfor %}
+                {% else %}
+                  <span class="legend-item"><i class="fas fa-circle text-success"></i> Ingresos</span>
+                  <span class="legend-item"><i class="fas fa-circle text-danger"></i> Gastos</span>
+                {% endif %}
+              </div>
+            </div>
+            <div class="chart-body">
+              <canvas id="timelineChart"></canvas>
+            </div>
+          </div>
+          
+          <div class="chart-card">
+            <div class="chart-header">
+              <h4>Balance acumulado</h4>
+              <div class="chart-legend">
+                <span class="legend-item">
+                  <i class="fas fa-circle" style="color: #4a9de9"></i> 
+                  Acumulado
+                </span>
+              </div>
+            </div>
+            <div class="chart-body">
+              <canvas id="balanceChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gráfica de barras comparativa mejorada -->
+        <div class="chart-card bar-chart-container mb-4">
           <div class="chart-header">
-            <h4>Balance acumulado</h4>
+            <h4>Comparativa de Ingresos vs Gastos</h4>
             <div class="chart-legend">
-              <span class="legend-item">
-                <i class="fas fa-circle" style="color: #4a9de9"></i> 
-                Acumulado
-              </span>
+              <span class="legend-item"><i class="fas fa-circle text-success"></i> Ingresos</span>
+              <span class="legend-item"><i class="fas fa-circle text-danger"></i> Gastos</span>
             </div>
           </div>
           <div class="chart-body">
-            <canvas id="balanceChart"></canvas>
+            <canvas id="barChart"></canvas>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Pestaña de Categorías -->
+      <div class="tab-pane fade" id="categories" role="tabpanel" aria-labelledby="categories-tab">
+        <div class="p-3">
+          <div class="row">
+            <div class="col-md-12 mb-4">
+              <div class="chart-card">
+                <div class="chart-header">
+                  <h4>Distribución de Gastos por Categoría</h4>
+                </div>
+                <div class="chart-body">
+                  <div class="text-center py-5">
+                    <i class="fas fa-chart-pie fa-4x text-muted mb-3"></i>
+                    <h4 class="text-muted">Distribución por Categorías</h4>
+                    <p class="text-muted">Próximamente podrás ver tus gastos organizados por categorías</p>
+                    <button class="btn btn-outline-primary mt-3" disabled>
+                      <i class="fas fa-tags me-2"></i>Implementar Categorías
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6 mb-4">
+              <div class="chart-card">
+                <div class="chart-header">
+                  <h4>Top Categorías de Gastos</h4>
+                </div>
+                <div class="p-4">
+                  <div class="coming-soon-feature">
+                    <i class="fas fa-award text-warning mb-3"></i>
+                    <h5>Top Gastos</h5>
+                    <p class="text-muted">Pronto podrás identificar las categorías donde más gastas tu dinero</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-4">
+              <div class="chart-card">
+                <div class="chart-header">
+                  <h4>Crecimiento por Categoría</h4>
+                </div>
+                <div class="p-4">
+                  <div class="coming-soon-feature">
+                    <i class="fas fa-chart-line text-info mb-3"></i>
+                    <h5>Tendencias</h5>
+                    <p class="text-muted">Analiza cómo cambian tus gastos por categoría a lo largo del tiempo</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Pestaña de Comparativa -->
+      <div class="tab-pane fade" id="comparison" role="tabpanel" aria-labelledby="comparison-tab">
+        <div class="p-3">
+          <div class="row mb-4">
+            <div class="col-md-4">
+              <div class="chart-card h-100">
+                <div class="chart-header">
+                  <h4>Periodos a Comparar</h4>
+                </div>
+                <div class="p-4">
+                  <div class="mb-3">
+                    <label class="form-label">Periodo Base</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                      <select class="form-select" disabled>
+                        <option>Mes actual</option>
+                        <option>Mes anterior</option>
+                        <option>Personalizado</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Comparar con</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="fas fa-exchange-alt"></i></span>
+                      <select class="form-select" disabled>
+                        <option>Mes anterior</option>
+                        <option>Mismo mes año anterior</option>
+                        <option>Personalizado</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <button class="btn btn-outline-primary w-100" disabled>
+                    <i class="fas fa-chart-bar me-2"></i>Comparar Periodos
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-8">
+              <div class="chart-card">
+                <div class="chart-header">
+                  <h4>Comparativa Visual</h4>
+                </div>
+                <div class="chart-body d-flex align-items-center justify-content-center">
+                  <div class="text-center p-4">
+                    <i class="fas fa-exchange-alt fa-4x text-muted mb-3"></i>
+                    <h4 class="text-muted">Comparativa de Periodos</h4>
+                    <p class="text-muted">Próximamente podrás comparar tus finanzas entre diferentes periodos de tiempo</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-12">
+              <div class="chart-card">
+                <div class="chart-header">
+                  <h4>Análisis de Tendencias</h4>
+                </div>
+                <div class="p-4 text-center">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <i class="fas fa-percentage fa-3x text-primary mb-3"></i>
+                      <h5>Variación Porcentual</h5>
+                      <p class="text-muted">Analiza los cambios porcentuales entre periodos</p>
+                    </div>
+                    <div class="col-md-4">
+                      <i class="fas fa-calendar-check fa-3x text-success mb-3"></i>
+                      <h5>Metas de Ahorro</h5>
+                      <p class="text-muted">Compara tu progreso con tus metas financieras</p>
+                    </div>
+                    <div class="col-md-4">
+                      <i class="fas fa-chart-area fa-3x text-warning mb-3"></i>
+                      <h5>Proyecciones</h5>
+                      <p class="text-muted">Estima tus ingresos y gastos futuros basado en tendencias</p>
+                    </div>
+                  </div>
+                  <div class="mt-3">
+                    <button class="btn btn-outline-primary" disabled>
+                      <i class="fas fa-rocket me-2"></i>Activar Análisis Avanzado
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
+    
+    <!-- Scripts y estilos adicionales -->
+    <style>
+      /* Estilo para características próximas */
+      .coming-soon-feature {
+        text-align: center;
+        padding: 20px;
+      }
+      
+      .coming-soon-feature i {
+        font-size: 3rem;
+        display: block;
+        margin-bottom: 15px;
+      }
+      
+      /* Mejora en controles de fecha */
+      .date-controls {
+        background-color: var(--card-bg);
+        border-radius: 10px;
+        padding: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      }
+      
+      .date-control-group {
+        margin-bottom: 0;
+      }
+      
+      /* Estilos para las pestañas */
+      .nav-tabs .nav-link {
+        border: none;
+        padding: 12px 20px;
+        font-weight: 500;
+        border-bottom: 2px solid transparent;
+      }
+      
+      /* Quitar flecha blanca en pestañas */
+      .nav-tabs .nav-link::after {
+        content: none !important;
+      }
+    </style>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <script src="{{ url_for('static', filename='js/theme-switcher.js') }}?v=1"></script>
@@ -575,6 +899,173 @@
         } catch (e) {
           console.error('Error al crear la gráfica de balance acumulado:', e);
         }
+      });
+    </script>
+    <script>
+      // --- GRÁFICA DE BARRAS COMPARATIVA MEJORADA ---
+      document.addEventListener('DOMContentLoaded', function() {
+        try {
+          var barLabels = [];
+          var ingresosData = [];
+          var gastosData = [];
+          
+          if (billeteraSel === 'Todas' && billeterasSeries && Object.keys(billeterasSeries).length > 0) {
+            // Para todas las billeteras, agrupamos por fecha
+            var firstBilletera = Object.keys(billeterasSeries)[0];
+            barLabels = Object.keys(billeterasSeries[firstBilletera]);
+            
+            // Inicializar arrays de datos
+            barLabels.forEach(() => {
+              ingresosData.push(0);
+              gastosData.push(0);
+            });
+            
+            // Sumar valores por fecha para todas las billeteras
+            barLabels.forEach((fecha, index) => {
+              Object.keys(billeterasSeries).forEach(billetera => {
+                const valor = billeterasSeries[billetera][fecha] || 0;
+                if (valor > 0) {
+                  ingresosData[index] += valor;
+                } else if (valor < 0) {
+                  gastosData[index] += Math.abs(valor);
+                }
+              });
+            });
+          } else if (datosJson.fechas && datosJson.fechas.length > 0) {
+            // Para una billetera específica
+            barLabels = datosJson.fechas.map(f => f[0]);
+            ingresosData = datosJson.fechas.map(f => f[1].ingresos || 0);
+            gastosData = datosJson.fechas.map(f => f[1].gastos || 0);
+          }
+          
+          const barCanvas = document.getElementById('barChart');
+          if (!barCanvas) {
+            console.error('No se encontró el elemento canvas barChart');
+            return;
+          }
+          
+          if (barLabels.length > 0) {
+            const ctx = barCanvas.getContext('2d');
+            new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels: barLabels,
+                datasets: [
+                  {
+                    label: 'Ingresos',
+                    data: ingresosData,
+                    backgroundColor: 'rgba(56, 176, 0, 0.7)',
+                    borderColor: '#38b000',
+                    borderWidth: 1
+                  },
+                  {
+                    label: 'Gastos',
+                    data: gastosData,
+                    backgroundColor: 'rgba(255, 89, 94, 0.7)',
+                    borderColor: '#ff595e',
+                    borderWidth: 1
+                  }
+                ]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: { 
+                    display: true,
+                    position: 'top'
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: function (context) {
+                        return context.dataset.label + ': $' + context.raw.toLocaleString('es-CO');
+                      }
+                    }
+                  }
+                },
+                scales: {
+                  x: {
+                    grid: {
+                      display: false
+                    }
+                  },
+                  y: {
+                    beginAtZero: true,
+                    ticks: {
+                      callback: function (value) {
+                        return '$' + value.toLocaleString('es-CO');
+                      }
+                    }
+                  }
+                }
+              }
+            });
+          } else {
+            console.warn('No hay datos suficientes para crear la gráfica de barras');
+          }
+        } catch (e) {
+          console.error('Error al crear la gráfica de barras:', e);
+        }
+      });
+      
+      // Manejo de los filtros visuales y control de rango
+      document.addEventListener('DOMContentLoaded', function() {
+        // Botones de período
+        const periodoBtns = document.querySelectorAll('.js-periodo-btn');
+        periodoBtns.forEach(btn => {
+          btn.addEventListener('click', function() {
+            const value = this.getAttribute('data-value');
+            document.getElementById('periodo').value = value;
+            document.getElementById('filtrosInformes').submit();
+          });
+        });
+        
+        // Botones de billetera
+        const billeteraBtns = document.querySelectorAll('.js-billetera-btn');
+        billeteraBtns.forEach(btn => {
+          btn.addEventListener('click', function() {
+            const value = this.getAttribute('data-value');
+            document.getElementById('billetera').value = value;
+            document.getElementById('filtrosInformes').submit();
+          });
+        });
+        
+        // Manejo del botón de filtrado para rango
+        const btnFiltrar = document.getElementById('btnFiltrar');
+        if (btnFiltrar) {
+          btnFiltrar.addEventListener('click', function() {
+            const desdeInput = document.getElementById('fecha_desde_input');
+            const hastaInput = document.getElementById('fecha_hasta_input');
+            
+            if (desdeInput && hastaInput) {
+              document.getElementById('fecha_desde').value = desdeInput.value;
+              document.getElementById('fecha_hasta').value = hastaInput.value;
+              
+              if (desdeInput.value && hastaInput.value) {
+                document.getElementById('filtrosInformes').submit();
+              } else {
+                alert('Por favor selecciona ambas fechas para filtrar por rango');
+              }
+            }
+          });
+        }
+        
+        // Función para validar rango de fechas
+        window.checkRangeDates = function() {
+          const desdeInput = document.getElementById('fecha_desde_input');
+          const hastaInput = document.getElementById('fecha_hasta_input');
+          
+          if (desdeInput && hastaInput && desdeInput.value && hastaInput.value) {
+            const desde = new Date(desdeInput.value);
+            const hasta = new Date(hastaInput.value);
+            
+            if (desde > hasta) {
+              alert('La fecha inicial no puede ser posterior a la fecha final');
+              desdeInput.value = '';
+              document.getElementById('fecha_desde').value = '';
+            }
+          }
+        };
       });
     </script>
   </body>
