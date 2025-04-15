@@ -15,22 +15,7 @@
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
-    <!-- Favicon -->
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="{{ url_for('static', filename='images/favicon.png', _external=True) }}?v=2" />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="{{ url_for('static', filename='images/favicon.png', _external=True) }}?v=2" />
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="{{ url_for('static', filename='images/favicon.png', _external=True) }}?v=2" />
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
 
     <!-- CSS personalizado -->
     <link
@@ -42,12 +27,89 @@
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/informes.css') }}?v=1" />
+
+    <style>
+      /* Asegúrate de tener esto en informes.css también */
+      .charts-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        margin: 20px auto;
+        max-width: 1200px;
+      }
+      
+      .chart-card {
+        width: 100%;
+        min-height: 400px;
+        max-height: 500px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        border-radius: 10px;
+        overflow: hidden;
+        background-color: var(--card-bg);
+        transition: all 0.3s ease;
+      }
+      
+      .chart-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+      }
+      
+      .chart-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      .chart-body {
+        height: 350px;
+        padding: 15px;
+      }
+      
+      .chart-legend {
+        display: flex;
+        gap: 15px;
+      }
+      
+      .legend-item {
+        display: flex;
+        align-items: center;
+        font-size: 0.85rem;
+      }
+      
+      .legend-item i {
+        margin-right: 5px;
+      }
+      
+      /* Media queries para responsividad */
+      @media (min-width: 992px) {
+        .charts-container {
+          flex-direction: row;
+        }
+        
+        .chart-card {
+          flex: 1;
+          max-width: 580px;
+        }
+      }
+      
+      @media (max-width: 768px) {
+        .chart-card {
+          min-height: 350px;
+        }
+        
+        .chart-body {
+          height: 300px;
+        }
+      }
+    </style>
   </head>
   <body>
     <!-- Barra de navegación -->
-    <nav
-      class="navbar navbar-dark"
-      style="background-color: var(--dark-color)">
+    <nav class="navbar navbar-dark" style="background-color: var(--dark-color)">
       <div class="container d-flex justify-content-between align-items-center">
         <span class="navbar-brand mb-0">
           <img
@@ -57,21 +119,13 @@
           Hola, {{ profile.name }}
         </span>
         <div class="d-flex align-items-center">
-          <button
-            id="theme-toggle"
-            class="btn-theme-toggle me-3">
-            <i
-              id="theme-icon"
-              class="fas fa-moon"></i>
+          <button id="theme-toggle" class="btn-theme-toggle me-3">
+            <i id="theme-icon" class="fas fa-moon"></i>
           </button>
-          <a
-            href="{{ url_for('dashboard') }}"
-            class="btn-back btn-dashboard">
+          <a href="{{ url_for('dashboard') }}" class="btn-back btn-dashboard">
             <i class="fas fa-chart-line"></i> <span>Dashboard</span>
           </a>
-          <a
-            href="{{ url_for('logout') }}"
-            class="btn-back btn-logout">
+          <a href="{{ url_for('logout') }}" class="btn-back btn-logout">
             <i class="fas fa-sign-out-alt"></i> <span>Cerrar sesión</span>
           </a>
         </div>
@@ -79,49 +133,133 @@
     </nav>
 
     <div class="container py-4">
-      <!-- Logo principal -->
-      <div class="logo-container">
+      <!-- Logo e título -->
+      <div class="logo-container text-center mb-4">
         <img
           src="{{ url_for('static', filename='images/favicon.png', _external=True) }}"
           alt="Wallet Logo"
-          class="main-logo" />
-        <h1 class="h4 mb-3">Informes Financieros</h1>
+          class="main-logo mb-2" />
+        <h1 class="h4">Informes Financieros</h1>
       </div>
 
-      <!-- Selector de período -->
-      <div class="period-selector mb-4">
-        <div
-          class="btn-group"
-          role="group">
-          <a
-            href="{{ url_for('informes', periodo='mes') }}"
-            class="btn btn-outline-primary {{ 'active' if periodo == 'mes' else '' }}"
-            >Mes actual</a
-          >
-          <a
-            href="{{ url_for('informes', periodo='trimestre') }}"
-            class="btn btn-outline-primary {{ 'active' if periodo == 'trimestre' else '' }}"
-            >Trimestre</a
-          >
-          <a
-            href="{{ url_for('informes', periodo='año') }}"
-            class="btn btn-outline-primary {{ 'active' if periodo == 'año' else '' }}"
-            >Año {{ fecha_inicio.year }}</a
-          >
+      <!-- FORMULARIO DE FILTROS -->
+      <form
+        id="filtrosInformes"
+        class="row g-3 align-items-end mb-4"
+        method="get"
+        action="{{ url_for('informes') }}">
+        <!-- Periodo -->
+        <div class="col-auto">
+          <label for="periodo" class="form-label mb-1">Periodo</label>
+          <select
+            class="form-select"
+            id="periodo"
+            name="periodo"
+            onchange="this.form.submit()">
+            <option value="dia" {% if periodo == 'dia' %}selected{% endif %}>Día</option>
+            <option value="mes" {% if periodo == 'mes' %}selected{% endif %}>Mes</option>
+            <option value="año" {% if periodo == 'año' %}selected{% endif %}>Año</option>
+            <option value="rango" {% if periodo == 'rango' %}selected{% endif %}>Rango</option>
+          </select>
         </div>
-        <div class="period-info">
-          {{ fecha_inicio.strftime('%d/%m/%Y') }} - {{
-          fecha_fin.strftime('%d/%m/%Y') }}
+        <!-- Día -->
+        <div class="col-auto" id="filtro-dia" {% if periodo != 'dia' %}style="display:none"{% endif %}>
+          <label for="fecha-dia" class="form-label mb-1">Fecha</label>
+          <input
+            type="date"
+            class="form-control"
+            id="fecha-dia"
+            name="fecha"
+            value="{{ fecha_str if periodo == 'dia' else hoy.strftime('%Y-%m-%d') }}"
+            onchange="this.form.submit()" />
         </div>
-      </div>
+        <!-- Mes -->
+        <div class="col-auto" id="filtro-mes" {% if periodo != 'mes' %}style="display:none"{% endif %}>
+          <label for="fecha-mes" class="form-label mb-1">Mes</label>
+          <select
+            class="form-select"
+            id="fecha-mes"
+            name="fecha"
+            onchange="this.form.submit()">
+            {% for a in anios %}
+              {% for m in meses %}
+                <option
+                  value="{{ a }}-{{ '%02d' % m }}"
+                  {% if fecha_str == a|string + '-' + '%02d' % m %}selected{% endif %}>
+                  {{ a }}-{{ '%02d' % m }}
+                </option>
+              {% endfor %}
+            {% endfor %}
+          </select>
+        </div>
+        <!-- Año -->
+        <div class="col-auto" id="filtro-anio" {% if periodo != 'año' %}style="display:none"{% endif %}>
+          <label for="fecha-anio" class="form-label mb-1">Año</label>
+          <select
+            class="form-select"
+            id="fecha-anio"
+            name="fecha"
+            onchange="this.form.submit()">
+            {% for a in anios %}
+              <option value="{{ a }}" {% if fecha_str == a|string %}selected{% endif %}>{{ a }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <!-- Rango -->
+        <div class="col-auto" id="filtro-rango" {% if periodo != 'rango' %}style="display:none"{% endif %}>
+          <label class="form-label mb-1">Desde</label>
+          <input
+            type="date"
+            class="form-control mb-1"
+            name="fecha_desde"
+            value="{{ fecha_desde or hoy.strftime('%Y-%m-%d') }}" />
+          <label class="form-label mb-1">Hasta</label>
+          <input
+            type="date"
+            class="form-control"
+            name="fecha_hasta"
+            value="{{ fecha_hasta or hoy.strftime('%Y-%m-%d') }}"
+            onchange="this.form.submit()" />
+        </div>
+        <!-- Billetera -->
+        <div class="col-auto">
+          <label for="billetera" class="form-label mb-1">Billetera</label>
+          <select
+            class="form-select"
+            id="billetera"
+            name="billetera"
+            onchange="this.form.submit()">
+            <option value="Todas" {% if billetera_sel == 'Todas' %}selected{% endif %}>Todas</option>
+            {% for b in billeteras_nombres %}
+              <option value="{{ b }}" {% if billetera_sel == b %}selected{% endif %}>{{ b }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </form>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const periodo = document.getElementById('periodo');
+          const filtroDia = document.getElementById('filtro-dia');
+          const filtroMes = document.getElementById('filtro-mes');
+          const filtroAnio = document.getElementById('filtro-anio');
+          const filtroRango = document.getElementById('filtro-rango');
+          function updateFiltros() {
+            filtroDia.style.display = periodo.value === 'dia' ? '' : 'none';
+            filtroMes.style.display = periodo.value === 'mes' ? '' : 'none';
+            filtroAnio.style.display = periodo.value === 'año' ? '' : 'none';
+            filtroRango.style.display = periodo.value === 'rango' ? '' : 'none';
+          }
+          periodo.addEventListener('change', updateFiltros);
+          updateFiltros();
+        });
+      </script>
 
       <!-- Tarjetas de resumen -->
       <div class="row mb-4">
         <div class="col-md-4 mb-3">
           <div class="summary-card income">
-            <div class="summary-icon">
-              <i class="fas fa-arrow-up"></i>
-            </div>
+            <div class="summary-icon"><i class="fas fa-arrow-up"></i></div>
             <div class="summary-details">
               <h5>Ingresos</h5>
               <h3>${{ total_ingresos|format_money }}</h3>
@@ -130,9 +268,7 @@
         </div>
         <div class="col-md-4 mb-3">
           <div class="summary-card expense">
-            <div class="summary-icon">
-              <i class="fas fa-arrow-down"></i>
-            </div>
+            <div class="summary-icon"><i class="fas fa-arrow-down"></i></div>
             <div class="summary-details">
               <h5>Gastos</h5>
               <h3>${{ total_gastos|format_money }}</h3>
@@ -141,13 +277,10 @@
         </div>
         <div class="col-md-4 mb-3">
           <div class="summary-card balance">
-            <div class="summary-icon">
-              <i class="fas fa-wallet"></i>
-            </div>
+            <div class="summary-icon"><i class="fas fa-wallet"></i></div>
             <div class="summary-details">
               <h5>Balance</h5>
-              <h3
-                class="{{ 'text-success' if balance_periodo >= 0 else 'text-danger' }}">
+              <h3 class="{{ 'text-success' if balance_periodo >= 0 else 'text-danger' }}">
                 ${{ balance_periodo|format_money }}
               </h3>
             </div>
@@ -155,37 +288,44 @@
         </div>
       </div>
 
-      <!-- Gráficos -->
-      <div class="row">
-        <!-- Gráfico de línea temporal -->
-        <div class="col-lg-8 mb-4">
-          <div class="chart-card">
-            <div class="chart-header">
-              <h4>Flujo de Dinero</h4>
-              <div class="chart-legend">
-                <span class="legend-item"
-                  ><i class="fas fa-circle text-success"></i> Ingresos</span
-                >
-                <span class="legend-item"
-                  ><i class="fas fa-circle text-danger"></i> Gastos</span
-                >
-              </div>
-            </div>
-            <div class="chart-body">
-              <canvas id="timelineChart"></canvas>
+      <!-- CONTENEDOR CENTRALIZADO DE GRÁFICAS -->
+      <div class="charts-container">
+        <div class="chart-card">
+          <div class="chart-header">
+            <h4>Flujo de Dinero</h4>
+            <div class="chart-legend">
+              {% if billetera_sel == 'Todas' %}
+                {% for b in billeteras_nombres %}
+                  {% if billeteras_dict[b].color %}
+                    <span class="legend-item">
+                      <i class="fas fa-circle" style="color: {{ billeteras_dict[b].color }}"></i>
+                      {{ b }}
+                    </span>
+                  {% endif %}
+                {% endfor %}
+              {% else %}
+                <span class="legend-item"><i class="fas fa-circle text-success"></i> Ingresos</span>
+                <span class="legend-item"><i class="fas fa-circle text-danger"></i> Gastos</span>
+              {% endif %}
             </div>
           </div>
+          <div class="chart-body">
+            <canvas id="timelineChart"></canvas>
+          </div>
         </div>
-
-        <!-- Gráfico de balance acumulado -->
-        <div class="col-lg-4 mb-4">
-          <div class="chart-card">
-            <div class="chart-header">
-              <h4>Balance acumulado</h4>
+        
+        <div class="chart-card">
+          <div class="chart-header">
+            <h4>Balance acumulado</h4>
+            <div class="chart-legend">
+              <span class="legend-item">
+                <i class="fas fa-circle" style="color: #4a9de9"></i> 
+                Acumulado
+              </span>
             </div>
-            <div class="chart-body">
-              <canvas id="balanceChart"></canvas>
-            </div>
+          </div>
+          <div class="chart-body">
+            <canvas id="balanceChart"></canvas>
           </div>
         </div>
       </div>
@@ -195,121 +335,72 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <script src="{{ url_for('static', filename='js/theme-switcher.js') }}?v=1"></script>
-
     <script>
-      // Crear datos como variables globales usando el formato correcto para Jinja
+      // Variables globales para los datos de informes
       var datosJson = {
         fechas: JSON.parse('{{ fechas|tojson|safe }}'),
-        gastosPorCuenta: JSON.parse('{{ gastos_por_cuenta|tojson|safe }}'),
-        ingresosPorCuenta: JSON.parse('{{ ingresos_por_cuenta|tojson|safe }}'),
         billeterasColores: JSON.parse('{{ billeteras_dict|tojson|safe }}'),
       };
+      var billeterasSeries = JSON.parse('{{ billeteras_series|tojson|safe }}');
+      var billeteraSel = '{{ billetera_sel }}';
+    </script>
 
-      // Variables globales para las referencias de los gráficos
-      var timelineChart, balanceChart; // Eliminar expensePieChart, incomePieChart
-
-      // Variables globales para los datos procesados
-      var timelineLabels = [],
-        incomeData = [],
-        expenseData = [],
-        balanceData = [];
-      // Eliminar: var gastosPorCuenta = {}, ingresosPorCuenta = {};
-
-      document.addEventListener('DOMContentLoaded', function () {
-        // Obtener datos de la variable global
-        const fechasData = datosJson.fechas || [];
-        // Eliminar: gastosPorCuenta = datosJson.gastosPorCuenta || {};
-        // Eliminar: ingresosPorCuenta = datosJson.ingresosPorCuenta || {};
-        // Eliminar: const billeterasColores = datosJson.billeterasColores || {};
-
-        // Verificar si hay datos para mostrar
-        if (fechasData.length === 0) {
-          document.querySelectorAll('.chart-body').forEach((el) => {
-            el.innerHTML =
-              '<div class="text-center text-muted p-5">No hay datos disponibles para este periodo</div>';
-          });
-          return; // Salir si no hay datos
-        }
-
-        // Procesar los datos para los gráficos
-        processChartData(fechasData);
-
-        // Aplicar el tema correcto a los gráficos
-        applyChartTheme();
-
-        // Inicializar solo los gráficos necesarios
-        createAllCharts();
-      });
-
-      // Función para procesar los datos de los gráficos
-      function processChartData(fechasData) {
-        timelineLabels = [];
-        incomeData = [];
-        expenseData = [];
-        balanceData = [];
-
-        for (const [date, amounts] of fechasData) {
-          // Formatear fecha para mostrar
-          const dateParts = date.split('-');
-          const formattedDate = `${dateParts[2]}/${dateParts[1]}`;
-
-          timelineLabels.push(formattedDate);
-          incomeData.push(amounts.ingresos);
-          expenseData.push(amounts.gastos);
-        }
-
-        // Calcular datos de balance acumulado
-        let runningBalance = 0;
-        for (let i = 0; i < timelineLabels.length; i++) {
-          runningBalance += incomeData[i] - expenseData[i];
-          balanceData.push(runningBalance);
-        }
-      }
-
-      // Función para aplicar el tema correcto a los gráficos
-      function applyChartTheme() {
-        const isDarkMode =
-          document.documentElement.getAttribute('data-theme') === 'dark';
-        const textColor = isDarkMode ? '#f8f9fa' : '#212529';
-        const gridColor = isDarkMode
-          ? 'rgba(255, 255, 255, 0.1)'
-          : 'rgba(0, 0, 0, 0.1)';
-
-        Chart.defaults.color = textColor;
-        Chart.defaults.scale.grid.color = gridColor;
-      }
-
-      // Función para crear todos los gráficos
-      function createAllCharts() {
-        createTimelineChart();
-        createBalanceChart();
-        // Eliminar: createPieChart('expensePieChart', gastosPorCuenta, 'expenseLegend');
-        // Eliminar: createPieChart('incomePieChart', ingresosPorCuenta, 'incomeLegend');
-      }
-
-      // Función para destruir todos los gráficos existentes
-      function destroyAllCharts() {
-        if (timelineChart) timelineChart.destroy();
-        if (balanceChart) balanceChart.destroy();
-        // Eliminar: if (expensePieChart) expensePieChart.destroy();
-        // Eliminar: if (incomePieChart) incomePieChart.destroy();
-
-        // Eliminar: // También limpiar las leyendas personalizadas
-        // Eliminar: document.getElementById('expenseLegend').innerHTML = '';
-        // Eliminar: document.getElementById('incomeLegend').innerHTML = '';
-      }
-
-      // Función para crear el gráfico de línea temporal
-      function createTimelineChart() {
-        const ctx = document.getElementById('timelineChart').getContext('2d');
-        timelineChart = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: timelineLabels,
-            datasets: [
+    <!-- Elimino el script de debug que puede estar causando conflictos -->
+    
+    <script>
+      // --- GRAFICA FLUJO DE DINERO ---
+      document.addEventListener('DOMContentLoaded', function() {
+        try {
+          var timelineLabels = [];
+          var datasets = [];
+          
+          // Asegurémonos de que las variables están definidas correctamente
+          if (typeof billeterasSeries === 'undefined' || billeterasSeries === null) {
+            console.error('billeterasSeries no está definido');
+            return;
+          }
+          
+          if (typeof billeteraSel === 'undefined' || billeteraSel === null) {
+            console.error('billeteraSel no está definido');
+            return;
+          }
+          
+          if (typeof datosJson === 'undefined' || datosJson === null) {
+            console.error('datosJson no está definido');
+            return;
+          }
+          
+          if (billeteraSel === 'Todas' && billeterasSeries && Object.keys(billeterasSeries).length > 0) {
+            // Mostrar una línea por cada billetera
+            var billeterasColores = datosJson.billeterasColores || {};
+            var firstBilletera = Object.keys(billeterasSeries)[0];
+            
+            if (firstBilletera && billeterasSeries[firstBilletera]) {
+              timelineLabels = Object.keys(billeterasSeries[firstBilletera]);
+              
+              for (const billetera in billeterasSeries) {
+                if (billeterasSeries.hasOwnProperty(billetera)) {
+                  const color = billeterasColores[billetera]?.color || '#4a9de9';
+                  datasets.push({
+                    label: billetera,
+                    data: Object.values(billeterasSeries[billetera]),
+                    borderColor: color,
+                    backgroundColor: color + '22',
+                    tension: 0.4,
+                    fill: false,
+                  });
+                }
+              }
+            }
+          } else if (datosJson.fechas && datosJson.fechas.length > 0) {
+            // Solo una billetera
+            timelineLabels = datosJson.fechas.map(f => f[0]);
+            var ingresos = datosJson.fechas.map(f => f[1].ingresos);
+            var gastos = datosJson.fechas.map(f => f[1].gastos);
+            datasets = [
               {
                 label: 'Ingresos',
-                data: incomeData,
+                data: ingresos,
                 borderColor: '#38b000',
                 backgroundColor: 'rgba(56, 176, 0, 0.1)',
                 tension: 0.4,
@@ -317,103 +408,173 @@
               },
               {
                 label: 'Gastos',
-                data: expenseData,
+                data: gastos,
                 borderColor: '#ff595e',
                 backgroundColor: 'rgba(255, 89, 94, 0.1)',
                 tension: 0.4,
                 fill: true,
+              }
+            ];
+          }
+          
+          const timelineCanvas = document.getElementById('timelineChart');
+          if (!timelineCanvas) {
+            console.error('No se encontró el elemento canvas timelineChart');
+            return;
+          }
+          
+          if (timelineLabels.length > 0 && datasets.length > 0) {
+            const ctx = timelineCanvas.getContext('2d');
+            new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: timelineLabels,
+                datasets: datasets,
               },
-            ],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                display: false,
-              },
-              tooltip: {
-                callbacks: {
-                  label: function (context) {
-                    return (
-                      context.dataset.label +
-                      ': $' +
-                      context.raw.toLocaleString('es-CO')
-                    );
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: { display: true },
+                  tooltip: {
+                    callbacks: {
+                      label: function (context) {
+                        return (
+                          context.dataset.label + ': $' + context.raw.toLocaleString('es-CO')
+                        );
+                      },
+                    },
+                  },
+                },
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    ticks: {
+                      callback: function (value) {
+                        return '$' + value.toLocaleString('es-CO');
+                      },
+                    },
                   },
                 },
               },
-            },
-            scales: {
-              y: {
-                beginAtZero: true,
-                ticks: {
-                  callback: function (value) {
-                    return '$' + value.toLocaleString('es-CO');
+            });
+          } else {
+            console.warn('No hay datos suficientes para crear la gráfica de flujo de dinero');
+          }
+        } catch (e) {
+          console.error('Error al crear la gráfica de flujo de dinero:', e);
+        }
+      });
+    </script>
+    <script>
+      // --- GRAFICA BALANCE ACUMULADO ---
+      document.addEventListener('DOMContentLoaded', function() {
+        try {
+          var timelineLabels = [];
+          var balanceData = [];
+          
+          // Verificar que las variables están definidas correctamente
+          if (typeof billeterasSeries === 'undefined' || billeterasSeries === null) {
+            console.error('billeterasSeries no está definido para el gráfico de balance');
+            return;
+          }
+          
+          if (typeof billeteraSel === 'undefined' || billeteraSel === null) {
+            console.error('billeteraSel no está definido para el gráfico de balance');
+            return;
+          }
+          
+          if (typeof datosJson === 'undefined' || datosJson === null) {
+            console.error('datosJson no está definido para el gráfico de balance');
+            return;
+          }
+          
+          if (billeteraSel === 'Todas' && billeterasSeries && Object.keys(billeterasSeries).length > 0) {
+            var billeterasNombres = Object.keys(billeterasSeries);
+            if (billeterasNombres.length > 0) {
+              var firstBilletera = billeterasNombres[0];
+              timelineLabels = Object.keys(billeterasSeries[firstBilletera]);
+              
+              // Calcular el balance total sumando todas las billeteras para cada fecha
+              let balanceTemporal = 0;
+              timelineLabels.forEach(fecha => {
+                let sumaDiaria = 0;
+                billeterasNombres.forEach(billetera => {
+                  if (billeterasSeries[billetera] && billeterasSeries[billetera][fecha] !== undefined) {
+                    sumaDiaria += billeterasSeries[billetera][fecha];
+                  }
+                });
+                balanceTemporal += sumaDiaria;
+                balanceData.push(balanceTemporal);
+              });
+            }
+          } else if (datosJson.fechas && datosJson.fechas.length > 0) {
+            // Para una sola billetera
+            timelineLabels = datosJson.fechas.map(f => f[0]);
+            let balanceTemporal = 0;
+            
+            datosJson.fechas.forEach(item => {
+              const ingresos = item[1].ingresos || 0;
+              const gastos = item[1].gastos || 0;
+              balanceTemporal += (ingresos - gastos);
+              balanceData.push(balanceTemporal);
+            });
+          }
+          
+          const balanceCanvas = document.getElementById('balanceChart');
+          if (!balanceCanvas) {
+            console.error('No se encontró el elemento canvas balanceChart');
+            return;
+          }
+          
+          if (timelineLabels.length > 0 && balanceData.length > 0) {
+            const ctx = balanceCanvas.getContext('2d');
+            new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: timelineLabels,
+                datasets: [
+                  {
+                    label: 'Balance Acumulado',
+                    data: balanceData,
+                    borderColor: '#4a9de9',
+                    backgroundColor: 'rgba(74, 157, 233, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: { display: false },
+                  tooltip: {
+                    callbacks: {
+                      label: function (context) {
+                        const signo = context.raw >= 0 ? '+' : '';
+                        return 'Balance: $' + signo + context.raw.toLocaleString('es-CO');
+                      },
+                    },
+                  },
+                },
+                scales: {
+                  y: {
+                    ticks: {
+                      callback: function (value) {
+                        return '$' + value.toLocaleString('es-CO');
+                      },
+                    },
                   },
                 },
               },
-            },
-          },
-        });
-      }
-
-      // Función para crear el gráfico de balance acumulado
-      function createBalanceChart() {
-        const ctx = document.getElementById('balanceChart').getContext('2d');
-        balanceChart = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: timelineLabels,
-            datasets: [
-              {
-                label: 'Balance',
-                data: balanceData,
-                borderColor: '#4a9de9',
-                backgroundColor: 'rgba(74, 157, 233, 0.1)',
-                tension: 0.4,
-                fill: true,
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                display: false,
-              },
-              tooltip: {
-                callbacks: {
-                  label: function (context) {
-                    return 'Balance: $' + context.raw.toLocaleString('es-CO');
-                  },
-                },
-              },
-            },
-            scales: {
-              y: {
-                ticks: {
-                  callback: function (value) {
-                    return '$' + value.toLocaleString('es-CO');
-                  },
-                },
-              },
-            },
-          },
-        });
-      }
-
-      // Escuchar cambios en el tema y actualizar gráficas
-      document.addEventListener('themeChanged', function (e) {
-        // Destruir los gráficos existentes
-        destroyAllCharts();
-
-        // Aplicar el nuevo tema
-        applyChartTheme();
-
-        // Recrear todos los gráficos con el nuevo tema
-        createAllCharts();
+            });
+          } else {
+            console.warn('No hay datos suficientes para crear la gráfica de balance acumulado');
+          }
+        } catch (e) {
+          console.error('Error al crear la gráfica de balance acumulado:', e);
+        }
       });
     </script>
   </body>

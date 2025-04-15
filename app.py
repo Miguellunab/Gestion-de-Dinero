@@ -582,106 +582,200 @@ def eliminar_billetera(id):
 def informes():
     if 'profile_id' not in session:
         return redirect(url_for('login'))
-    
     profile_id = session['profile_id']
     profile = Profile.query.get_or_404(profile_id)
-    
-    # Obtener período de tiempo (por defecto: último mes)
+
+    # Obtener parámetros de filtro
     periodo = request.args.get('periodo', 'mes')
-    
-    # Calcular fechas
+    billetera_sel = request.args.get('billetera', 'Todas')
+    fecha_str = request.args.get('fecha')
+    fecha_desde = request.args.get('fecha_desde')
+    fecha_hasta = request.args.get('fecha_hasta')
     hoy = date.today()
-    
-    if periodo == 'año':
-        inicio = date(hoy.year, 1, 1)
-        fin = date(hoy.year, 12, 31)
-    elif periodo == 'trimestre':
-        mes_actual = hoy.month
-        trimestre_actual = (mes_actual - 1) // 3 + 1
-        mes_inicio = (trimestre_actual - 1) * 3 + 1
-        mes_fin = mes_inicio + 2
-        
-        inicio = date(hoy.year, mes_inicio, 1)
-        ultimo_dia = calendar.monthrange(hoy.year, mes_fin)[1]
-        fin = date(hoy.year, mes_fin, ultimo_dia)
+
+    # Determinar rango de fechas según periodo o rango personalizado
+    if periodo == 'rango' and fecha_desde and fecha_hasta:
+        inicio = datetime.strptime(fecha_desde, '%Y-%m-%d').date()
+        fin = datetime.strptime(fecha_hasta, '%Y-%m-%d').date()
+    elif periodo == 'dia':
+        if fecha_str and len(fecha_str) == 10:
+            inicio = datetime.strptime(fecha_str, '%Y-%m-%d').date()
+        else:
+            inicio = hoy
+        fin = inicio
+    elif periodo == 'año':
+        if fecha_str and len(fecha_str) == 4:
+            year = int(fecha_str)
+            inicio = date(year, 1, 1)
+            fin = date(year, 12, 31)
+        else:
+            inicio = date(hoy.year, 1, 1)
+            fin = date(hoy.year, 12, 31)
     else:  # mes por defecto
-        inicio = date(hoy.year, hoy.month, 1)
-        ultimo_dia = calendar.monthrange(hoy.year, hoy.month)[1]
-        fin = date(hoy.year, hoy.month, ultimo_dia)
-    
-    # Convertir a datetime para consulta
+        if fecha_str and len(fecha_str) == 7:
+            year, month = map(int, fecha_str.split('-'))
+            inicio = date(year, month, 1)
+        else:
+            inicio = date(hoy.year, hoy.month, 1)
+        ultimo_dia = calendar.monthrange(inicio.year, inicio.month)[1]
+        fin = date(inicio.year, inicio.month, ultimo_dia)
+
     fecha_inicio = datetime.combine(inicio, datetime.min.time())
     fecha_fin = datetime.combine(fin, datetime.max.time())
-    
-    # Consultar gastos e ingresos en el periodo
-    gastos = Gasto.query.filter(
-        Gasto.profile_id == profile_id,
-        Gasto.fecha.between(fecha_inicio, fecha_fin)
-    ).order_by(Gasto.fecha).all()
-    
-    ingresos = Ingreso.query.filter(
-        Ingreso.profile_id == profile_id,
-        Ingreso.fecha.between(fecha_inicio, fecha_fin)
-    ).order_by(Ingreso.fecha).all()
-    
-    # Preparar datos para gráficos
-    # 1. Datos por fecha (línea temporal)
-    fecha_dict = {}
-    
-    for gasto in gastos:
-        fecha_str = gasto.fecha.strftime('%Y-%m-%d')
-        if fecha_str not in fecha_dict:
-            fecha_dict[fecha_str] = {'gastos': 0, 'ingresos': 0}
-        fecha_dict[fecha_str]['gastos'] += gasto.monto
-    
-    for ingreso in ingresos:
-        fecha_str = ingreso.fecha.strftime('%Y-%m-%d')
-        if fecha_str not in fecha_dict:
-            fecha_dict[fecha_str] = {'gastos': 0, 'ingresos': 0}
-        fecha_dict[fecha_str]['ingresos'] += ingreso.monto
-    
-    # Convertir a lista de tuplas ordenada por fecha
-    fechas = []
-    for fecha_str, valores in sorted(fecha_dict.items()):
-        fechas.append([fecha_str, valores])
-    
-    # 2. Datos por cuenta (gráfico circular)
-    gastos_por_cuenta = {}
-    for gasto in gastos:
-        cuenta = gasto.cuenta or "Efectivo"
-        if cuenta not in gastos_por_cuenta:
-            gastos_por_cuenta[cuenta] = 0
-        gastos_por_cuenta[cuenta] += gasto.monto
-    
-    ingresos_por_cuenta = {}
-    for ingreso in ingresos:
-        cuenta = ingreso.cuenta or "Efectivo"
-        if cuenta not in ingresos_por_cuenta:
-            ingresos_por_cuenta[cuenta] = 0
-        ingresos_por_cuenta[cuenta] += ingreso.monto
-    
-    # Consultar billeteras para colores consistentes
+
+    # Consultar billeteras
     billeteras = Billetera.query.filter_by(profile_id=profile_id).all()
     billeteras_dict = {b.nombre: {"icono": b.icono, "color": b.color} for b in billeteras}
+    billeteras_nombres = [b.nombre for b in billeteras]
+
+    # Filtro de billetera
+    filtro_gasto = [Gasto.profile_id == profile_id, Gasto.fecha.between(fecha_inicio, fecha_fin)]
+    filtro_ingreso = [Ingreso.profile_id == profile_id, Ingreso.fecha.between(fecha_inicio, fecha_fin)]
+    if billetera_sel != 'Todas':
+        filtro_gasto.append(Gasto.cuenta == billetera_sel)
+        filtro_ingreso.append(Ingreso.cuenta == billetera_sel)
+
+    gastos = Gasto.query.filter(*filtro_gasto).order_by(Gasto.fecha).all()
+    ingresos = Ingreso.query.filter(*filtro_ingreso).order_by(Ingreso.fecha).all()
+
+    # Agrupar datos para la gráfica
+    fechas = []
+    billeteras_series = {}
     
-    # Calcular totales
+    if billetera_sel == 'Todas':
+        # Agrupar por billetera y fecha
+        # Inicializar estructura
+        for b in billeteras_nombres:
+            billeteras_series[b] = {}
+            
+        # Determinar agrupación (día, mes, año, rango)
+        if periodo == 'año':
+            for m in range(1, 13):
+                key = f"{inicio.year}-{m:02d}"
+                for b in billeteras_nombres:
+                    billeteras_series[b][key] = 0
+            
+            # Procesar gastos e ingresos
+            for gasto in gastos:
+                key = gasto.fecha.strftime('%Y-%m')
+                cuenta = gasto.cuenta or 'Efectivo'
+                if cuenta in billeteras_series:
+                    billeteras_series[cuenta][key] = billeteras_series[cuenta].get(key, 0) - gasto.monto
+            
+            for ingreso in ingresos:
+                key = ingreso.fecha.strftime('%Y-%m')
+                cuenta = ingreso.cuenta or 'Efectivo'
+                if cuenta in billeteras_series:
+                    billeteras_series[cuenta][key] = billeteras_series[cuenta].get(key, 0) + ingreso.monto
+            
+            fechas = [f"{inicio.year}-{m:02d}" for m in range(1, 13)]
+        else:
+            # Por día (o rango)
+            dias = (fin - inicio).days + 1
+            for d in range(dias):
+                day = inicio + timedelta(days=d)
+                key = day.strftime('%Y-%m-%d')
+                for b in billeteras_nombres:
+                    billeteras_series[b][key] = 0
+            
+            # Procesar gastos e ingresos
+            for gasto in gastos:
+                key = gasto.fecha.strftime('%Y-%m-%d')
+                cuenta = gasto.cuenta or 'Efectivo'
+                if cuenta in billeteras_series and key in billeteras_series[cuenta]:
+                    billeteras_series[cuenta][key] -= gasto.monto
+            
+            for ingreso in ingresos:
+                key = ingreso.fecha.strftime('%Y-%m-%d')
+                cuenta = ingreso.cuenta or 'Efectivo'
+                if cuenta in billeteras_series and key in billeteras_series[cuenta]:
+                    billeteras_series[cuenta][key] += ingreso.monto
+            
+            fechas = [(inicio + timedelta(days=d)).strftime('%Y-%m-%d') for d in range(dias)]
+    else:
+        # Lógica para una sola billetera
+        fecha_dict = {}
+        if periodo == 'dia':
+            for h in range(24):
+                fecha_dict[f"{inicio.strftime('%Y-%m-%d')} {h:02d}"] = {'gastos': 0, 'ingresos': 0}
+            
+            for gasto in gastos:
+                key = gasto.fecha.strftime('%Y-%m-%d %H')
+                if key in fecha_dict:
+                    fecha_dict[key]['gastos'] += gasto.monto
+            
+            for ingreso in ingresos:
+                key = ingreso.fecha.strftime('%Y-%m-%d %H')
+                if key in fecha_dict:
+                    fecha_dict[key]['ingresos'] += ingreso.monto
+                    
+        elif periodo == 'año':
+            for m in range(1, 13):
+                key = f"{inicio.year}-{m:02d}"
+                fecha_dict[key] = {'gastos': 0, 'ingresos': 0}
+                
+            for gasto in gastos:
+                key = gasto.fecha.strftime('%Y-%m')
+                if key in fecha_dict:
+                    fecha_dict[key]['gastos'] += gasto.monto
+                    
+            for ingreso in ingresos:
+                key = ingreso.fecha.strftime('%Y-%m')
+                if key in fecha_dict:
+                    fecha_dict[key]['ingresos'] += ingreso.monto
+        else:
+            # Mes o rango personalizado
+            dias = (fin - inicio).days + 1
+            for d in range(dias):
+                day = inicio + timedelta(days=d)
+                key = day.strftime('%Y-%m-%d')
+                fecha_dict[key] = {'gastos': 0, 'ingresos': 0}
+                
+            for gasto in gastos:
+                key = gasto.fecha.strftime('%Y-%m-%d')
+                if key in fecha_dict:
+                    fecha_dict[key]['gastos'] += gasto.monto
+                    
+            for ingreso in ingresos:
+                key = ingreso.fecha.strftime('%Y-%m-%d')
+                if key in fecha_dict:
+                    fecha_dict[key]['ingresos'] += ingreso.monto
+                    
+        # Convertir el diccionario a lista de pares para la plantilla
+        fechas = [[k, v] for k, v in sorted(fecha_dict.items())]
+
+    # Totales
     total_gastos = sum(gasto.monto for gasto in gastos)
     total_ingresos = sum(ingreso.monto for ingreso in ingresos)
     balance_periodo = total_ingresos - total_gastos
-    
+
+    # Para el selector de años y meses
+    anios = list({g.fecha.year for g in Gasto.query.filter_by(profile_id=profile_id)} | {i.fecha.year for i in Ingreso.query.filter_by(profile_id=profile_id)})
+    anios.sort(reverse=True)
+    if not anios:  # Si no hay años, agregar el año actual
+        anios = [hoy.year]
+    meses = list(range(1, 13))
+
     return render_template(
         'informes.html',
         profile=profile,
         periodo=periodo,
         fechas=fechas,
-        gastos_por_cuenta=gastos_por_cuenta,
-        ingresos_por_cuenta=ingresos_por_cuenta,
         billeteras_dict=billeteras_dict,
+        billeteras_nombres=billeteras_nombres,
+        billetera_sel=billetera_sel,
+        billeteras_series=billeteras_series,
         total_gastos=total_gastos,
         total_ingresos=total_ingresos,
         balance_periodo=balance_periodo,
         fecha_inicio=inicio,
-        fecha_fin=fin
+        fecha_fin=fin,
+        anios=anios,
+        meses=meses,
+        hoy=hoy,
+        fecha_str=fecha_str,
+        fecha_desde=fecha_desde,
+        fecha_hasta=fecha_hasta
     )
 
 # Ruta index: redirige a dashboard o login según la sesión

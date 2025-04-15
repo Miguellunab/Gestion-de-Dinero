@@ -324,6 +324,43 @@
       </div>
     </div>
 
+    <!-- Modal para editar movimiento -->
+    <div class="modal fade" id="editMovimientoModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <form id="editMovimientoForm" method="post" action="">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Editar Movimiento</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="edit_monto" class="form-label">Monto (COP):</label>
+                <input type="text" class="form-control" id="edit_monto" name="monto" required oninput="formatAsPesos(this)">
+              </div>
+              <div class="mb-3">
+                <label for="edit_descripcion" class="form-label">Descripción:</label>
+                <input type="text" class="form-control" id="edit_descripcion" name="descripcion">
+              </div>
+              <div class="mb-3">
+                <label for="edit_cuenta" class="form-label">Billetera:</label>
+                <select class="form-select" id="edit_cuenta" name="cuenta" required>
+                  {% for billetera in billeteras %}
+                  <option value="{{ billetera.nombre }}">{{ billetera.nombre }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- Scripts agrupados -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -426,30 +463,38 @@
       });
     </script>
     <script>
-      // Modal para editar movimiento
-      document.addEventListener('DOMContentLoaded', function() {
+      // Modal for editing movement
+      document.addEventListener('DOMContentLoaded', function () {
         const editModal = document.getElementById('editMovimientoModal');
-        editModal.addEventListener('show.bs.modal', function(event) {
-          const button = event.relatedTarget;
-          const id = button.getAttribute('data-id');
-          const tipo = button.getAttribute('data-tipo');
-          const monto = button.getAttribute('data-monto');
-          const descripcion = button.getAttribute('data-descripcion');
-          const cuenta = button.getAttribute('data-cuenta');
-          const montoFormatted = new Intl.NumberFormat('es-CO', {
-            maximumFractionDigits: 0
-          }).format(parseInt(monto));
-          document.getElementById('editMovimientoForm').action = `/editar_movimiento/${tipo}/${id}`;
-          document.getElementById('edit_monto').value = montoFormatted;
-          document.getElementById('edit_descripcion').value = descripcion;
-          const cuentaSelect = document.getElementById('edit_cuenta');
-          for (let i = 0; i < cuentaSelect.options.length; i++) {
-            if (cuentaSelect.options[i].value === cuenta) {
-              cuentaSelect.options[i].selected = true;
-              break;
+
+        if (editModal) {
+          editModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const id = button.getAttribute('data-id');
+            const tipo = button.getAttribute('data-tipo');
+            const monto = button.getAttribute('data-monto');
+            const descripcion = button.getAttribute('data-descripcion');
+            const cuenta = button.getAttribute('data-cuenta');
+
+            // Format the amount for display
+            const montoFormatted = new Intl.NumberFormat('es-CO', {
+              maximumFractionDigits: 0,
+            }).format(parseInt(monto));
+
+            // Update the modal form action and fields
+            document.getElementById('editMovimientoForm').action = `/editar_movimiento/${tipo}/${id}`;
+            document.getElementById('edit_monto').value = montoFormatted;
+            document.getElementById('edit_descripcion').value = descripcion;
+
+            const cuentaSelect = document.getElementById('edit_cuenta');
+            for (let i = 0; i < cuentaSelect.options.length; i++) {
+              if (cuentaSelect.options[i].value === cuenta) {
+                cuentaSelect.options[i].selected = true;
+                break;
+              }
             }
-          }
-        });
+          });
+        }
       });
     </script>
     <script src="{{ url_for('static', filename='js/theme-switcher.js') }}?v=1"></script>
