@@ -31,6 +31,11 @@ body {
   height: 24px;
   width: 24px;
   margin-right: 10px;
+  /* Prevenir layout shift estableciendo un espacio explícito para el logo antes de cargar */
+  min-height: 24px;
+  min-width: 24px;
+  aspect-ratio: 1/1;
+  display: block;
 }
 
 .btn-logout {
@@ -77,6 +82,14 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+}
+
+/* Estabilizar contenedores flexibles para prevenir layout shift */
+.page-header .d-flex.align-items-center {
+  display: flex;
+  align-items: center;
+  min-height: 40px; /* Altura mínima para evitar cambios de diseño */
+  position: relative;
 }
 
 .btn-back {
@@ -158,21 +171,29 @@ body {
   color: #666;
 }
 
-/* Contenedor de transacciones */
+/* Contenedor de transacciones con dimensiones estables para evitar layout shifts */
 .transactions-container {
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 2px 10px var(--shadow-color);
   padding: 20px;
   margin-bottom: 20px;
+  /* Prevenir layout shift al cargar contenido dinámico */
+  min-height: 200px;
+  position: relative;
+  contain: content; /* Mejora en navegadores modernos */
 }
 
-/* Estilos para cada transacción */
+/* Estilos para cada transacción - Prevención de layout shift */
 .transaction-item {
   display: flex;
   align-items: center;
   padding: 12px 0;
   border-bottom: 1px solid #eee;
+  /* Establecer altura mínima para prevenir cambios de diseño */
+  min-height: 60px;
+  position: relative;
+  box-sizing: border-box;
 }
 
 .transaction-item:last-child {
@@ -252,6 +273,11 @@ body {
   background-color: #f5f5f5;
   color: #666;
   transition: all 0.2s;
+  /* Prevenir layout shift estableciendo tamaños mínimos y dimensiones fijas */
+  min-width: 30px;
+  min-height: 30px;
+  flex: 0 0 30px; /* Evita que el botón cambie de tamaño */
+  position: relative;
 }
 
 .btn-action.edit:hover {
@@ -305,6 +331,21 @@ body {
 .modal-content {
   border-radius: 12px;
   overflow: hidden;
+  /* Definir tamaños mínimos para evitar cambios de diseño al abrir */
+  min-width: 300px;
+  width: 100%;
+}
+
+.modal-body {
+  /* Establecer altura mínima para evitar shifts cuando se carga el contenido */
+  min-height: 150px;
+}
+
+/* Asegurar que las etiquetas ocupen un espacio constante */
+.modal-body .form-label {
+  display: block;
+  height: 24px;
+  margin-bottom: 8px;
 }
 
 .modal-header {
