@@ -112,6 +112,9 @@
         const pinInput = document.getElementById('pinInput');
         const toggleIcon = document.getElementById('toggleIcon');
 
+        // Enfoca automáticamente el campo de PIN al cargar la página
+        pinInput.focus();
+
         togglePin.addEventListener('click', function () {
           if (pinInput.type === 'password') {
             pinInput.type = 'text';

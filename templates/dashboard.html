@@ -234,21 +234,17 @@
 
       <!-- Lista de movimientos recientes -->
       <div class="transactions-card">
-        <div class="transactions-header" id="transactionsHeader">
+        <div class="transactions-header d-flex justify-content-between align-items-center">
           <h5>Movimientos Recientes</h5>
-          <i class="fas fa-chevron-down transactions-toggle-icon"></i>
+          <a href="{{ url_for('movimientos') }}" class="btn btn-outline-primary btn-sm">
+            <i class="fas fa-list-ul me-1"></i>Ver todos
+          </a>
         </div>
-        <div class="transactions-body" id="transactionsBody" style="display: none;">
-          <!-- Paginación de movimientos -->
-          {% set items_per_page = 10 %}
-          {% set page = request.args.get('page', 1) | int %}
-          {% set start_index = (page - 1) * items_per_page %}
-          {% set end_index = start_index + items_per_page %}
-          {% set all_transactions = (ingresos + gastos) | sort(attribute='fecha', reverse=True) %}
-          {% set transactions_page = all_transactions[start_index:end_index] %}
-          {% set total_pages = ((all_transactions | length) / items_per_page) | round(0, 'ceil') | int %}
-          {% if all_transactions %}
-            {% for item in transactions_page %}
+        <div class="transactions-body">
+          {% if ingresos or gastos %}
+            {# Obtener y ordenar transacciones, luego tomar solo los primeros 5 #}
+            {% set sorted_transactions = (ingresos + gastos) | sort(attribute='fecha', reverse=True) %}
+            {% for item in sorted_transactions[:5] %}
               <div class="transaction-item">
                 <div class="transaction-icon {% if item in gastos %}gasto-icon{% else %}ingreso-icon{% endif %}">
                   <i class="fas fa-{% if item in gastos %}arrow-down{% else %}arrow-up{% endif %}"></i>
@@ -262,7 +258,7 @@
                     <span class="transaction-account">
                       {% set cuenta = item.cuenta if item.cuenta and item.cuenta != 'none' else "Efectivo" %}
                       {% if cuenta in billeteras_dict %}
-                        <i class="fas fa-{{ billeteras_dict[cuenta]['icono'] }} me-1" style="color: {{ billeteras_dict[cuenta]['color'] }}"></i>
+                        <i class="{{ billeteras_dict[cuenta]['icono'] }} me-1" style="color: {{ billeteras_dict[cuenta]['color'] }}"></i>
                       {% else %}
                         <i class="fas fa-wallet me-1"></i>
                       {% endif %}
@@ -273,45 +269,13 @@
                 <div class="transaction-date">
                   {{ item.fecha.strftime('%d/%m/%Y') }}<br />{{ item.fecha.strftime('%H:%M') }}
                 </div>
-                <div class="transaction-actions">
-                  <button 
-                    type="button" 
-                    class="btn-action edit" 
-                    title="Editar movimiento"
-                    data-bs-toggle="modal"
-                    data-bs-target="#editMovimientoModal"
-                    data-id="{{ item.id }}" 
-                    data-tipo="{{ 'gasto' if item in gastos else 'ingreso' }}"
-                    data-monto="{{ item.monto }}"
-                    data-descripcion="{{ item.descripcion or '' }}"
-                    data-cuenta="{{ item.cuenta if item.cuenta and item.cuenta != 'none' else 'Efectivo' }}">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <form action="{{ url_for('deshacer_movimiento', tipo='gasto' if item in gastos else 'ingreso', mov_id=item.id) }}" method="post">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="btn-action delete" title="Eliminar movimiento">
-                      <i class="fas fa-times"></i>
-                    </button>
-                  </form>
-                </div>
               </div>
             {% endfor %}
-            <!-- Paginación -->
-            {% if total_pages > 1 %}
-              <div class="transactions-pagination">
-                {% if page > 1 %}
-                  <a href="{{ url_for('dashboard', page=page-1) }}" class="pagination-btn">
-                    <i class="fas fa-chevron-left"></i> Anterior
-                  </a>
-                {% endif %}
-                <span class="pagination-count">Página {{ page }} de {{ total_pages }}</span>
-                {% if page < total_pages %}
-                  <a href="{{ url_for('dashboard', page=page+1) }}" class="pagination-btn">
-                    Siguiente <i class="fas fa-chevron-right"></i>
-                  </a>
-                {% endif %}
-              </div>
-            {% endif %}
+            <div class="text-center py-3">
+              <a href="{{ url_for('movimientos') }}" class="btn btn-link">
+                Ver todos los movimientos <i class="fas fa-arrow-right ms-1"></i>
+              </a>
+            </div>
           {% else %}
             <div class="no-transactions">
               <div class="text-center p-4">

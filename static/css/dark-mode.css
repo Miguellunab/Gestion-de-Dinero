@@ -37,6 +37,90 @@
     border-color: var(--border-color);
 }
 
+/* Modal en modo oscuro - correcciones completas */
+[data-theme="dark"] .modal-content {
+    background-color: #202020 !important;
+    border-color: #333333 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .modal-header {
+    background-color: #242424 !important;
+    border-bottom: 1px solid #333333 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .modal-title {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .modal-footer {
+    border-top: 1px solid #333333 !important;
+    background-color: #202020 !important;
+}
+
+/* Botones del modal en modo oscuro */
+[data-theme="dark"] .modal-footer .btn-secondary {
+    background-color: #3a3a3a !important;
+    border-color: #444444 !important;
+    color: #ffffff !important;
+    transition: all 0.3s ease !important;
+}
+
+[data-theme="dark"] .modal-footer .btn-secondary:hover {
+    background-color: #4a4a4a !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-theme="dark"] .modal-footer .btn-primary {
+    background-color: #1e88e5 !important;
+    border-color: #1976d2 !important;
+    color: #ffffff !important;
+    transition: all 0.3s ease !important;
+}
+
+[data-theme="dark"] .modal-footer .btn-primary:hover {
+    background-color: #0d6efd !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Formularios en modales */
+[data-theme="dark"] .form-label {
+    color: #e0e0e0 !important;
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+    background-color: #2d2d2d !important;
+    border-color: #444444 !important;
+    color: #ffffff !important;
+}
+
+/* Corrección para la flecha de los selects en modo oscuro */
+[data-theme="dark"] .form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+    background-color: #2d2d2d !important;
+    border-color: #444444 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+    border-color: #1e88e5 !important;
+    box-shadow: 0 0 0 0.25rem rgba(30, 136, 229, 0.25) !important;
+}
+
+/* Botón close en modal */
+[data-theme="dark"] .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%) !important;
+    opacity: 0.8 !important;
+}
+
+[data-theme="dark"] .btn-close:hover {
+    opacity: 1 !important;
+}
+
 /* Formularios e inputs */
 [data-theme="dark"] .form-control,
 [data-theme="dark"] .input-group-text {
@@ -140,4 +224,78 @@
 /* Asegurar que .text-muted se vea correctamente */
 [data-theme="dark"] .text-muted {
     color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .transactions-container {
+    background-color: #1a1a1a !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5) !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .transaction-account {
+    background-color: #252525 !important;
+    color: #dddddd !important;
+}
+
+[data-theme="dark"] .btn-action {
+    background-color: #252525 !important;
+    color: #dddddd !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important;
+}
+
+[data-theme="dark"] .btn-action:hover {
+    background-color: #333333 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-theme="dark"] .btn-action.edit:hover {
+    background-color: #1e88e5 !important;
+    color: white !important;
+}
+
+[data-theme="dark"] .btn-action.delete:hover {
+    background-color: #e53935 !important;
+    color: white !important;
+}
+
+[data-theme="dark"] .btn-back {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .btn-back:hover {
+    background-color: #1e88e5 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .navbar-brand,
+[data-theme="dark"] .btn-logout,
+[data-theme="dark"] .btn-logout span {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .btn-logout i {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .pagination-btn {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .pagination-btn:hover {
+    background-color: #1e88e5 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .btn-filter {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .btn-filter:hover {
+    background-color: #1e88e5 !important;
+    color: #ffffff !important;
 }

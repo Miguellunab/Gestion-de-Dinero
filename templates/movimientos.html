@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movimientos - Gestión de Dinero</title>
+
+    <!-- Bootstrap 5 CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet" />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Favicons -->
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='images/favicon.png', _external=True) }}?v=2" />
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='images/favicon.png', _external=True) }}?v=2"
+      type="image/png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="{{ url_for('static', filename='images/favicon.png', _external=True) }}?v=2" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="{{ url_for('static', filename='images/favicon.png', _external=True) }}?v=2" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="{{ url_for('static', filename='images/favicon.png', _external=True) }}?v=2" />
+
+    <!-- CSS personalizado para movimientos y modo oscuro -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/movimientos.css') }}?v=1" />
+    <link 
+      rel="stylesheet" 
+      href="{{ url_for('static', filename='css/dark-mode.css') }}?v=1" />
+  </head>
+  <body>
+    <!-- Barra superior -->
+    <nav class="navbar navbar-dark" style="background-color: #1e88e5;">
+      <div class="container d-flex justify-content-between align-items-center">
+        <span class="navbar-brand mb-0">
+          <img
+            src="{{ url_for('static', filename='images/favicon.png', _external=True) }}"
+            alt="Wallet Logo"
+            class="app-logo" />
+          Hola, {{ profile.name }}
+        </span>
+        <div class="d-flex align-items-center">
+          <button id="theme-toggle" class="btn-theme-toggle me-3">
+            <i id="theme-icon" class="fas fa-moon"></i>
+          </button>
+          <a href="{{ url_for('logout') }}" class="btn-logout">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Cerrar sesión</span>
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container py-4">
+      <!-- Encabezado -->
+      <div class="page-header">
+        <div class="d-flex align-items-center">
+          <a href="{{ url_for('dashboard') }}" class="btn-back me-3">
+            <i class="fas fa-arrow-left"></i>
+          </a>
+          <h1 class="h4 mb-0">Movimientos</h1>
+        </div>
+        <!-- Menú de filtros -->
+        <div class="filter-dropdown dropdown">
+          <button class="btn-filter dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-filter me-1"></i> Filtrar
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filterDropdown">
+            <form action="{{ url_for('movimientos') }}" method="get" class="px-3 py-2">
+              <li>
+                <div class="mb-3">
+                  <label class="form-label">Tipo:</label>
+                  <div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="checkbox" name="tipo" value="ingreso" id="filtroIngreso" 
+                        {% if 'ingreso' in tipos_seleccionados %}checked{% endif %}>
+                      <label class="form-check-label" for="filtroIngreso">Ingresos</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="checkbox" name="tipo" value="gasto" id="filtroGasto"
+                        {% if 'gasto' in tipos_seleccionados %}checked{% endif %}>
+                      <label class="form-check-label" for="filtroGasto">Gastos</label>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="mb-3">
+                  <label for="filtroCuenta" class="form-label">Billetera:</label>
+                  <select class="form-select form-select-sm" id="filtroCuenta" name="cuenta">
+                    <option value="">Todas</option>
+                    {% for billetera in billeteras %}
+                    <option value="{{ billetera.nombre }}" {% if cuenta_seleccionada == billetera.nombre %}selected{% endif %}>
+                      {{ billetera.nombre }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </li>
+              <li>
+                <div class="mb-3">
+                  <label for="filtroFechaDesde" class="form-label">Fecha desde:</label>
+                  <input type="date" class="form-control form-control-sm" id="filtroFechaDesde" name="fecha_desde"
+                    value="{{ fecha_desde }}">
+                </div>
+              </li>
+              <li>
+                <div class="mb-3">
+                  <label for="filtroFechaHasta" class="form-label">Fecha hasta:</label>
+                  <input type="date" class="form-control form-control-sm" id="filtroFechaHasta" name="fecha_hasta"
+                    value="{{ fecha_hasta }}">
+                </div>
+              </li>
+              <li>
+                <div class="d-grid gap-2">
+                  <button type="submit" class="btn btn-primary btn-sm">Aplicar filtros</button>
+                  <a href="{{ url_for('movimientos') }}" class="btn btn-outline-secondary btn-sm">Limpiar filtros</a>
+                </div>
+              </li>
+            </form>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Lista de movimientos -->
+      <div class="transactions-container">
+        <!-- Indicadores de filtros activos -->
+        {% if hay_filtros_activos %}
+        <div class="active-filters mb-3">
+          <span class="filter-label">Filtros activos:</span>
+          {% if tipos_seleccionados %}
+            <span class="filter-badge">
+              Tipo: {{ tipos_seleccionados|join(', ') }}
+              {# construir query sin parametro tipo #}
+              {% set args = [] %}
+              {% for k,v in request.args.items() if k != 'tipo' %}
+                {% set _ = args.append(k ~ '=' ~ v) %}
+              {% endfor %}
+              <a href="{{ url_for('movimientos') }}{% if args %}?{{ args|join('&') }}{% endif %}" class="filter-remove"><i class="fas fa-times-circle"></i></a>
+            </span>
+          {% endif %}
+          {% if cuenta_seleccionada %}
+            <span class="filter-badge">
+              Billetera: {{ cuenta_seleccionada }}
+              {# construir query sin parametro cuenta #}
+              {% set args = [] %}
+              {% for k,v in request.args.items() if k != 'cuenta' %}
+                {% set _ = args.append(k ~ '=' ~ v) %}
+              {% endfor %}
+              <a href="{{ url_for('movimientos') }}{% if args %}?{{ args|join('&') }}{% endif %}" class="filter-remove"><i class="fas fa-times-circle"></i></a>
+            </span>
+          {% endif %}
+          {% if fecha_desde %}
+            <span class="filter-badge">
+              Desde: {{ fecha_desde }}
+              {# construir query sin parametro fecha_desde #}
+              {% set args = [] %}
+              {% for k,v in request.args.items() if k != 'fecha_desde' %}
+                {% set _ = args.append(k ~ '=' ~ v) %}
+              {% endfor %}
+              <a href="{{ url_for('movimientos') }}{% if args %}?{{ args|join('&') }}{% endif %}" class="filter-remove"><i class="fas fa-times-circle"></i></a>
+            </span>
+          {% endif %}
+          {% if fecha_hasta %}
+            <span class="filter-badge">
+              Hasta: {{ fecha_hasta }}
+              {# construir query sin parametro fecha_hasta #}
+              {% set args = [] %}
+              {% for k,v in request.args.items() if k != 'fecha_hasta' %}
+                {% set _ = args.append(k ~ '=' ~ v) %}
+              {% endfor %}
+              <a href="{{ url_for('movimientos') }}{% if args %}?{{ args|join('&') }}{% endif %}" class="filter-remove"><i class="fas fa-times-circle"></i></a>
+            </span>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Resultados y paginación -->
+        <div class="results-count mb-3">
+          <span>{{ total_movimientos }} resultado{{ 's' if total_movimientos != 1 else '' }}</span>
+        </div>
+
+        <!-- Movimientos -->
+        {% if transactions_page %}
+          {% for item in transactions_page %}
+            <div class="transaction-item">
+              <div class="transaction-icon {% if item.tipo == 'gasto' %}gasto-icon{% else %}ingreso-icon{% endif %}">
+                <i class="fas fa-{% if item.tipo == 'gasto' %}arrow-down{% else %}arrow-up{% endif %}"></i>
+              </div>
+              <div class="transaction-details">
+                <div class="transaction-amount {% if item.tipo == 'gasto' %}text-danger{% else %}text-success{% endif %}">
+                  {% if item.tipo == 'gasto' %}-{% else %}+{% endif %}${{ item.monto|format_money }}
+                </div>
+                <div class="transaction-description">
+                  {{ item.descripcion or "Sin descripción" }}
+                  <span class="transaction-account">
+                    {% set cuenta = item.cuenta if item.cuenta and item.cuenta != 'none' else "Efectivo" %}
+                    {% if cuenta in billeteras_dict %}
+                      <i class="{{ billeteras_dict[cuenta]['icono'] }} me-1" style="color: {{ billeteras_dict[cuenta]['color'] }}"></i>
+                    {% else %}
+                      <i class="fas fa-wallet me-1"></i>
+                    {% endif %}
+                    <small>{{ cuenta }}</small>
+                  </span>
+                </div>
+              </div>
+              <div class="transaction-date">
+                {{ item.fecha.strftime('%d/%m/%Y') }}<br />{{ item.fecha.strftime('%H:%M') }}
+              </div>
+              <div class="transaction-actions">
+                <button 
+                  type="button" 
+                  class="btn-action edit" 
+                  title="Editar movimiento"
+                  data-bs-toggle="modal"
+                  data-bs-target="#editMovimientoModal"
+                  data-id="{{ item.id }}" 
+                  data-tipo="{{ item.tipo }}"
+                  data-monto="{{ item.monto }}"
+                  data-descripcion="{{ item.descripcion or '' }}"
+                  data-cuenta="{{ item.cuenta if item.cuenta and item.cuenta != 'none' else 'Efectivo' }}">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <form action="{{ url_for('deshacer_movimiento', tipo=item.tipo, mov_id=item.id, next='movimientos') }}" method="post">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn-action delete" title="Eliminar movimiento">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
+          {% endfor %}
+          
+          <!-- Paginación -->
+          {% if total_pages > 1 %}
+            <div class="transactions-pagination">
+              {% if page > 1 %}
+                {# construir query sin parametro page para página anterior #}
+                {% set args = [] %}
+                {% for k,v in request.args.items() if k != 'page' %}
+                  {% set _ = args.append(k ~ '=' ~ v) %}
+                {% endfor %}
+                <a href="{{ url_for('movimientos') }}?page={{ page-1 }}{% if args %}&{{ args|join('&') }}{% endif %}" class="pagination-btn">
+                  <i class="fas fa-chevron-left"></i> Anterior
+                </a>
+              {% endif %}
+              <span class="pagination-count">Página {{ page }} de {{ total_pages }}</span>
+              {% if page < total_pages %}
+                {# construir query sin parametro page para página siguiente #}
+                {% set args = [] %}
+                {% for k,v in request.args.items() if k != 'page' %}
+                  {% set _ = args.append(k ~ '=' ~ v) %}
+                {% endfor %}
+                <a href="{{ url_for('movimientos') }}?page={{ page+1 }}{% if args %}&{{ args|join('&') }}{% endif %}" class="pagination-btn">
+                  Siguiente <i class="fas fa-chevron-right"></i>
+                </a>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% else %}
+          <div class="no-transactions">
+            <div class="text-center p-4">
+              <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
+              <p class="mb-0">No hay movimientos que coincidan con los filtros</p>
+              {% if hay_filtros_activos %}
+                <a href="{{ url_for('movimientos') }}" class="btn btn-outline-secondary btn-sm mt-3">Limpiar filtros</a>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Modal para editar movimiento -->
+    <div class="modal fade" id="editMovimientoModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <form id="editMovimientoForm" method="post" action="">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="next" value="movimientos">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Editar Movimiento</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="edit_monto" class="form-label">Monto (COP):</label>
+                <input type="text" class="form-control" id="edit_monto" name="monto" required oninput="formatAsPesos(this)">
+              </div>
+              <div class="mb-3">
+                <label for="edit_descripcion" class="form-label">Descripción:</label>
+                <input type="text" class="form-control" id="edit_descripcion" name="descripcion">
+              </div>
+              <div class="mb-3">
+                <label for="edit_cuenta" class="form-label">Billetera:</label>
+                <select class="form-select" id="edit_cuenta" name="cuenta" required>
+                  {% for billetera in billeteras %}
+                  <option value="{{ billetera.nombre }}">{{ billetera.nombre }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Scripts agrupados -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Formato en vivo para montos
+      function formatAsPesos(input) {
+        let val = input.value.replace(/\D/g, '');
+        if (val === '') {
+          input.value = '';
+          return;
+        }
+        let formatted = new Intl.NumberFormat('es-CO', {
+          maximumFractionDigits: 0,
+        }).format(parseInt(val));
+        input.value = formatted;
+      }
+    </script>
+    <script>
+      // Modal for editing movement
+      document.addEventListener('DOMContentLoaded', function () {
+        const editModal = document.getElementById('editMovimientoModal');
+
+        if (editModal) {
+          editModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const id = button.getAttribute('data-id');
+            const tipo = button.getAttribute('data-tipo');
+            const monto = button.getAttribute('data-monto');
+            const descripcion = button.getAttribute('data-descripcion');
+            const cuenta = button.getAttribute('data-cuenta');
+
+            // Format the amount for display
+            const montoFormatted = new Intl.NumberFormat('es-CO', {
+              maximumFractionDigits: 0,
+            }).format(parseInt(monto));
+
+            // Update the modal form action and fields
+            document.getElementById('editMovimientoForm').action = `/editar_movimiento/${tipo}/${id}`;
+            document.getElementById('edit_monto').value = montoFormatted;
+            document.getElementById('edit_descripcion').value = descripcion;
+
+            const cuentaSelect = document.getElementById('edit_cuenta');
+            for (let i = 0; i < cuentaSelect.options.length; i++) {
+              if (cuentaSelect.options[i].value === cuenta) {
+                cuentaSelect.options[i].selected = true;
+                break;
+              }
+            }
+          });
+        }
+      });
+    </script>
+    <script src="{{ url_for('static', filename='js/theme-switcher.js') }}?v=1"></script>
+  </body>
+</html>

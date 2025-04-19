@@ -205,28 +205,15 @@ def dashboard():
     profile_id = session['profile_id']
     profile = Profile.query.get_or_404(profile_id)
     
-    # Consulta gastos e ingresos
-    gastos = Gasto.query.filter_by(profile_id=profile_id).order_by(Gasto.fecha.desc()).all()
-    ingresos = Ingreso.query.filter_by(profile_id=profile_id).order_by(Ingreso.fecha.desc()).all()
-    
-    # Normalizar cuentas "none" a "Efectivo"
-    for ingreso in ingresos:
-        if not ingreso.cuenta or ingreso.cuenta == 'none':
-            ingreso.cuenta = 'Efectivo'
-
-    for gasto in gastos:
-        if not gasto.cuenta or gasto.cuenta == 'none':
-            gasto.cuenta = 'Efectivo'
-    
-    # Consulta billeteras
+    # Consulta billeteras primero (son pocos registros)
     billeteras = Billetera.query.filter_by(profile_id=profile_id).all()
     
     # Si no hay billeteras, crear las predeterminadas
     if not billeteras:
         billeteras_predefinidas = [
-            {"nombre": "Efectivo", "icono": "money-bill-wave", "color": "#28a745"},
-            {"nombre": "Bancolombia", "icono": "university", "color": "#007bff"},
-            {"nombre": "Nequi", "icono": "mobile-alt", "color": "#e83e8c"}
+            {"nombre": "Efectivo", "icono": "fas fa-money-bill-wave", "color": "#28a745"},
+            {"nombre": "Bancolombia", "icono": "fas fa-university", "color": "#007bff"},
+            {"nombre": "Nequi", "icono": "fas fa-mobile-alt", "color": "#e83e8c"}
         ]
         
         for billetera in billeteras_predefinidas:
@@ -241,42 +228,73 @@ def dashboard():
         db.session.commit()
         billeteras = Billetera.query.filter_by(profile_id=profile_id).all()
     
+    # Crear un diccionario de billeteras para mostrar iconos y colores correctos
+    billeteras_dict = {b.nombre: {"icono": b.icono, "color": b.color} for b in billeteras}
+    
+    # OPTIMIZACIÓN: Calcular el balance mediante una consulta específica en lugar de cargar todos los registros
+    # Obtener suma total de ingresos
+    total_ingresos = db.session.query(db.func.sum(Ingreso.monto)).filter_by(profile_id=profile_id).scalar() or 0
+    
+    # Obtener suma total de gastos
+    total_gastos = db.session.query(db.func.sum(Gasto.monto)).filter_by(profile_id=profile_id).scalar() or 0
+    
     # Calcular balance global
-    total_gastos = sum(gasto.monto for gasto in gastos)
-    total_ingresos = sum(ingreso.monto for ingreso in ingresos)
     balance = total_ingresos - total_gastos
     
-    # Calcular balance por cuenta
-    balance_por_cuenta = {}
+    # OPTIMIZACIÓN: Calcular balance por cuenta con consultas eficientes
+    # Saldo inicial para todas las cuentas es 0
+    balance_por_cuenta = {billetera.nombre: 0 for billetera in billeteras}
     
-    # Sumar ingresos por cuenta
-    for ingreso in ingresos:
-        cuenta = ingreso.cuenta or "Efectivo"
-        if cuenta not in balance_por_cuenta:
-            balance_por_cuenta[cuenta] = 0
-        balance_por_cuenta[cuenta] += ingreso.monto
+    # Sumar ingresos por cuenta con una única consulta
+    ingresos_por_cuenta = db.session.query(
+        Ingreso.cuenta, db.func.sum(Ingreso.monto)
+    ).filter_by(profile_id=profile_id).group_by(Ingreso.cuenta).all()
     
-    # Restar gastos por cuenta
-    for gasto in gastos:
-        cuenta = gasto.cuenta or "Efectivo"
-        if cuenta not in balance_por_cuenta:
-            balance_por_cuenta[cuenta] = 0
-        balance_por_cuenta[cuenta] -= gasto.monto
+    for cuenta, monto in ingresos_por_cuenta:
+        cuenta = cuenta if cuenta and cuenta != 'none' else "Efectivo"
+        balance_por_cuenta[cuenta] = balance_por_cuenta.get(cuenta, 0) + monto
+    
+    # Restar gastos por cuenta con una única consulta
+    gastos_por_cuenta = db.session.query(
+        Gasto.cuenta, db.func.sum(Gasto.monto)
+    ).filter_by(profile_id=profile_id).group_by(Gasto.cuenta).all()
+    
+    for cuenta, monto in gastos_por_cuenta:
+        cuenta = cuenta if cuenta and cuenta != 'none' else "Efectivo"
+        balance_por_cuenta[cuenta] = balance_por_cuenta.get(cuenta, 0) - monto
     
     # Eliminar cuentas con balance cero
     balance_por_cuenta = {k: v for k, v in balance_por_cuenta.items() if v != 0}
     
-    # Crear un diccionario de billeteras para mostrar iconos y colores correctos
-    billeteras_dict = {b.nombre: {"icono": b.icono, "color": b.color} for b in billeteras}
+    # OPTIMIZACIÓN: Cargar solo los 5 movimientos más recientes
+    # Obtener los 5 gastos más recientes
+    gastos_recientes = Gasto.query.filter_by(profile_id=profile_id).order_by(Gasto.fecha.desc()).limit(5).all()
+    
+    # Obtener los 5 ingresos más recientes
+    ingresos_recientes = Ingreso.query.filter_by(profile_id=profile_id).order_by(Ingreso.fecha.desc()).limit(5).all()
+    
+    # Normalizar cuentas "none" a "Efectivo"
+    for ingreso in ingresos_recientes:
+        if not ingreso.cuenta or ingreso.cuenta == 'none':
+            ingreso.cuenta = 'Efectivo'
+
+    for gasto in gastos_recientes:
+        if not gasto.cuenta or gasto.cuenta == 'none':
+            gasto.cuenta = 'Efectivo'
+    
+    # En el template, se combinan y ordenan para mostrar solo los 5 movimientos más recientes en total
+    # El slice ya está incluido en la plantilla
     
     return render_template('dashboard.html', 
                           profile=profile, 
                           balance=balance, 
-                          gastos=gastos, 
-                          ingresos=ingresos, 
+                          gastos=gastos_recientes, 
+                          ingresos=ingresos_recientes, 
                           balance_por_cuenta=balance_por_cuenta,
                           billeteras=billeteras,
-                          billeteras_dict=billeteras_dict)
+                          billeteras_dict=billeteras_dict,
+                          show_accounts=True if balance_por_cuenta else False,
+                          hide_balance=False)
 
 @app.route('/agregar_gasto', methods=['POST'])
 def agregar_gasto():
@@ -352,7 +370,7 @@ def agregar_ingreso():
         return redirect(url_for('dashboard'))
         
     # Validar que la cuenta exista para este usuario
-    billetera = Billetera.query.filter_by(profile_id=profile_id, nombre=cuenta).first()
+    billetera = Billetera.querand.filter_by(profile_id=profile_id, nombre=cuenta).first()
     if not billetera:
         flash(f"La billetera {cuenta} no existe o no te pertenece", "danger")
         return redirect(url_for('dashboard'))
@@ -409,6 +427,7 @@ def editar_movimiento(tipo, id):
     monto = request.form.get('monto', '0')
     descripcion = request.form.get('descripcion', '')
     cuenta = request.form.get('cuenta', 'Efectivo')
+    next_page = request.form.get('next', 'dashboard')  # Obtener la página a la que redirigir
     
     # Limpiar el monto
     monto_clean = monto.replace(".", "").replace(",", "")
@@ -438,7 +457,11 @@ def editar_movimiento(tipo, id):
         db.session.rollback()
         flash(f"Error al actualizar el movimiento: {str(e)}", 'danger')
     
-    return redirect(url_for('dashboard'))
+    # Redirigir según el parámetro 'next'
+    if next_page == 'movimientos':
+        return redirect(url_for('movimientos'))
+    else:
+        return redirect(url_for('dashboard'))
 
 # Nuevas rutas para gestión de billeteras
 @app.route('/billeteras')
@@ -726,7 +749,7 @@ def informes():
                 if key in fecha_dict:
                     fecha_dict[key]['ingresos'] += ingreso.monto
                     
-        elif periodo == 'año':
+        if periodo == 'año':
             for m in range(1, 13):
                 key = f"{inicio.year}-{m:02d}"
                 fecha_dict[key] = {'gastos': 0, 'ingresos': 0}
@@ -793,6 +816,116 @@ def informes():
         fecha_str=fecha_str,
         fecha_desde=fecha_desde,
         fecha_hasta=fecha_hasta
+    )
+
+@app.route('/movimientos')
+def movimientos():
+    if 'profile_id' not in session:
+        return redirect(url_for('login'))
+    
+    profile_id = session['profile_id']
+    profile = Profile.query.get_or_404(profile_id)
+    
+    # Parámetros de paginación y filtrado
+    page = request.args.get('page', 1, type=int)
+    per_page = 20  # Cantidad de movimientos por página
+    
+    # Filtros
+    tipos_seleccionados = request.args.getlist('tipo')
+    cuenta_seleccionada = request.args.get('cuenta', '')
+    fecha_desde = request.args.get('fecha_desde', '')
+    fecha_hasta = request.args.get('fecha_hasta', '')
+    
+    # Construir la consulta base
+    query_ingresos = Ingreso.query.filter_by(profile_id=profile_id)
+    query_gastos = Gasto.query.filter_by(profile_id=profile_id)
+    
+    # Aplicar filtros
+    if tipos_seleccionados and len(tipos_seleccionados) == 1:
+        if 'ingreso' not in tipos_seleccionados:
+            query_ingresos = query_ingresos.filter(False)
+        if 'gasto' not in tipos_seleccionados:
+            query_gastos = query_gastos.filter(False)
+    
+    if cuenta_seleccionada:
+        query_ingresos = query_ingresos.filter(Ingreso.cuenta == cuenta_seleccionada)
+        query_gastos = query_gastos.filter(Gasto.cuenta == cuenta_seleccionada)
+    
+    if fecha_desde:
+        fecha_desde_obj = datetime.strptime(fecha_desde, '%Y-%m-%d')
+        query_ingresos = query_ingresos.filter(Ingreso.fecha >= fecha_desde_obj)
+        query_gastos = query_gastos.filter(Gasto.fecha >= fecha_desde_obj)
+    
+    if fecha_hasta:
+        fecha_hasta_obj = datetime.strptime(fecha_hasta, '%Y-%m-%d')
+        fecha_hasta_obj = fecha_hasta_obj.replace(hour=23, minute=59, second=59)
+        query_ingresos = query_ingresos.filter(Ingreso.fecha <= fecha_hasta_obj)
+        query_gastos = query_gastos.filter(Gasto.fecha <= fecha_hasta_obj)
+    
+    # Ejecutar las consultas por separado
+    ingresos = query_ingresos.all()
+    gastos = query_gastos.all()
+    
+    # Combinar y ordenar los resultados
+    all_transactions = []
+    
+    for ingreso in ingresos:
+        all_transactions.append({
+            'id': ingreso.id,
+            'tipo': 'ingreso',
+            'monto': ingreso.monto,
+            'descripcion': ingreso.descripcion,
+            'fecha': ingreso.fecha,
+            'cuenta': ingreso.cuenta if ingreso.cuenta != 'none' else 'Efectivo'
+        })
+    
+    for gasto in gastos:
+        all_transactions.append({
+            'id': gasto.id,
+            'tipo': 'gasto',
+            'monto': gasto.monto,
+            'descripcion': gasto.descripcion,
+            'fecha': gasto.fecha,
+            'cuenta': gasto.cuenta if gasto.cuenta != 'none' else 'Efectivo'
+        })
+    
+    # Ordenar por fecha (más reciente primero)
+    all_transactions.sort(key=lambda x: x['fecha'], reverse=True)
+    
+    # Información de paginación
+    total_movimientos = len(all_transactions)
+    total_pages = (total_movimientos + per_page - 1) // per_page  # Ceil división
+    
+    # Limitar los resultados a la página actual
+    start_idx = (page - 1) * per_page
+    end_idx = start_idx + per_page
+    transactions_page = all_transactions[start_idx:end_idx] if start_idx < total_movimientos else []
+    
+    # Obtener información de billeteras para íconos y colores
+    billeteras = Billetera.query.filter_by(profile_id=profile_id).all()
+    billeteras_dict = {}
+    for billetera in billeteras:
+        billeteras_dict[billetera.nombre] = {
+            'icono': billetera.icono or 'fas fa-wallet',
+            'color': billetera.color or '#1e88e5'
+        }
+    
+    hay_filtros_activos = bool(tipos_seleccionados or cuenta_seleccionada or fecha_desde or fecha_hasta)
+    
+    return render_template(
+        'movimientos.html',
+        profile=profile,
+        transactions_page=transactions_page,
+        billeteras=billeteras,
+        billeteras_dict=billeteras_dict,
+        page=page,
+        total_pages=total_pages,
+        total_movimientos=total_movimientos,
+        tipos_seleccionados=tipos_seleccionados,
+        cuenta_seleccionada=cuenta_seleccionada,
+        fecha_desde=fecha_desde,
+        fecha_hasta=fecha_hasta,
+        hay_filtros_activos=hay_filtros_activos
     )
 
 # Ruta index: redirige a dashboard o login según la sesión

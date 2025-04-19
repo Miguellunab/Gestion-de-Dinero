@@ -1,0 +1,666 @@
+/* Estilos para la página de movimientos */
+:root {
+  --primary-color: #1e88e5;
+  --accent-color: #f9a825;
+  --dark-color: #1a1a2e;
+  --light-color: #f5f5f7;
+  --error-color: #e53935;
+  --success-color: #43a047;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+body {
+  background-color: #f7f7f7;
+  color: #333;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.container {
+  flex: 1;
+}
+
+/* Estilos para la barra de navegación */
+.navbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.app-logo {
+  height: 24px;
+  width: 24px;
+  margin-right: 10px;
+}
+
+.btn-logout {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.15);
+  transition: background-color 0.2s;
+}
+
+.btn-logout:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+.btn-logout i {
+  margin-right: 6px;
+}
+
+/* Botón de cambio de tema */
+.btn-theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  transition: all 0.2s;
+}
+
+.btn-theme-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Encabezado de página */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.btn-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--light-color);
+  color: #555;
+  border: none;
+  transition: background-color 0.2s, color 0.2s;
+  text-decoration: none;
+}
+
+.btn-back:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* Filtros */
+.btn-filter {
+  padding: 7px 15px;
+  border-radius: 20px;
+  background-color: var(--light-color);
+  color: #555;
+  border: none;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.btn-filter:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.filter-dropdown .dropdown-menu {
+  padding: 15px;
+  width: 300px;
+  max-width: 90vw;
+}
+
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.filter-label {
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-right: 5px;
+}
+
+.filter-badge {
+  background-color: var(--light-color);
+  color: #555;
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+}
+
+.filter-remove {
+  margin-left: 6px;
+  color: #888;
+  font-size: 1rem;
+}
+
+.filter-remove:hover {
+  color: var(--error-color);
+}
+
+.results-count {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Contenedor de transacciones */
+.transactions-container {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px var(--shadow-color);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+/* Estilos para cada transacción */
+.transaction-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.transaction-item:last-child {
+  border-bottom: none;
+}
+
+.transaction-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+
+.gasto-icon {
+  background-color: rgba(229, 57, 53, 0.1);
+  color: var(--error-color);
+}
+
+.ingreso-icon {
+  background-color: rgba(67, 160, 71, 0.1);
+  color: var(--success-color);
+}
+
+.transaction-details {
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.transaction-amount {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.transaction-description {
+  color: #666;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.transaction-account {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 2px 8px;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  font-size: 0.75rem;
+}
+
+.transaction-date {
+  text-align: right;
+  color: #888;
+  font-size: 0.8rem;
+  margin: 0 15px;
+  flex-shrink: 0;
+}
+
+.transaction-actions {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.btn-action {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background-color: #f5f5f5;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.btn-action.edit:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-action.delete:hover {
+  background-color: var(--error-color);
+  color: white;
+}
+
+/* Paginación */
+.transactions-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 20px;
+  margin-top: 10px;
+  border-top: 1px solid #eee;
+}
+
+.pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 15px;
+  border-radius: 20px;
+  background-color: var(--light-color);
+  color: #555;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.pagination-btn:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.pagination-count {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.no-transactions {
+  padding: 30px 0;
+  color: #888;
+}
+
+/* Modal de edición */
+.modal-content {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.modal-header {
+  background-color: var(--light-color);
+  border-bottom: none;
+}
+
+.modal-footer {
+  border-top: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .transaction-item {
+    flex-wrap: wrap;
+  }
+
+  .transaction-actions {
+    width: 100%;
+    margin-top: 10px;
+    justify-content: flex-end;
+  }
+
+  .transaction-date {
+    margin-left: auto;
+  }
+
+  .btn-logout span {
+    display: none;
+  }
+}
+
+/* Modo oscuro - actualizaciones completas */
+body.dark-mode {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+/* Contenedor principal de transacciones en modo oscuro - CORRECCIÓN ESPECÍFICA */
+body.dark-mode .transactions-container,
+[data-theme="dark"] .transactions-container {
+  background-color: #1a1a1a !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5) !important;
+  color: #ffffff !important;
+}
+
+/* Navbar en modo oscuro */
+body.dark-mode .navbar {
+  background-color: #0d47a1 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .navbar .navbar-brand,
+body.dark-mode .navbar .btn-logout,
+body.dark-mode .navbar .btn-theme-toggle {
+  color: #ffffff !important;
+}
+
+/* Botón tema y logout en modo oscuro */
+body.dark-mode .btn-theme-toggle {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .btn-theme-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .btn-logout {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .btn-logout:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Botones volver y filtro en modo oscuro */
+body.dark-mode .btn-back {
+  background-color: #1a1a1a;
+  color: #dddddd;
+}
+
+body.dark-mode .btn-back:hover {
+  background-color: #1e88e5;
+  color: white;
+}
+
+body.dark-mode .btn-filter {
+  background-color: #1a1a1a;
+  color: #dddddd;
+}
+
+body.dark-mode .btn-filter:hover {
+  background-color: #1e88e5;
+  color: white;
+}
+
+/* Contenedor principal de transacciones en modo oscuro */
+body.dark-mode .transactions-container {
+  background-color: #1a1a1a !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  color: #ffffff;
+}
+
+/* Elementos dentro de la tabla en modo oscuro */
+body.dark-mode .transaction-item {
+  border-bottom-color: #333333;
+}
+
+body.dark-mode .results-count,
+body.dark-mode .filter-label {
+  color: #dddddd;
+}
+
+body.dark-mode .transaction-description {
+  color: #dddddd !important;
+}
+
+/* Íconos de transacción en modo oscuro */
+body.dark-mode .transaction-icon {
+  color: #ffffff;
+}
+
+body.dark-mode .gasto-icon {
+  background-color: rgba(229, 57, 53, 0.2);
+  color: #ff5252;
+}
+
+body.dark-mode .ingreso-icon {
+  background-color: rgba(67, 160, 71, 0.2);
+  color: #69f0ae;
+}
+
+body.dark-mode .transaction-account {
+  background-color: #252525 !important;
+  color: #dddddd !important;
+}
+
+body.dark-mode .transaction-date {
+  color: #bbbbbb;
+}
+
+body.dark-mode .btn-action {
+  background-color: #252525 !important;
+  color: #dddddd !important;
+}
+
+body.dark-mode .btn-action.edit:hover {
+  background-color: #1e88e5 !important;
+  color: white !important;
+}
+
+body.dark-mode .btn-action.delete:hover {
+  background-color: #e53935 !important;
+  color: white !important;
+}
+
+/* Paginación en modo oscuro */
+body.dark-mode .transactions-pagination {
+  border-top-color: #333333;
+}
+
+body.dark-mode .pagination-btn {
+  background-color: #252525;
+  color: #dddddd;
+}
+
+body.dark-mode .pagination-btn:hover {
+  background-color: #1e88e5;
+  color: white;
+}
+
+body.dark-mode .pagination-count {
+  color: #bbbbbb;
+}
+
+body.dark-mode .no-transactions {
+  color: #bbbbbb;
+}
+
+body.dark-mode .no-transactions i {
+  color: #555555 !important;
+}
+
+body.dark-mode .no-transactions .btn-outline-secondary {
+  color: #dddddd;
+  border-color: #555555;
+}
+
+body.dark-mode .no-transactions .btn-outline-secondary:hover {
+  background-color: #1e88e5;
+  color: #ffffff;
+  border-color: #1e88e5;
+}
+
+/* Filtros en modo oscuro */
+body.dark-mode .filter-badge {
+  background-color: #252525 !important;
+  color: #dddddd !important;
+}
+
+body.dark-mode .filter-remove {
+  color: #999999;
+}
+
+body.dark-mode .filter-remove:hover {
+  color: #ff5252;
+}
+
+/* Modal en modo oscuro - ajustes importantes */
+body.dark-mode .modal-content {
+  background-color: #1a1a1a !important;
+  border: 1px solid #333333;
+}
+
+body.dark-mode .modal-header {
+  background-color: #252525 !important;
+  border-bottom: 1px solid #333333;
+  color: #ffffff !important;
+}
+
+body.dark-mode .modal-footer {
+  border-top: 1px solid #333333;
+}
+
+body.dark-mode .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+body.dark-mode .btn-secondary {
+  background-color: #424242;
+  border-color: #424242;
+  color: #ffffff;
+}
+
+body.dark-mode .btn-primary {
+  background-color: #1e88e5;
+  border-color: #1976d2;
+}
+
+/* Dropdown y formularios en modo oscuro */
+body.dark-mode .dropdown-menu {
+  background-color: #1a1a1a !important;
+  border-color: #333333 !important;
+}
+
+body.dark-mode .dropdown-menu .form-label,
+body.dark-mode .dropdown-menu .form-check-label {
+  color: #ffffff !important;
+}
+
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+  background-color: #252525 !important;
+  border-color: #333333 !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .form-control:focus,
+body.dark-mode .form-select:focus {
+  border-color: #1e88e5 !important;
+  box-shadow: 0 0 0 0.25rem rgba(30, 136, 229, 0.25) !important;
+}
+
+body.dark-mode .form-control::placeholder {
+  color: #777777 !important;
+}
+
+body.dark-mode .form-check-input {
+  background-color: #252525 !important;
+  border-color: #555555 !important;
+}
+
+body.dark-mode .form-check-input:checked {
+  background-color: #1e88e5 !important;
+  border-color: #1e88e5 !important;
+}
+
+/* Filtros en modo oscuro - correcciones específicas para la modal y controles de filtro */
+body.dark-mode .filter-dropdown .dropdown-menu,
+[data-theme="dark"] .filter-dropdown .dropdown-menu {
+  background-color: #252525 !important;
+  border-color: #444444 !important;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5) !important;
+  color: #ffffff !important;
+  padding: 16px !important;
+}
+
+/* Mejorar los controles dentro de la modal de filtros */
+body.dark-mode .filter-dropdown .form-control,
+body.dark-mode .filter-dropdown .form-select,
+[data-theme="dark"] .filter-dropdown .form-control,
+[data-theme="dark"] .filter-dropdown .form-select {
+  background-color: #333333 !important;
+  border-color: #444444 !important;
+  color: #ffffff !important;
+  padding: 8px 12px !important;
+}
+
+/* Mejorar el aspecto de los campos de fecha */
+body.dark-mode .filter-dropdown input[type="date"],
+[data-theme="dark"] .filter-dropdown input[type="date"] {
+  background-color: #333333 !important;
+  border-color: #444444 !important;
+  color: #ffffff !important;
+  padding: 8px 12px !important;
+  height: 38px !important;
+}
+
+/* Ajustar el color del calendario emergente */
+body.dark-mode .filter-dropdown input[type="date"]::-webkit-calendar-picker-indicator,
+[data-theme="dark"] .filter-dropdown input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) !important;
+}
+
+/* Mejorar los checkboxes */
+body.dark-mode .filter-dropdown .form-check-input,
+[data-theme="dark"] .filter-dropdown .form-check-input {
+  background-color: #333333 !important;
+  border-color: #1e88e5 !important;
+}
+
+/* Mejorar los botones de la modal de filtros */
+body.dark-mode .filter-dropdown .btn-primary,
+[data-theme="dark"] .filter-dropdown .btn-primary {
+  background-color: #1e88e5 !important;
+  border-color: #1976d2 !important;
+  color: #ffffff !important;
+  font-weight: 500 !important;
+}
+
+body.dark-mode .filter-dropdown .btn-outline-secondary,
+[data-theme="dark"] .filter-dropdown .btn-outline-secondary {
+  background-color: transparent !important;
+  border-color: #666666 !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .filter-dropdown .btn-outline-secondary:hover,
+[data-theme="dark"] .filter-dropdown .btn-outline-secondary:hover {
+  background-color: #333333 !important;
+  border-color: #1e88e5 !important;
+  color: #1e88e5 !important;
+}
+
+/* Asegurar que las etiquetas tengan buen contraste */
+body.dark-mode .filter-dropdown .form-label,
+body.dark-mode .filter-dropdown .form-check-label,
+[data-theme="dark"] .filter-dropdown .form-label,
+[data-theme="dark"] .filter-dropdown .form-check-label {
+  color: #e0e0e0 !important;
+  font-weight: 500 !important;
+  margin-bottom: 6px !important;
+}
+
+/* Espaciado entre elementos del formulario */
+body.dark-mode .filter-dropdown .mb-3,
+[data-theme="dark"] .filter-dropdown .mb-3 {
+  margin-bottom: 16px !important;
+}
