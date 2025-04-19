@@ -76,10 +76,20 @@ def _tojson(obj):
 
 @app.template_filter('format_money')
 def format_money(value):
-    """Formatea valores monetarios correctamente."""
+    """Formatea valores monetarios correctamente según el tipo de moneda."""
     try:
-        # Usar el valor directamente sin dividir por 100
-        return f"{value:,.0f}".replace(",", ".")
+        # Si hay una sesión activa, obtener el perfil y su moneda
+        if 'profile_id' in session:
+            profile = Profile.query.get(session['profile_id'])
+            if profile and profile.moneda == 'COP':
+                # Para pesos colombianos, mostrar sin decimales
+                return f"{value:,.0f}".replace(",", ".")
+            else:
+                # Para otras monedas, mostrar con dos decimales
+                return f"{value:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        else:
+            # Si no hay sesión, usar formato entero por defecto
+            return f"{value:,.0f}".replace(",", ".")
     except (TypeError, ValueError):
         return "0"
 
@@ -107,7 +117,8 @@ def check_session_timeout():
 def login():
     if 'profile_id' in session:
         return redirect(url_for('dashboard'))
-    profiles = Profile.query.all()
+    # Ordenar perfiles por fecha de creación
+    profiles = Profile.query.order_by(Profile.fecha_creacion).all()
     return render_template('login.html', profiles=profiles)
 
 @app.route('/select_profile/<int:profile_id>', methods=['GET', 'POST'])
@@ -157,10 +168,14 @@ def create_profile():
     if request.method == 'POST':
         name = request.form.get('name')
         pin = request.form.get('pin')
+        moneda = request.form.get('moneda', 'COP')  # Obtener moneda seleccionada, COP por defecto
+        
         if not name or not pin or len(pin) != 4 or not pin.isdigit():
             flash("Por favor, ingresa un nombre y un PIN de 4 dígitos.", "warning")
             return redirect(url_for('create_profile'))
-        new_profile = Profile(name=name, pin=pin)
+        
+        # Crear el nuevo perfil con la moneda seleccionada
+        new_profile = Profile(name=name, pin=pin, moneda=moneda)
         db.session.add(new_profile)
         db.session.commit()
         flash("Perfil creado exitosamente.", "success")
@@ -302,6 +317,7 @@ def agregar_gasto():
         return redirect(url_for('login'))
     
     profile_id = session['profile_id']
+    profile = Profile.query.get_or_404(profile_id)
     monto = request.form.get('monto', '')
     descripcion = request.form.get('descripcion', '')
     cuenta = request.form.get('cuenta', 'Efectivo')
@@ -323,17 +339,23 @@ def agregar_gasto():
         return redirect(url_for('dashboard'))
     
     try:
-        # Limpieza y validación del monto
-        monto_clean = monto.replace(".", "").replace(",", "")
-        monto_int = int(monto_clean)
+        # Procesar el monto según la moneda del perfil
+        if profile.moneda == 'COP':
+            # Para COP usar valores enteros (sin centavos)
+            monto_clean = monto.replace(".", "").replace(",", "")
+            monto_valor = int(monto_clean)
+        else:
+            # Para otras monedas, preservar decimales
+            monto_clean = monto.replace(".", "").replace(",", ".")
+            monto_valor = float(monto_clean)
         
         # Verificar que el monto sea positivo
-        if monto_int <= 0:
+        if monto_valor <= 0:
             flash("El monto debe ser mayor que cero", "danger")
             return redirect(url_for('dashboard'))
             
         nuevo_gasto = Gasto(
-            monto=monto_int,
+            monto=monto_valor,
             descripcion=descripcion,
             profile_id=profile_id,
             cuenta=cuenta
@@ -355,6 +377,7 @@ def agregar_ingreso():
         return redirect(url_for('login'))
     
     profile_id = session['profile_id']
+    profile = Profile.query.get_or_404(profile_id)
     monto = request.form.get('monto', '')
     descripcion = request.form.get('descripcion', '')
     cuenta = request.form.get('cuenta', 'Efectivo')
@@ -370,23 +393,29 @@ def agregar_ingreso():
         return redirect(url_for('dashboard'))
         
     # Validar que la cuenta exista para este usuario
-    billetera = Billetera.querand.filter_by(profile_id=profile_id, nombre=cuenta).first()
+    billetera = Billetera.query.filter_by(profile_id=profile_id, nombre=cuenta).first()
     if not billetera:
         flash(f"La billetera {cuenta} no existe o no te pertenece", "danger")
         return redirect(url_for('dashboard'))
     
     try:
-        # Limpieza y validación del monto
-        monto_clean = monto.replace(".", "").replace(",", "")
-        monto_int = int(monto_clean)
+        # Procesar el monto según la moneda del perfil
+        if profile.moneda == 'COP':
+            # Para COP usar valores enteros (sin centavos)
+            monto_clean = monto.replace(".", "").replace(",", "")
+            monto_valor = int(monto_clean)
+        else:
+            # Para otras monedas, preservar decimales
+            monto_clean = monto.replace(".", "").replace(",", ".")
+            monto_valor = float(monto_clean)
         
         # Verificar que el monto sea positivo
-        if monto_int <= 0:
+        if monto_valor <= 0:
             flash("El monto debe ser mayor que cero", "danger")
             return redirect(url_for('dashboard'))
             
         nuevo_ingreso = Ingreso(
-            monto=monto_int,
+            monto=monto_valor,
             descripcion=descripcion,
             profile_id=profile_id,
             cuenta=cuenta
@@ -422,6 +451,7 @@ def editar_movimiento(tipo, id):
         return redirect(url_for('login'))
     
     profile_id = session['profile_id']
+    profile = Profile.query.get_or_404(profile_id)
     
     # Obtener los datos del formulario
     monto = request.form.get('monto', '0')
@@ -429,23 +459,28 @@ def editar_movimiento(tipo, id):
     cuenta = request.form.get('cuenta', 'Efectivo')
     next_page = request.form.get('next', 'dashboard')  # Obtener la página a la que redirigir
     
-    # Limpiar el monto
-    monto_clean = monto.replace(".", "").replace(",", "")
-    
     try:
-        monto_int = int(monto_clean)
+        # Procesar el monto según la moneda del perfil
+        if profile.moneda == 'COP':
+            # Para COP usar valores enteros (sin centavos)
+            monto_clean = monto.replace(".", "").replace(",", "")
+            monto_valor = int(monto_clean)
+        else:
+            # Para otras monedas, preservar decimales
+            monto_clean = monto.replace(".", "").replace(",", ".")
+            monto_valor = float(monto_clean)
         
         # Actualizar según el tipo de movimiento
         if tipo == 'ingreso':
             movimiento = Ingreso.query.filter_by(id=id, profile_id=profile_id).first_or_404()
-            movimiento.monto = monto_int
+            movimiento.monto = monto_valor
             movimiento.descripcion = descripcion
             movimiento.cuenta = cuenta
             mensaje = "Ingreso actualizado correctamente"
             
         elif tipo == 'gasto':
             movimiento = Gasto.query.filter_by(id=id, profile_id=profile_id).first_or_404()
-            movimiento.monto = monto_int
+            movimiento.monto = monto_valor
             movimiento.descripcion = descripcion
             movimiento.cuenta = cuenta
             mensaje = "Gasto actualizado correctamente"

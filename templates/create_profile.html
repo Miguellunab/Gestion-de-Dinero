@@ -107,6 +107,39 @@
               </div>
             </div>
 
+            <div class="mb-3">
+              <label
+                for="profileCurrency"
+                class="form-label"
+                >Moneda</label
+              >
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="fas fa-money-bill"></i>
+                </span>
+                <select
+                  id="profileCurrency"
+                  name="moneda"
+                  class="form-control"
+                  required>
+                  <option
+                    value="COP"
+                    selected>
+                    COP - Peso Colombiano (entero)
+                  </option>
+                  <option value="USD">
+                    USD - Dólar Estadounidense (decimal)
+                  </option>
+                  <option value="EUR">EUR - Euro (decimal)</option>
+                  <option value="MXN">MXN - Peso Mexicano (decimal)</option>
+                </select>
+              </div>
+              <div class="form-text">
+                Esta opción afecta cómo se guardan los valores en la app
+                (enteros o decimales)
+              </div>
+            </div>
+
             <button
               type="submit"
               class="btn btn-create w-100">
