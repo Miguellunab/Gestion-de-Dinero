@@ -17,18 +17,31 @@
     <!-- Favicon -->
     <link
       rel="icon"
-      href="{{ url_for('static', filename='images/favicon.png', _external=True) }}?v=2" />
+      href="{{ url_for('static', filename='images/favicon.png') }}?v=2" />
     <!-- CSS personalizado para crear perfil -->
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/create_profile.css') }}?v=2" />
+    <!-- Cargar CSS de modo oscuro -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/dark-mode.css') }}?v=1" />
   </head>
   <body>
+    <!-- Botón de modo oscuro -->
+    <button
+      id="theme-toggle"
+      title="Cambiar tema"
+      class="btn-theme-toggle position-absolute top-0 end-0 m-3">
+      <i
+        id="theme-icon"
+        class="fas fa-moon"></i>
+    </button>
     <div class="container py-4">
       <div class="profile-card">
         <div class="profile-header">
           <img
-            src="{{ url_for('static', filename='favicon.png', _external=True) }}"
+            src="{{ url_for('static', filename='images/favicon.png') }}"
             alt="App Logo"
             class="app-logo" />
           <h2 class="profile-title">Crear Nuevo Perfil</h2>
@@ -180,5 +193,7 @@
         });
       });
     </script>
+    <!-- Script para cambiar tema -->
+    <script src="{{ url_for('static', filename='js/theme-switcher.js') }}?v=1"></script>
   </body>
 </html>

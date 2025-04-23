@@ -213,13 +213,13 @@
     <!-- Barra de navegación -->
     <nav class="navbar navbar-dark" style="background-color: var(--dark-color)">
       <div class="container d-flex justify-content-between align-items-center">
-        <span class="navbar-brand mb-0">
+        <a href="{{ url_for('dashboard') }}" class="navbar-brand mb-0">
           <img
             src="{{ url_for('static', filename='images/favicon.png', _external=True) }}"
             alt="Wallet Logo"
             class="app-logo" />
           Hola, {{ profile.name }}
-        </span>
+        </a>
         <div class="d-flex align-items-center">
           <button id="theme-toggle" class="btn-theme-toggle me-3">
             <i id="theme-icon" class="fas fa-moon"></i>

@@ -1,235 +1,159 @@
-:root {
-    /* Variables para tema claro (default) */
-    --bg-color: #f5f7fa;
-    --card-bg: #ffffff;
-    --text-color: #212529;
-    --text-muted: #6c757d;
-    --border-color: #e0e0e0;
-    --shadow-color: rgba(0, 0, 0, 0.05);
-}
-
+/* ============================================
+   VARIABLES DE COLORES - MODO OSCURO
+   ============================================ */
 [data-theme="dark"] {
-    --bg-color: #121212;
-    --card-bg: #1e1e1e;
-    --text-color: #f8f9fa;
-    --text-muted: #adb5bd;
-    --border-color: #2d2d2d;
-    --shadow-color: rgba(0, 0, 0, 0.2);
-    /* Colores específicos para elementos */
-    --primary-dark: #2a75e8;
-    --success-dark: #2c9d00;
-    --danger-dark: #e63946;
+    /* Colores de fondo */
+    --bg-color: #121212;             /* Fondo de página */
+    --card-bg: #1e1e1e;              /* Fondo de tarjetas */
+    
+    /* Colores de texto */
+    --text-color: #f8f9fa;           /* Texto principal */
+    --text-muted: #ffffff;           /* Texto secundario (blanco en modo oscuro) */
+    
+    /* Colores estructurales */
+    --border-color: #2d2d2d;         /* Bordes */
+    --shadow-color: rgba(0, 0, 0, 0.2); /* Sombras */
+    
+    /* Colores de aplicación específicos */
+    --primary-dark: #4a9de9;         /* Azul principal oscuro */
+    --success-dark: #2c9d00;         /* Verde para ingresos */
+    --danger-dark: #e63946;          /* Rojo para gastos */
 }
 
-/* Aplicar fondo y color global */
+/* ============================================
+   ESTILOS GENERALES
+   ============================================ */
 [data-theme="dark"] body {
-    background-color: var(--bg-color);
+    background-color: #0d1117;       /* Azul oscuro estilo GitHub */
     color: var(--text-color);
 }
 
-/* Tarjetas, modales y contenedores */
+/* ============================================
+   BARRA DE NAVEGACIÓN EN MODO OSCURO
+   ============================================ */
+[data-theme="dark"] .navbar.navbar-dark {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .navbar-brand,
+[data-theme="dark"] .navbar-dark .navbar-brand {
+    color: white !important;
+}
+
+[data-theme="dark"] .btn-logout,
+[data-theme="dark"] .btn-logout span {
+    color: white !important;
+}
+
+[data-theme="dark"] .btn-logout i {
+    color: white !important;
+}
+
+[data-theme="dark"] .btn-theme-toggle {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   TARJETA DE BALANCE EN MODO OSCURO
+   ============================================ */
+[data-theme="dark"] .balance-card {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
+}
+
+[data-theme="dark"] .balance-amount h3,
+[data-theme="dark"] .balance-amount h3.text-success {
+    color: white !important;
+}
+
+[data-theme="dark"] .balance-amount h3.text-danger {
+    color: #ff595e !important;
+}
+
+[data-theme="dark"] .btn-informes {
+    color: white !important;
+}
+
+[data-theme="dark"] .btn-informes i {
+    color: white !important;
+}
+
+/* ============================================
+   TARJETAS Y CONTENEDORES
+   ============================================ */
 [data-theme="dark"] .card,
-[data-theme="dark"] .modal-content,
 [data-theme="dark"] .action-card,
-[data-theme="dark"] .transactions-card,
-[data-theme="dark"] .bg-white {
+[data-theme="dark"] .transactions-card {
     background-color: var(--card-bg) !important;
-    border-color: var(--border-color);
-}
-
-/* Modal en modo oscuro - correcciones completas */
-[data-theme="dark"] .modal-content {
-    background-color: #202020 !important;
-    border-color: #333333 !important;
-    color: #ffffff !important;
-}
-
-[data-theme="dark"] .modal-header {
-    background-color: #242424 !important;
-    border-bottom: 1px solid #333333 !important;
-    color: #ffffff !important;
-}
-
-[data-theme="dark"] .modal-title {
-    color: #ffffff !important;
-}
-
-[data-theme="dark"] .modal-footer {
-    border-top: 1px solid #333333 !important;
-    background-color: #202020 !important;
-}
-
-/* Botones del modal en modo oscuro */
-[data-theme="dark"] .modal-footer .btn-secondary {
-    background-color: #3a3a3a !important;
-    border-color: #444444 !important;
-    color: #ffffff !important;
-    transition: all 0.3s ease !important;
-}
-
-[data-theme="dark"] .modal-footer .btn-secondary:hover {
-    background-color: #4a4a4a !important;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3) !important;
-}
-
-[data-theme="dark"] .modal-footer .btn-primary {
-    background-color: #1e88e5 !important;
-    border-color: #1976d2 !important;
-    color: #ffffff !important;
-    transition: all 0.3s ease !important;
-}
-
-[data-theme="dark"] .modal-footer .btn-primary:hover {
-    background-color: #0d6efd !important;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3) !important;
-    transform: translateY(-1px) !important;
-}
-
-/* Formularios en modales */
-[data-theme="dark"] .form-label {
-    color: #e0e0e0 !important;
-}
-
-[data-theme="dark"] .form-control,
-[data-theme="dark"] .form-select {
-    background-color: #2d2d2d !important;
-    border-color: #444444 !important;
-    color: #ffffff !important;
-}
-
-/* Corrección para la flecha de los selects en modo oscuro */
-[data-theme="dark"] .form-select {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
-    background-color: #2d2d2d !important;
-    border-color: #444444 !important;
-    color: #ffffff !important;
-}
-
-[data-theme="dark"] .form-control:focus,
-[data-theme="dark"] .form-select:focus {
-    border-color: #1e88e5 !important;
-    box-shadow: 0 0 0 0.25rem rgba(30, 136, 229, 0.25) !important;
-}
-
-/* Botón close en modal */
-[data-theme="dark"] .btn-close {
-    filter: invert(1) grayscale(100%) brightness(200%) !important;
-    opacity: 0.8 !important;
-}
-
-[data-theme="dark"] .btn-close:hover {
-    opacity: 1 !important;
-}
-
-/* Formularios e inputs */
-[data-theme="dark"] .form-control,
-[data-theme="dark"] .input-group-text {
-    background-color: #2d2d2d !important;
     border-color: var(--border-color) !important;
-    color: var(--text-color) !important;
+    color: white !important;
+}
+
+[data-theme="dark"] .action-header,
+[data-theme="dark"] .transactions-header {
+    background-color: #161b22 !important;
+    border-color: #30363d !important;
+    color: white !important;
+}
+
+/* ============================================
+   FORMULARIOS
+   ============================================ */
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .input-group-text,
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+    background-color: #2d2d2d !important;
+    border-color: #333 !important;
+    color: white !important;
 }
 
 [data-theme="dark"] .form-control:focus {
-    background-color: #333 !important;
     border-color: var(--primary-color) !important;
-    color: var(--text-color) !important;
+    box-shadow: 0 0 0 0.25rem rgba(30, 136, 229, 0.25) !important;
 }
 
-/* Transacciones y textos secundarios */
-[data-theme="dark"] .transaction-item {
-    border-bottom-color: var(--border-color);
+[data-theme="dark"] .form-select {
+    background-color: #2d2d2d !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+    color: white !important;
+    border-color: #333 !important;
 }
 
-[data-theme="dark"] .transaction-description,
-[data-theme="dark"] .transaction-account,
-[data-theme="dark"] .transaction-date,
-[data-theme="dark"] .btn-action {
-    color: var(--text-muted);
+[data-theme="dark"] .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+    opacity: 1 !important;
 }
 
-/* Navegación y pestañas */
+/* ============================================
+   PESTAÑAS Y NAVEGACIÓN
+   ============================================ */
 [data-theme="dark"] .nav-tabs .nav-link {
     color: var(--text-muted);
 }
 
 [data-theme="dark"] .nav-tabs .nav-link.active {
-    color: var(--text-color);
-    border-bottom-color: var(--primary-color);
+    color: #4a9de9 !important;
+    border-bottom: 2px solid #4a9de9;
 }
 
-/* Gráficos y contenedores de charts */
-[data-theme="dark"] .chart-container {
-    background-color: var(--card-bg);
-    border-color: var(--border-color);
-}
-
-/* Encabezados de tarjetas y secciones */
-[data-theme="dark"] .transactions-header,
-[data-theme="dark"] .action-header {
-    background-color: #252525;
-    color: var(--text-color);
-    border-color: var(--border-color);
-}
-
-/* Login y formularios de acceso */
-[data-theme="dark"] .login-container,
-[data-theme="dark"] .login-form,
-[data-theme="dark"] .login-header,
-[data-theme="dark"] .login-title,
-[data-theme="dark"] .form-label,
-[data-theme="dark"] label,
-[data-theme="dark"] p {
-    background-color: inherit;
-    color: white !important;
-    border-color: inherit;
-}
-
-[data-theme="dark"] a {
-    color: #58a6ff !important;
-}
-
-/* Botones principales */
-[data-theme="dark"] .btn-primary,
-[data-theme="dark"] .btn-success,
-[data-theme="dark"] #btnLogin {
-    background-color: #0d6efd !important;
-    border-color: #0d6efd !important;
-    color: white !important;
-}
-
-/* Tarjetas y perfiles */
-[data-theme="dark"] .profile-card,
-[data-theme="dark"] .user-card,
-[data-theme="dark"] .profile-name,
-[data-theme="dark"] .profile-card .card-title,
-[data-theme="dark"] .profile-card .card-text,
-[data-theme="dark"] .user-card .username {
+/* Corregir el fondo del contenido de las pestañas en modo oscuro */
+[data-theme="dark"] .tab-content.bg-white {
     background-color: var(--card-bg) !important;
-    border-color: #333 !important;
-    color: white !important;
+    color: var(--text-color) !important;
 }
 
-/* Enlaces, spans y textos pequeños */
-[data-theme="dark"] .btn-link,
-[data-theme="dark"] a:not(.btn),
-[data-theme="dark"] span,
-[data-theme="dark"] small {
-    color: #58a6ff !important;
+/* ============================================
+   TRANSACCIONES
+   ============================================ */
+[data-theme="dark"] .transaction-item {
+    border-bottom-color: var(--border-color);
 }
 
-[data-theme="dark"] .btn:not(.btn-link) span {
-    color: inherit !important;
-}
-
-/* Asegurar que .text-muted se vea correctamente */
-[data-theme="dark"] .text-muted {
-    color: var(--text-muted) !important;
-}
-
-[data-theme="dark"] .transactions-container {
-    background-color: #1a1a1a !important;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5) !important;
-    color: #ffffff !important;
+[data-theme="dark"] .transaction-description,
+[data-theme="dark"] .transaction-date {
+    color: var(--text-color) !important;
 }
 
 [data-theme="dark"] .transaction-account {
@@ -237,10 +161,40 @@
     color: #dddddd !important;
 }
 
+[data-theme="dark"] .transaction-account small {
+    color: #adb5bd !important;
+}
+
+/* Garantizar que todos los íconos sean visibles */
+[data-theme="dark"] .btn-toggle-accounts i,
+[data-theme="dark"] .btn-hide-balance i,
+[data-theme="dark"] .btn-theme-toggle i,
+[data-theme="dark"] .transaction-icon i {
+    color: white !important;
+}
+
+[data-theme="dark"] .ingreso-icon {
+    background-color: rgba(67, 160, 71, 0.2);
+}
+
+[data-theme="dark"] .gasto-icon {
+    background-color: rgba(229, 57, 53, 0.2);
+}
+
+[data-theme="dark"] .ingreso-icon i {
+    color: var(--success-color) !important;
+}
+
+[data-theme="dark"] .gasto-icon i {
+    color: var(--danger-color) !important;
+}
+
+/* ============================================
+   BOTONES Y ACCIONES
+   ============================================ */
 [data-theme="dark"] .btn-action {
     background-color: #252525 !important;
     color: #dddddd !important;
-    transition: all 0.3s ease !important;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important;
 }
 
@@ -260,42 +214,272 @@
     color: white !important;
 }
 
-[data-theme="dark"] .btn-back {
+[data-theme="dark"] .btn:not(.btn-link) span {
+    color: inherit !important;
+}
+
+[data-theme="dark"] .btn i {
+    color: white !important;
+}
+
+[data-theme="dark"] .btn:disabled {
+    background-color: #3d3d3d !important;
+    color: #aaa !important;
+}
+
+/* Corregir color del icono de flecha atrás */
+[data-theme="dark"] .btn-back i {
+    color: #313233 !important; /* Gris claro para contraste en fondo oscuro */
+}
+
+/* ============================================
+   MODALES
+   ============================================ */
+[data-theme="dark"] .modal-content {
+    background-color: #202020 !important;
+    border-color: #333333 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .modal-header {
+    background-color: #242424 !important;
+    border-bottom: 1px solid #333333 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .modal-footer {
+    border-top: 1px solid #333333 !important;
+    background-color: #202020 !important;
+}
+
+[data-theme="dark"] .modal-title {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%) !important;
+    opacity: 0.8 !important;
+}
+
+[data-theme="dark"] .btn-close:hover {
+    opacity: 1 !important;
+}
+
+[data-theme="dark"] .modal-footer .btn-secondary {
+    background-color: #3a3a3a !important;
+    border-color: #444444 !important;
+    color: #ffffff !important;
+    transition: all 0.3s ease !important;
+}
+
+[data-theme="dark"] .modal-footer .btn-secondary:hover {
+    background-color: #4a4a4a !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-theme="dark"] .modal-footer .btn-primary {
+    background-color: #4a9de9 !important;
+    border-color: #4a9de9 !important;
+    color: #ffffff !important;
+    transition: all 0.3s ease !important;
+}
+
+[data-theme="dark"] .modal-footer .btn-primary:hover {
+    background-color: #4a9de9 !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* ============================================
+   DROPDOWN Y MENÚS
+   ============================================ */
+[data-theme="dark"] .dropdown-menu {
     background-color: #1a1a1a !important;
+    border-color: #333333 !important;
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: white !important;
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background-color: #2d2d2d !important;
+}
+
+/* ============================================
+   SEPARADORES Y BORDES
+   ============================================ */
+[data-theme="dark"] hr {
+    border-color: #333 !important;
+}
+
+/* ============================================
+   AJUSTES DE TEXTO
+   ============================================ */
+/* Asegurar que todos los textos sean visibles */
+[data-theme="dark"] label,
+[data-theme="dark"] .form-label,
+[data-theme="dark"] .input-group-text,
+[data-theme="dark"] h1, 
+[data-theme="dark"] h2, 
+[data-theme="dark"] h3, 
+[data-theme="dark"] h4, 
+[data-theme="dark"] h5, 
+[data-theme="dark"] h6,
+[data-theme="dark"] .card-title,
+[data-theme="dark"] p,
+[data-theme="dark"] .modal-title {
+    color: white !important;
+}
+
+/* El más importante: asegurar que text-muted sea siempre blanco en modo oscuro */
+[data-theme="dark"] .text-muted {
+    color: white !important;
+}
+
+/* ============================================
+   BILLETERAS (billeteras.html)
+   ============================================ */
+
+/* Botón Volver */
+[data-theme="dark"] .back-button {
+    color: var(--text-color) !important; /* Texto blanco */
+}
+
+[data-theme="dark"] .back-button i {
+    color: var(--primary-dark) !important; /* Icono azul principal */
+}
+
+[data-theme="dark"] .back-button:hover {
+    color: var(--primary-dark) !important;
+}
+
+/* Botón de cambio de tema */
+[data-theme="dark"] .btn-theme-toggle {
+    color: var(--text-color) !important; /* Icono blanco */
+    background-color: var(--card-bg) !important; /* Fondo de tarjeta */
+    border-color: var(--border-color) !important; /* Borde oscuro */
+}
+
+[data-theme="dark"] .btn-theme-toggle:hover {
+    background-color: #2d2d2d !important; /* Un poco más claro al pasar el mouse */
+}
+
+/* Título y descripción */
+[data-theme="dark"] h2 {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .text-muted {
+    color: white !important; /* Gris claro para texto muted en modo oscuro */
+}
+
+/* Tarjetas de billetera */
+[data-theme="dark"] .wallet-card {
+    background-color: var(--card-bg) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .wallet-name {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .default-wallet-badge {
+    color: #ccc !important;
+    background-color: #3a3a3a !important;
+}
+
+/* Botones de acción en tarjeta */
+[data-theme="dark"] .wallet-actions .btn-outline-primary {
+    color: var(--primary-dark) !important;
+    border-color: var(--primary-dark) !important;
+}
+
+[data-theme="dark"] .wallet-actions .btn-outline-primary:hover {
+    background-color: rgba(74, 157, 233, 0.1) !important;
+}
+
+[data-theme="dark"] .wallet-actions .btn-outline-danger {
+    color: var(--danger-dark) !important;
+    border-color: var(--danger-dark) !important;
+}
+
+[data-theme="dark"] .wallet-actions .btn-outline-danger:hover {
+    background-color: rgba(230, 57, 70, 0.1) !important;
+}
+
+/* Tarjeta Añadir Billetera */
+[data-theme="dark"] .add-wallet-card {
+    background-color: var(--card-bg) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .add-wallet-card i,
+[data-theme="dark"] .add-wallet-card .text-muted {
+    color: #adb5bd !important; /* Icono y texto gris claro */
+}
+
+[data-theme="dark"] .add-wallet-card:hover {
+    border-color: var(--primary-dark) !important;
+    background-color: #2d2d2d !important;
+}
+
+[data-theme="dark"] .add-wallet-card:hover i,
+[data-theme="dark"] .add-wallet-card:hover .text-muted {
+    color: var(--primary-dark) !important;
+}
+
+/* Modales en modo oscuro (Asegurar consistencia) */
+[data-theme="dark"] .modal-content {
+    background-color: #202020 !important;
+    border-color: #333333 !important;
     color: #ffffff !important;
 }
 
-[data-theme="dark"] .btn-back:hover {
-    background-color: #1e88e5 !important;
+[data-theme="dark"] .modal-header {
+    background-color: #242424 !important;
+    border-bottom: 1px solid #333333 !important;
     color: #ffffff !important;
 }
 
-[data-theme="dark"] .navbar-brand,
-[data-theme="dark"] .btn-logout,
-[data-theme="dark"] .btn-logout span {
+[data-theme="dark"] .modal-footer {
+    border-top: 1px solid #333333 !important;
+    background-color: #202020 !important;
+}
+
+[data-theme="dark"] .modal-title {
     color: #ffffff !important;
 }
 
-[data-theme="dark"] .btn-logout i {
+[data-theme="dark"] .form-label {
     color: #ffffff !important;
 }
 
-[data-theme="dark"] .pagination-btn {
-    background-color: #1a1a1a !important;
-    color: #ffffff !important;
+[data-theme="dark"] .form-control {
+    background-color: #2d2d2d !important;
+    border-color: #333 !important;
+    color: white !important;
 }
 
-[data-theme="dark"] .pagination-btn:hover {
-    background-color: #1e88e5 !important;
-    color: #ffffff !important;
+[data-theme="dark"] .color-circle.selected {
+    border-color: #f8f9fa !important; /* Borde blanco para selección en modo oscuro */
 }
 
-[data-theme="dark"] .btn-filter {
-    background-color: #1a1a1a !important;
-    color: #ffffff !important;
+[data-theme="dark"] .icon-option {
+    border-color: var(--border-color) !important;
+    color: #adb5bd !important;
 }
 
-[data-theme="dark"] .btn-filter:hover {
-    background-color: #1e88e5 !important;
-    color: #ffffff !important;
+[data-theme="dark"] .icon-option:hover {
+    background-color: #2d2d2d !important;
+}
+
+[data-theme="dark"] .icon-option.selected {
+    background-color: var(--primary-dark) !important;
+    border-color: var(--primary-dark) !important;
+    color: white !important;
+}
+
+[data-theme="dark"] .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%) !important;
 }

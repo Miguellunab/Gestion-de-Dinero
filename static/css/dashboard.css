@@ -1,28 +1,43 @@
-/* Colores principales de la aplicación */
+/* ============================================
+   VARIABLES DE COLORES - MODO CLARO
+   ============================================ */
 :root {
-    --primary-color: #3a86ff;
-    /* Azul principal */
-    --success-color: #38b000;
-    /* Verde para ingresos */
-    --danger-color: #ff595e;
-    /* Rojo para gastos */
-    --dark-color: #4a9de9;
-    /* Azul para barra superior */
-    --light-color: #f8f9fa;
-    --wallet-color: #ffe8d6;
-    /* Color que combina con la billetera del logo */
-    --coin-color: #ff9e00;
-    /* Color que combina con la moneda del logo */
+    /* Colores principales */
+    --primary-color: #4a9de9;        /* Azul principal */
+    --success-color: #38b000;        /* Verde para ingresos */
+    --danger-color: #ff595e;         /* Rojo para gastos */
+    --dark-color: #4a9de9;           /* Azul para barra superior */
+    
+    /* Colores secundarios */
+    --light-color: #f8f9fa;          /* Fondo claro */
+    --bg-color: #f5f7fa;             /* Fondo principal */
+    --text-color: #212529;           /* Texto principal */
+    --text-muted: #ffffff;           /* Texto secundario */
+    --border-color: #e0e0e0;         /* Bordes */
+    --shadow-color: rgba(0, 0, 0, 0.05); /* Sombras */
+    
+    /* Colores especiales */
+    --wallet-color: #ffe8d6;         /* Color de fondo para billeteras */
+    --coin-color: #ff9e00;           /* Color para monedas */
 }
 
-/* Estilo general de la página */
+/* ============================================
+   ESTILOS GENERALES
+   ============================================ */
 body {
-    background-color: #f5f7fa;
-    /* Fondo gris claro */
+    background-color: var(--bg-color);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Barra de navegación superior */
+/* ============================================
+   BARRA DE NAVEGACIÓN
+   ============================================ */
+.navbar {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    background-color: var(--dark-color); /* Added from inline style */
+}
+
 .navbar-brand {
     font-weight: 700;
     letter-spacing: 0.5px;
@@ -36,13 +51,211 @@ body {
     margin-right: 15px;
 }
 
-/* Aumentar altura de la navbar */
-.navbar {
-    padding-top: 12px;
-    padding-bottom: 12px;
+.btn-logout {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50px;
+    padding: 8px 15px;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s;
+    font-weight: 500;
 }
 
-/* Tarjetas superiores */
+.btn-logout:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-logout i {
+    margin-right: 6px;
+}
+
+/* Botón de cambio de tema */
+.btn-theme-toggle {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.btn-theme-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   LOGO PRINCIPAL
+   ============================================ */
+.logo-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.main-logo {
+    width: 130px;
+    height: auto;
+    margin-bottom: 15px;
+}
+
+/* ============================================
+   TARJETA DE BALANCE
+   ============================================ */
+.balance-card {
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 15px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.balance-amount {
+    display: flex;
+    align-items: center;
+}
+
+.balance-logo {
+    display: inline-block;
+    vertical-align: middle;
+    width: 30px;
+    height: 30px;
+    margin-right: 5px;
+}
+
+.balance-hidden {
+    filter: blur(8px);
+}
+
+.balance-hidden:hover {
+    filter: blur(8px);
+}
+
+/* Botón ocultar/mostrar balance */
+.btn-hide-balance {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: 12px;
+}
+
+.btn-hide-balance:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Acciones de balance */
+.balance-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding-right: 10px;
+}
+
+.btn-toggle-accounts {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    padding: 0;
+    cursor: pointer;
+}
+
+.btn-toggle-accounts:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+.btn-informes {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.btn-informes:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+/* Panel de cuentas */
+.account-details {
+    color: white;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.account-item {
+    font-size: 0.95rem;
+    padding: 5px 0;
+}
+
+.account-name {
+    font-weight: 500;
+}
+
+.account-name i {
+    opacity: 0.9;
+    width: 20px;
+    text-align: center;
+}
+
+/* ============================================
+   PESTAÑAS DE ACCIÓN (INGRESO/GASTO)
+   ============================================ */
+.nav-tabs .nav-link {
+    border: none;
+    color: #6c757d;
+    padding: 12px 16px;
+    font-weight: 500;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--dark-color);
+    border-bottom: 2px solid var(--dark-color);
+    background: none;
+}
+
+.tab-content {
+    padding-top: 20px;
+}
+
+/* ============================================
+   TARJETAS Y ELEMENTOS DE INTERFAZ
+   ============================================ */
 .top-card {
     border-radius: 15px;
     border: none;
@@ -51,19 +264,6 @@ body {
     overflow: hidden;
 }
 
-/* Tarjeta de balance */
-.balance-card {
-  background: var(--primary-color) linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
-  color: white;
-  border-radius: 15px;
-  padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Tarjeta de acción */
 .action-card {
     background: white;
     border-radius: 15px;
@@ -82,7 +282,9 @@ body {
     padding: 20px;
 }
 
-/* Botones de acción */
+/* ============================================
+   BOTONES DE ACCIÓN
+   ============================================ */
 .btn-ingreso {
     background-color: var(--success-color);
     border: none;
@@ -117,7 +319,58 @@ body {
     box-shadow: 0 4px 8px rgba(255, 89, 94, 0.3);
 }
 
-/* Formularios */
+.btn-floating {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(58, 134, 255, 0.4);
+    transition: all 0.3s;
+    z-index: 1000;
+}
+
+.btn-floating:hover,
+.btn-floating:focus {
+    background-color: #2a75e8;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(58, 134, 255, 0.5);
+}
+
+.btn-action {
+    border: none;
+    background: none;
+    color: #6c757d;
+    transition: transform 0.2s, color 0.2s;
+    margin-left: 8px;
+    padding: 4px 6px;
+}
+
+.btn-action.delete:hover,
+.btn-action.delete:focus {
+    color: var(--danger-color);
+    transform: translateY(-2px);
+}
+
+.btn-action.edit:hover,
+.btn-action.edit:focus {
+    color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.btn-outline-secondary {
+    border-color: #ced4da;
+}
+
+/* ============================================
+   FORMULARIOS
+   ============================================ */
 .form-control {
     border-radius: 10px;
     padding: 12px;
@@ -129,7 +382,9 @@ body {
     border-color: var(--primary-color);
 }
 
-/* Tarjeta de transacciones */
+/* ============================================
+   TRANSACCIONES
+   ============================================ */
 .transactions-card {
     border-radius: 15px;
     border: none;
@@ -137,8 +392,6 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
     margin-bottom: 20px;
 }
-
-/* Agregar estos estilos para la sección colapsable */
 
 .transactions-header {
     display: flex;
@@ -155,44 +408,6 @@ body {
     font-weight: 600;
 }
 
-.transactions-toggle-icon {
-    transition: transform 0.3s;
-}
-
-.transactions-toggle-icon.collapsed {
-    transform: rotate(180deg);
-}
-
-.transactions-pagination {
-    display: flex;
-    justify-content: center;
-    padding: 15px;
-    border-top: 1px solid rgba(0,0,0,0.1);
-}
-
-.pagination-btn {
-    padding: 5px 15px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    margin: 0 5px;
-    color: #6c757d;
-    text-decoration: none;
-}
-
-.pagination-btn:hover, 
-.pagination-btn.active {
-    background-color: #007bff;
-    color: white;
-}
-
-.pagination-count {
-    font-size: 0.9rem;
-    color: #6c757d;
-    align-self: center;
-    margin: 0 10px;
-}
-
-/* Listado de transacciones */
 .transaction-item {
     padding: 15px 20px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
@@ -236,6 +451,13 @@ body {
     margin-top: 3px;
 }
 
+.transaction-account {
+    display: block;
+    font-size: 0.8rem;
+    margin-top: 3px;
+    color: #6c757d;
+}
+
 .transaction-date {
     font-size: 0.8rem;
     color: #adb5bd;
@@ -248,31 +470,55 @@ body {
     display: flex;
 }
 
-/* Estilo para botones de acción */
-.btn-action {
-    border: none;
-    background: none;
-    color: #6c757d;  /* Color más visible por defecto */
-    transition: transform 0.2s, color 0.2s;
-    margin-left: 8px;
-    padding: 4px 6px;
+.transactions-toggle-icon {
+    transition: transform 0.3s;
 }
 
-/* Botón de eliminar en rojo al hover */
-.btn-action.delete:hover,
-.btn-action.delete:focus {
-    color: var(--danger-color, #dc3545);
-    transform: translateY(-2px);
+.transactions-toggle-icon.collapsed {
+    transform: rotate(180deg);
 }
 
-/* Botón de editar en azul al hover */
-.btn-action.edit:hover,
-.btn-action.edit:focus {
-    color: var(--primary-color, #007bff);
-    transform: translateY(-2px);
+.no-transactions {
+    padding: 40px 20px;
+    text-align: center;
+    color: #adb5bd;
 }
 
-/* Modal */
+/* ============================================
+   PAGINACIÓN
+   ============================================ */
+.transactions-pagination {
+    display: flex;
+    justify-content: center;
+    padding: 15px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+.pagination-btn {
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    margin: 0 5px;
+    color: #6c757d;
+    text-decoration: none;
+}
+
+.pagination-btn:hover, 
+.pagination-btn.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.pagination-count {
+    font-size: 0.9rem;
+    color: #6c757d;
+    align-self: center;
+    margin: 0 10px;
+}
+
+/* ============================================
+   MODALES
+   ============================================ */
 .modal-content {
     border-radius: 15px;
     border: none;
@@ -286,6 +532,9 @@ body {
     border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
+/* ============================================
+   RESPONSIVIDAD
+   ============================================ */
 @media (max-width: 576px) {
     .container {
         padding-left: 15px;
@@ -304,101 +553,7 @@ body {
     .transaction-amount {
         font-size: 0.95rem;
     }
-}
-
-.no-transactions {
-    padding: 40px 20px;
-    text-align: center;
-    color: #adb5bd;
-}
-
-/* Botón flotante */
-.btn-floating {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background-color: var(--primary-color);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 12px rgba(58, 134, 255, 0.4);
-    transition: all 0.3s;
-    z-index: 1000;
-}
-
-.btn-floating:hover,
-.btn-floating:focus {
-    background-color: #2a75e8;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(58, 134, 255, 0.5);
-}
-
-/* Pestañas de acción */
-.nav-tabs .nav-link {
-    border: none;
-    color: #6c757d;
-    padding: 12px 16px;
-    font-weight: 500;
-}
-
-.nav-tabs .nav-link.active {
-    color: var(--dark-color);
-    border-bottom: 2px solid var(--dark-color);
-    background: none;
-}
-
-.tab-content {
-    padding-top: 20px;
-}
-
-/* Logo principal */
-.logo-container {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.main-logo {
-    width: 130px;
-    height: auto;
-    margin-bottom: 15px;
-}
-
-/* Balance */
-.balance-logo {
-    display: inline-block;
-    vertical-align: middle;
-    width: 30px;
-    height: 30px;
-    margin-right: 5px;
-}
-
-.btn-logout {
-    color: white;
-    background-color: rgba(255, 255, 255, 0.2);
-    border: none;
-    border-radius: 50px;
-    padding: 8px 15px;
-    display: flex;
-    align-items: center;
-    transition: all 0.3s;
-    font-weight: 500;
-}
-
-.btn-logout:hover {
-    background-color: rgba(255, 255, 255, 0.3);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.btn-logout i {
-    margin-right: 6px;
-}
-
-@media (max-width: 576px) {
+    
     .btn-logout span {
         display: none;
     }
@@ -413,140 +568,24 @@ body {
     }
 }
 
-/* Ocultar/mostrar balance */
-.btn-hide-balance {
-    background-color: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 34px;
-    height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    margin-left: 12px;
+/* Hacer que el valor del balance sea blanco en modo claro */
+.balance-amount h3 {
+    color: white !important;
 }
 
-.btn-hide-balance:hover {
-    background-color: rgba(255, 255, 255, 0.3);
-    transform: translateY(-1px);
+/* Solo para el texto negativo (en rojo), mantener un color destacado */
+.balance-amount h3.text-danger {
+    color: #ff595e !important; /* Mantener el rojo para valores negativos */
 }
 
-.balance-amount {
-    display: flex;
-    align-items: center;
+/* Hacer que text-muted sea siempre blanco en modo claro */
+.text-muted {
+    color: white !important;
 }
 
-.balance-hidden {
-    filter: blur(8px);
-}
-
-.balance-hidden:hover {
-    filter: blur(8px);
-}
-
-/* Estilos para el botón de toggle de cuentas */
-.btn-toggle-accounts {
-    background-color: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 34px;
-    height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    padding: 0;
-    cursor: pointer;
-}
-
-.btn-toggle-accounts:hover {
-    background-color: rgba(255, 255, 255, 0.3);
-    transform: translateY(-1px);
-}
-
-/* Estilos para el panel de desglose de cuentas */
-.account-details {
-    color: white;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.account-item {
-    font-size: 0.95rem;
-    padding: 5px 0;
-}
-
-.account-name {
-    font-weight: 500;
-}
-
-/* Estilos para la etiqueta de cuenta en transacciones */
-.transaction-account {
-    display: block;
-    font-size: 0.8rem;
-    margin-top: 3px;
-    color: #6c757d;
-}
-
-/* Estilos para los iconos de cuenta */
-.account-name i {
-    opacity: 0.9;
-    width: 20px;
-    text-align: center;
-}
-
-/* Añadir al final del archivo */
-
-/* Botón de cambio de tema */
-.btn-theme-toggle {
-    color: white;
-    background-color: rgba(255, 255, 255, 0.2);
-    border: none;
-    border-radius: 50%;
-    width: 34px;
-    height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s;
-    cursor: pointer;
-}
-
-.btn-theme-toggle:hover {
-    background-color: rgba(255, 255, 255, 0.3);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-
-.btn-informes {
-  background-color: rgba(255, 255, 255, 0.15);
-  color: white;
-  border: none;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s;
-}
-
-.balance-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding-right: 10px;
-}
-
-/* Asegurar que el verde del balance se adapte al tema */
-.balance-amount h3.text-success {
-  color: #2dce89 !important; /* Verde claro para ambos modos */
+/* Tarjeta de balance en modo oscuro - AGREGADA: gradiente solo en modo oscuro */
+[data-theme="dark"] .balance-card {
+  background: var(--primary-color) linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
 }
 
 /* Corregir la inversión de colores en dark-mode.css */
@@ -807,4 +846,9 @@ body {
 /* Configuración en selectores */
 .btn-outline-secondary {
   border-color: #ced4da;
+}
+
+/* Corrección para text-muted en modo oscuro - AGREGADA */
+[data-theme="dark"] .text-muted {
+  color: white !important;
 }

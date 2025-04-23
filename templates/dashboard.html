@@ -62,17 +62,17 @@
   </head>
   <body>
     <!-- Barra superior -->
-    <nav class="navbar navbar-dark" style="background-color: var(--dark-color)">
+    <nav class="navbar navbar-dark">
       <div class="container d-flex justify-content-between align-items-center">
-        <span class="navbar-brand mb-0">
+        <a href="{{ url_for('dashboard') }}" class="navbar-brand mb-0">
           <img
             src="{{ url_for('static', filename='images/favicon.png', _external=True) }}"
             alt="Wallet Logo"
             class="app-logo" />
           Hola, {{ profile.name }}
-        </span>
+        </a>
         <div class="d-flex align-items-center">
-          <button id="theme-toggle" class="btn-theme-toggle me-3">
+          <button id="theme-toggle" class="btn-theme-toggle me-3" title="Cambiar tema">
             <i id="theme-icon" class="fas fa-moon"></i>
           </button>
           <a href="{{ url_for('logout') }}" class="btn-logout">
@@ -101,7 +101,7 @@
             <h3 class="{{ 'text-success' if balance >= 0 else 'text-danger' }} {{ 'balance-hidden' if hide_balance else '' }}">
               ${{ balance|format_money }}
             </h3>
-            <button class="btn-hide-balance" onclick="toggleBalance()">
+            <button class="btn-hide-balance" onclick="toggleBalance()" title="Mostrar/Ocultar balance">
               <i class="fas fa-eye{{ '-slash' if hide_balance else '' }}"></i>
             </button>
           </div>

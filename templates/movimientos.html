@@ -37,27 +37,45 @@
       sizes="180x180"
       href="{{ url_for('static', filename='images/favicon.png', _external=True) }}?v=2" />
 
-    <!-- CSS personalizado para movimientos y modo oscuro -->
+    <!-- CSS personalizado para dashboard y modo oscuro -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/dashboard.css') }}?v=3" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}?v=1" />
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/movimientos.css') }}?v=1" />
-    <link 
-      rel="stylesheet" 
-      href="{{ url_for('static', filename='css/dark-mode.css') }}?v=1" />
+
+    <!-- Estilos adicionales en línea -->
+    <style>
+      /* Botón para toggle de cuentas y detalles */
+      .btn-toggle-accounts {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+      }
+    </style>
   </head>
   <body>
     <!-- Barra superior -->
-    <nav class="navbar navbar-dark" style="background-color: #1e88e5;">
+    <nav class="navbar navbar-dark">
       <div class="container d-flex justify-content-between align-items-center">
-        <span class="navbar-brand mb-0">
+        <a href="{{ url_for('dashboard') }}" class="navbar-brand mb-0">
           <img
             src="{{ url_for('static', filename='images/favicon.png', _external=True) }}"
             alt="Wallet Logo"
             class="app-logo" />
           Hola, {{ profile.name }}
-        </span>
+        </a>
         <div class="d-flex align-items-center">
-          <button id="theme-toggle" class="btn-theme-toggle me-3">
+          <button id="theme-toggle" class="btn-theme-toggle me-3" title="Cambiar tema">
             <i id="theme-icon" class="fas fa-moon"></i>
           </button>
           <a href="{{ url_for('logout') }}" class="btn-logout">
@@ -72,7 +90,7 @@
       <!-- Encabezado -->
       <div class="page-header">
         <div class="d-flex align-items-center">
-          <a href="{{ url_for('dashboard') }}" class="btn-back me-3">
+          <a href="{{ url_for('dashboard') }}" class="btn-back me-3" title="Volver al dashboard">
             <i class="fas fa-arrow-left"></i>
           </a>
           <h1 class="h4 mb-0">Movimientos</h1>
@@ -82,8 +100,8 @@
           <button class="btn-filter dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fas fa-filter me-1"></i> Filtrar
           </button>
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filterDropdown">
-            <form action="{{ url_for('movimientos') }}" method="get" class="px-3 py-2">
+          <form action="{{ url_for('movimientos') }}" method="get">
+            <ul class="dropdown-menu dropdown-menu-end px-3 py-2" aria-labelledby="filterDropdown">
               <li>
                 <div class="mb-3">
                   <label class="form-label">Tipo:</label>
@@ -134,8 +152,8 @@
                   <a href="{{ url_for('movimientos') }}" class="btn btn-outline-secondary btn-sm">Limpiar filtros</a>
                 </div>
               </li>
-            </form>
-          </ul>
+            </ul>
+          </form>
         </div>
       </div>
 
@@ -153,7 +171,7 @@
               {% for k,v in request.args.items() if k != 'tipo' %}
                 {% set _ = args.append(k ~ '=' ~ v) %}
               {% endfor %}
-              <a href="{{ url_for('movimientos') }}{% if args %}?{{ args|join('&') }}{% endif %}" class="filter-remove"><i class="fas fa-times-circle"></i></a>
+              <a href="{{ url_for('movimientos') }}{% if args %}?{{ args|join('&') }}{% endif %}" class="filter-remove" title="Quitar filtro"><i class="fas fa-times-circle"></i></a>
             </span>
           {% endif %}
           {% if cuenta_seleccionada %}
@@ -164,7 +182,7 @@
               {% for k,v in request.args.items() if k != 'cuenta' %}
                 {% set _ = args.append(k ~ '=' ~ v) %}
               {% endfor %}
-              <a href="{{ url_for('movimientos') }}{% if args %}?{{ args|join('&') }}{% endif %}" class="filter-remove"><i class="fas fa-times-circle"></i></a>
+              <a href="{{ url_for('movimientos') }}{% if args %}?{{ args|join('&') }}{% endif %}" class="filter-remove" title="Quitar filtro"><i class="fas fa-times-circle"></i></a>
             </span>
           {% endif %}
           {% if fecha_desde %}
@@ -175,7 +193,7 @@
               {% for k,v in request.args.items() if k != 'fecha_desde' %}
                 {% set _ = args.append(k ~ '=' ~ v) %}
               {% endfor %}
-              <a href="{{ url_for('movimientos') }}{% if args %}?{{ args|join('&') }}{% endif %}" class="filter-remove"><i class="fas fa-times-circle"></i></a>
+              <a href="{{ url_for('movimientos') }}{% if args %}?{{ args|join('&') }}{% endif %}" class="filter-remove" title="Quitar filtro"><i class="fas fa-times-circle"></i></a>
             </span>
           {% endif %}
           {% if fecha_hasta %}
@@ -186,7 +204,7 @@
               {% for k,v in request.args.items() if k != 'fecha_hasta' %}
                 {% set _ = args.append(k ~ '=' ~ v) %}
               {% endfor %}
-              <a href="{{ url_for('movimientos') }}{% if args %}?{{ args|join('&') }}{% endif %}" class="filter-remove"><i class="fas fa-times-circle"></i></a>
+              <a href="{{ url_for('movimientos') }}{% if args %}?{{ args|join('&') }}{% endif %}" class="filter-remove" title="Quitar filtro"><i class="fas fa-times-circle"></i></a>
             </span>
           {% endif %}
         </div>
