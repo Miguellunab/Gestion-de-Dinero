@@ -73,3 +73,12 @@ class Ingreso(db.Model):
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
     profile_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)
     cuenta = db.Column(db.String(50), default="Efectivo")  # Nuevo campo para la cuenta
+
+class Transferencia(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    monto = db.Column(db.Float, nullable=False)
+    descripcion = db.Column(db.String(200), nullable=True)
+    fecha = db.Column(db.DateTime, default=datetime.utcnow)
+    origen = db.Column(db.String(50), nullable=False)
+    destino = db.Column(db.String(50), nullable=False)
+    profile_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)

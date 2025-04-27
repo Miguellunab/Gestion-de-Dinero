@@ -151,6 +151,12 @@
               <i class="fas fa-minus-circle text-danger me-2"></i>Gasto
             </button>
           </li>
+          <!-- New Transferencia tab -->
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="transferencia-tab" data-bs-toggle="tab" data-bs-target="#transferencia" type="button" role="tab" aria-selected="false">
+              <i class="fas fa-exchange-alt text-primary me-2"></i>Transferencia
+            </button>
+          </li>
         </ul>
 
         <div class="tab-content bg-white p-3 rounded-bottom shadow-sm" id="actionTabsContent">
@@ -226,6 +232,51 @@
               </div>
               <button type="submit" class="btn btn-gasto w-100">
                 <i class="fas fa-check me-2"></i>Agregar Gasto
+              </button>
+            </form>
+          </div>
+
+          <!-- Formulario de Transferencia -->
+          <div class="tab-pane fade" id="transferencia" role="tabpanel" aria-labelledby="transferencia-tab">
+            <form action="{{ url_for('realizar_transferencia') }}" method="post">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <div class="mb-3">
+                <label for="monto_transferencia" class="form-label">Monto a transferir ({{ profile.moneda }}):</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input type="text" class="form-control" id="monto_transferencia" name="monto" placeholder="10000" inputmode="numeric" required oninput="formatAsPesos(this)" />
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="origen_transferencia" class="form-label">Desde:</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-wallet"></i></span>
+                    <select class="form-select" id="origen_transferencia" name="origen" required>
+                      {% for billetera in billeteras %}
+                      <option value="{{ billetera.nombre }}">{{ billetera.nombre }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="destino_transferencia" class="form-label">Hacia:</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-wallet"></i></span>
+                    <select class="form-select" id="destino_transferencia" name="destino" required>
+                      {% for billetera in billeteras %}
+                      <option value="{{ billetera.nombre }}">{{ billetera.nombre }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="descripcion_transferencia" class="form-label">Descripción (opcional):</label>
+                <input type="text" class="form-control" id="descripcion_transferencia" name="descripcion" placeholder="Pago, préstamo, etc." />
+              </div>
+              <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-exchange-alt me-2"></i>Realizar Transferencia
               </button>
             </form>
           </div>
@@ -327,6 +378,7 @@
 
     <!-- Scripts agrupados -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/theme-switcher.js') }}"></script>
     <script>
       // Formato en vivo para montos según la moneda del perfil
       function formatAsPesos(input) {
@@ -467,44 +519,19 @@
             // Update the modal form action and fields
             document.getElementById('editMovimientoForm').action = `/editar_movimiento/${tipo}/${id}`;
             document.getElementById('edit_monto').value = montoFormatted;
-            document.getElementById('edit_descripcion').value = descripcion;
-
-            const cuentaSelect = document.getElementById('edit_cuenta');
-            for (let i = 0; i < cuentaSelect.options.length; i++) {
-              if (cuentaSelect.options[i].value === cuenta) {
-                cuentaSelect.options[i].selected = true;
+            document.getElementById('edit_descripcion').value = descripcion || '';
+            
+            // Set the select value
+            const selectCuenta = document.getElementById('edit_cuenta');
+            for (let i = 0; i < selectCuenta.options.length; i++) {
+              if (selectCuenta.options[i].value === cuenta) {
+                selectCuenta.selectedIndex = i;
                 break;
               }
             }
           });
         }
       });
-    </script>
-    <script src="{{ url_for('static', filename='js/theme-switcher.js') }}?v=1"></script>
-    <script>
-      // Funciones toggle para balance y cuentas
-      function toggleBalance() {
-        const balanceElements = document.querySelectorAll('.balance-amount h3, .account-item strong');
-        balanceElements.forEach(el => {
-          el.classList.toggle('balance-hidden');
-        });
-        const eyeIcon = document.querySelector('.btn-hide-balance i');
-        eyeIcon.classList.toggle('fa-eye');
-        eyeIcon.classList.toggle('fa-eye-slash');
-      }
-      function toggleAccounts() {
-        const accountDetails = document.getElementById('accountDetails');
-        const accountsIcon = document.querySelector('.btn-toggle-accounts i');
-        if (accountDetails.style.display === 'none') {
-          accountDetails.style.display = 'block';
-          accountsIcon.classList.remove('fa-list');
-          accountsIcon.classList.add('fa-list-ul');
-        } else {
-          accountDetails.style.display = 'none';
-          accountsIcon.classList.remove('fa-list-ul');
-          accountsIcon.classList.add('fa-list');
-        }
-      }
     </script>
   </body>
 </html>

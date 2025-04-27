@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv  # Añadir esta línea
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from config import Config
-from models import db, Profile, Gasto, Ingreso, Billetera
+from models import db, Profile, Gasto, Ingreso, Billetera, Transferencia  # Importar el nuevo modelo
 from flask_migrate import Migrate
 from datetime import datetime, timedelta, date  # Añadir importación de funciones para manipular fechas
 import calendar
@@ -962,6 +962,97 @@ def movimientos():
         fecha_hasta=fecha_hasta,
         hay_filtros_activos=hay_filtros_activos
     )
+
+@app.route('/realizar_transferencia', methods=['POST'])
+def realizar_transferencia():
+    if 'profile_id' not in session:
+        return redirect(url_for('login'))
+    
+    profile_id = session['profile_id']
+    profile = Profile.query.get_or_404(profile_id)
+    monto = request.form.get('monto', '')
+    descripcion = request.form.get('descripcion', '')
+    origen = request.form.get('origen', 'Efectivo')
+    destino = request.form.get('destino', 'Efectivo')
+    
+    # Validaciones estrictas
+    if not monto or not monto.strip():
+        flash("El monto es obligatorio", "danger")
+        return redirect(url_for('dashboard'))
+    
+    # Validar que la descripción no exceda cierto límite
+    if descripcion and len(descripcion) > 200:
+        flash("La descripción no puede exceder los 200 caracteres", "danger")
+        return redirect(url_for('dashboard'))
+    
+    # Verificar que no sea la misma billetera
+    if origen == destino:
+        flash("No se puede transferir a la misma billetera", "danger")
+        return redirect(url_for('dashboard'))
+        
+    # Validar que las billeteras existan para este usuario
+    billetera_origen = Billetera.query.filter_by(profile_id=profile_id, nombre=origen).first()
+    billetera_destino = Billetera.query.filter_by(profile_id=profile_id, nombre=destino).first()
+    
+    if not billetera_origen or not billetera_destino:
+        flash("Una de las billeteras seleccionadas no existe o no te pertenece", "danger")
+        return redirect(url_for('dashboard'))
+    
+    try:
+        # Procesar el monto según la moneda del perfil
+        if profile.moneda == 'COP':
+            # Para COP usar valores enteros (sin centavos)
+            monto_clean = monto.replace(".", "").replace(",", "")
+            monto_valor = int(monto_clean)
+        else:
+            # Para otras monedas, preservar decimales
+            monto_clean = monto.replace(".", "").replace(",", ".")
+            monto_valor = float(monto_clean)
+        
+        # Verificar que el monto sea positivo
+        if monto_valor <= 0:
+            flash("El monto debe ser mayor que cero", "danger")
+            return redirect(url_for('dashboard'))
+        
+        # Crear la transferencia en la base de datos
+        nueva_transferencia = Transferencia(
+            monto=monto_valor,
+            descripcion=descripcion,
+            origen=origen,
+            destino=destino,
+            profile_id=profile_id
+        )
+        
+        # Crear el gasto de la cuenta origen
+        gasto_origen = Gasto(
+            monto=monto_valor,
+            descripcion=f"Transferencia a {destino}" + (f": {descripcion}" if descripcion else ""),
+            profile_id=profile_id,
+            cuenta=origen
+        )
+        
+        # Crear el ingreso en la cuenta destino
+        ingreso_destino = Ingreso(
+            monto=monto_valor,
+            descripcion=f"Transferencia desde {origen}" + (f": {descripcion}" if descripcion else ""),
+            profile_id=profile_id,
+            cuenta=destino
+        )
+        
+        # Guardar todo en la base de datos
+        db.session.add(nueva_transferencia)
+        db.session.add(gasto_origen)
+        db.session.add(ingreso_destino)
+        db.session.commit()
+        
+        flash(f"Transferencia de ${monto_valor:,.0f} de {origen} a {destino} realizada correctamente", "success")
+    except ValueError:
+        flash("El monto debe ser un valor numérico válido", "danger")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error al realizar la transferencia: {str(e)}", "danger")
+    
+    return redirect(url_for('dashboard'))
 
 # Ruta index: redirige a dashboard o login según la sesión
 @app.route('/')
