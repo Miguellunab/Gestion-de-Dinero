@@ -331,8 +331,7 @@ def agregar_gasto():
     if descripcion and len(descripcion) > 200:
         flash("La descripción no puede exceder los 200 caracteres", "danger")
         return redirect(url_for('dashboard'))
-        
-    # Validar que la cuenta exista para este usuario
+          # Validar que la cuenta exista para este usuario
     billetera = Billetera.query.filter_by(profile_id=profile_id, nombre=cuenta).first()
     if not billetera:
         flash(f"La billetera {cuenta} no existe o no te pertenece", "danger")
@@ -345,8 +344,15 @@ def agregar_gasto():
             monto_clean = monto.replace(".", "").replace(",", "")
             monto_valor = int(monto_clean)
         else:
-            # Para otras monedas, preservar decimales
-            monto_clean = monto.replace(".", "").replace(",", ".")
+            # Para otras monedas (USD), permitir decimales
+            # Normalizar entrada: reemplazar coma por punto
+            monto_clean = monto.replace(",", ".")
+            # Remover puntos que sean separadores de miles (solo si hay más de un punto)
+            dot_count = monto_clean.count('.')
+            if dot_count > 1:
+                # Si hay múltiples puntos, el último es decimal, los demás son separadores de miles
+                parts = monto_clean.split('.')
+                monto_clean = ''.join(parts[:-1]) + '.' + parts[-1]
             monto_valor = float(monto_clean)
         
         # Verificar que el monto sea positivo
@@ -405,8 +411,15 @@ def agregar_ingreso():
             monto_clean = monto.replace(".", "").replace(",", "")
             monto_valor = int(monto_clean)
         else:
-            # Para otras monedas, preservar decimales
-            monto_clean = monto.replace(".", "").replace(",", ".")
+            # Para otras monedas (USD), permitir decimales
+            # Normalizar entrada: reemplazar coma por punto
+            monto_clean = monto.replace(",", ".")
+            # Remover puntos que sean separadores de miles (solo si hay más de un punto)
+            dot_count = monto_clean.count('.')
+            if dot_count > 1:
+                # Si hay múltiples puntos, el último es decimal, los demás son separadores de miles
+                parts = monto_clean.split('.')
+                monto_clean = ''.join(parts[:-1]) + '.' + parts[-1]
             monto_valor = float(monto_clean)
         
         # Verificar que el monto sea positivo
@@ -452,8 +465,7 @@ def editar_movimiento(tipo, id):
     
     profile_id = session['profile_id']
     profile = Profile.query.get_or_404(profile_id)
-    
-    # Obtener los datos del formulario
+      # Obtener los datos del formulario
     monto = request.form.get('monto', '0')
     descripcion = request.form.get('descripcion', '')
     cuenta = request.form.get('cuenta', 'Efectivo')
@@ -466,8 +478,15 @@ def editar_movimiento(tipo, id):
             monto_clean = monto.replace(".", "").replace(",", "")
             monto_valor = int(monto_clean)
         else:
-            # Para otras monedas, preservar decimales
-            monto_clean = monto.replace(".", "").replace(",", ".")
+            # Para otras monedas (USD), permitir decimales
+            # Normalizar entrada: reemplazar coma por punto
+            monto_clean = monto.replace(",", ".")
+            # Remover puntos que sean separadores de miles (solo si hay más de un punto)
+            dot_count = monto_clean.count('.')
+            if dot_count > 1:
+                # Si hay múltiples puntos, el último es decimal, los demás son separadores de miles
+                parts = monto_clean.split('.')
+                monto_clean = ''.join(parts[:-1]) + '.' + parts[-1]
             monto_valor = float(monto_clean)
         
         # Actualizar según el tipo de movimiento
@@ -1064,5 +1083,20 @@ def index():
 
 # ---------------------- ARRANQUE DE LA APLICACIÓN ----------------------
 if __name__ == '__main__':
+    # Configuración para desarrollo
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    
+    print("🚀 Servidor Flask con recarga automática")
+    print(f"🌐 http://127.0.0.1:{port}")
+    print("✨ Los cambios se recargarán automáticamente")
+    print("🛑 Presiona Ctrl+C para detener")
+    print("=" * 50)
+    
+    app.run(
+        host='127.0.0.1', 
+        port=port, 
+        debug=True,  # Habilita debug y recarga automática
+        use_reloader=True,  # Recarga automática cuando cambian archivos Python
+        use_debugger=True,  # Debugger web
+        extra_files=['templates/', 'static/']  # Observar también templates y static
+    )

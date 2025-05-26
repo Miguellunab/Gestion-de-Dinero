@@ -104,15 +104,14 @@
             <button class="btn-hide-balance" onclick="toggleBalance()" title="Mostrar/Ocultar balance">
               <i class="fas fa-eye{{ '-slash' if hide_balance else '' }}"></i>
             </button>
-          </div>
-          <!-- Si hay cuentas para mostrar -->
+          </div>          <!-- Si hay cuentas para mostrar -->
           {% if balance_por_cuenta %}
-          <div id="accountDetails" class="account-details mt-3" style="{{ 'display: none;' if not show_accounts else '' }}">
+          <div id="accountDetails" class="account-details mt-3" {% if not show_accounts %}style="display: none;"{% endif %}>
             {% for cuenta, saldo in balance_por_cuenta.items() %}
             <div class="account-item">
               <span class="account-name">
                 {% if billeteras_dict.get(cuenta) %}
-                <i class="{{ billeteras_dict[cuenta]['icono'] }}" style="color: {{ billeteras_dict[cuenta]['color'] }};"></i>
+                <i class="{{ billeteras_dict[cuenta]['icono'] }}" {% if billeteras_dict[cuenta]['color'] %}style="color: {{ billeteras_dict[cuenta]['color'] }};"{% endif %}></i>
                 {% endif %}
                 {{ cuenta }}:
               </span>
@@ -305,11 +304,10 @@
                     {% if item in gastos %}-{% else %}+{% endif %}${{ item.monto|format_money }}
                   </div>
                   <div class="transaction-description">
-                    {{ item.descripcion or "Sin descripción" }}
-                    <span class="transaction-account">
+                    {{ item.descripcion or "Sin descripción" }}                    <span class="transaction-account">
                       {% set cuenta = item.cuenta if item.cuenta and item.cuenta != 'none' else "Efectivo" %}
                       {% if cuenta in billeteras_dict %}
-                        <i class="{{ billeteras_dict[cuenta]['icono'] }} me-1" style="color: {{ billeteras_dict[cuenta]['color'] }}"></i>
+                        <i class="{{ billeteras_dict[cuenta]['icono'] }} me-1" {% if billeteras_dict[cuenta]['color'] %}style="color: {{ billeteras_dict[cuenta]['color'] }};"{% endif %}></i>
                       {% else %}
                         <i class="fas fa-wallet me-1"></i>
                       {% endif %}
@@ -378,37 +376,48 @@
 
     <!-- Scripts agrupados -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ url_for('static', filename='js/theme-switcher.js') }}"></script>
-    <script>
+    <script src="{{ url_for('static', filename='js/theme-switcher.js') }}"></script>    <script>
       // Formato en vivo para montos según la moneda del perfil
       function formatAsPesos(input) {
-        let val = input.value.replace(/\D/g, '');
-        if (val === '') {
-          input.value = '';
-          return;
-        }
-        
-        // Determinar si debemos usar formato con decimales según la moneda
         const moneda = "{{ profile.moneda }}";
+        
         if (moneda === 'COP') {
-          // Para pesos colombianos: sin decimales
+          // Para pesos colombianos: sin decimales, solo enteros
+          let val = input.value.replace(/\D/g, '');
+          if (val === '') {
+            input.value = '';
+            return;
+          }
           let formatted = new Intl.NumberFormat('es-CO', {
             maximumFractionDigits: 0,
           }).format(parseInt(val));
           input.value = formatted;
         } else {
-          // Para otras monedas: con 2 decimales
-          // Manejar valor como centavos y convertir a formato decimal
-          let valor = parseInt(val);
-          if (val.length > 2) {
-            // Si hay más de 2 dígitos, interpretar como X,YZ (donde YZ son los centavos)
-            valor = valor / 100;
+          // Para otras monedas (como USD): permitir decimales
+          let val = input.value;
+          
+          // Permitir solo números, punto y coma
+          val = val.replace(/[^0-9.,]/g, '');
+          
+          // Reemplazar coma por punto para consistencia interna
+          val = val.replace(',', '.');
+          
+          // Evitar múltiples puntos decimales
+          const dotCount = (val.match(/\./g) || []).length;
+          if (dotCount > 1) {
+            const parts = val.split('.');
+            val = parts[0] + '.' + parts.slice(1).join('');
           }
-          let formatted = new Intl.NumberFormat('es-CO', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }).format(valor);
-          input.value = formatted;
+          
+          // Limitar a 2 decimales
+          if (val.includes('.')) {
+            const parts = val.split('.');
+            if (parts[1] && parts[1].length > 2) {
+              val = parts[0] + '.' + parts[1].substring(0, 2);
+            }
+          }
+          
+          input.value = val;
         }
       }
     </script>
