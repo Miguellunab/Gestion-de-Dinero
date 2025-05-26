@@ -56,6 +56,7 @@ class Billetera(db.Model):
     nombre = db.Column(db.String(50), nullable=False)
     icono = db.Column(db.String(50), default="wallet") # Nombre del icono de FontAwesome
     color = db.Column(db.String(20), default="#6c757d") # Color en hexadecimal
+    incluir_en_balance = db.Column(db.Boolean, default=True, nullable=False) # Nueva columna para incluir/excluir del balance
     profile_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)
 
 class Gasto(db.Model):

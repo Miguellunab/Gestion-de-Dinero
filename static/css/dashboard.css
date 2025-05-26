@@ -221,6 +221,16 @@ body {
 .account-item {
     font-size: 0.95rem;
     padding: 5px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.account-info {
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .account-name {
@@ -231,6 +241,58 @@ body {
     opacity: 0.9;
     width: 20px;
     text-align: center;
+}
+
+.account-actions {
+    margin-left: 10px;
+}
+
+.btn-toggle-balance {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    padding: 0;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.btn-toggle-balance:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.btn-toggle-balance:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+/* Estilos para billeteras excluidas del balance */
+.account-excluded {
+    opacity: 0.7;
+    position: relative;
+}
+
+.account-excluded::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    right: 35px; /* Espacio para el botón */
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.account-excluded .account-name {
+    font-style: italic;
 }
 
 /* ============================================

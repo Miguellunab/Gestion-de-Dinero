@@ -222,13 +222,10 @@ def dashboard():
     
     # Consulta billeteras primero (son pocos registros)
     billeteras = Billetera.query.filter_by(profile_id=profile_id).all()
-    
-    # Si no hay billeteras, crear las predeterminadas
+      # Si no hay billeteras, crear solo la predeterminada "Efectivo"
     if not billeteras:
         billeteras_predefinidas = [
-            {"nombre": "Efectivo", "icono": "fas fa-money-bill-wave", "color": "#28a745"},
-            {"nombre": "Bancolombia", "icono": "fas fa-university", "color": "#007bff"},
-            {"nombre": "Nequi", "icono": "fas fa-mobile-alt", "color": "#e83e8c"}
+            {"nombre": "Efectivo", "icono": "fas fa-money-bill-wave", "color": "#28a745"}
         ]
         
         for billetera in billeteras_predefinidas:
@@ -242,18 +239,30 @@ def dashboard():
         
         db.session.commit()
         billeteras = Billetera.query.filter_by(profile_id=profile_id).all()
+      # Crear un diccionario de billeteras para mostrar iconos y colores correctos
+    billeteras_dict = {b.nombre: {"icono": b.icono, "color": b.color, "incluir_en_balance": b.incluir_en_balance} for b in billeteras}
     
-    # Crear un diccionario de billeteras para mostrar iconos y colores correctos
-    billeteras_dict = {b.nombre: {"icono": b.icono, "color": b.color} for b in billeteras}
+    # Obtener las billeteras que deben incluirse en el balance
+    billeteras_incluidas = [b.nombre for b in billeteras if b.incluir_en_balance]
     
     # OPTIMIZACIÓN: Calcular el balance mediante una consulta específica en lugar de cargar todos los registros
-    # Obtener suma total de ingresos
-    total_ingresos = db.session.query(db.func.sum(Ingreso.monto)).filter_by(profile_id=profile_id).scalar() or 0
+    # Obtener suma total de ingresos (solo de billeteras incluidas en el balance)
+    total_ingresos = 0
+    if billeteras_incluidas:
+        total_ingresos = db.session.query(db.func.sum(Ingreso.monto)).filter(
+            Ingreso.profile_id == profile_id,
+            Ingreso.cuenta.in_(billeteras_incluidas)
+        ).scalar() or 0
     
-    # Obtener suma total de gastos
-    total_gastos = db.session.query(db.func.sum(Gasto.monto)).filter_by(profile_id=profile_id).scalar() or 0
+    # Obtener suma total de gastos (solo de billeteras incluidas en el balance)
+    total_gastos = 0
+    if billeteras_incluidas:
+        total_gastos = db.session.query(db.func.sum(Gasto.monto)).filter(
+            Gasto.profile_id == profile_id,
+            Gasto.cuenta.in_(billeteras_incluidas)
+        ).scalar() or 0
     
-    # Calcular balance global
+    # Calcular balance global (solo de billeteras incluidas)
     balance = total_ingresos - total_gastos
     
     # OPTIMIZACIÓN: Calcular balance por cuenta con consultas eficientes
@@ -269,7 +278,7 @@ def dashboard():
         cuenta = cuenta if cuenta and cuenta != 'none' else "Efectivo"
         balance_por_cuenta[cuenta] = balance_por_cuenta.get(cuenta, 0) + monto
     
-    # Restar gastos por cuenta con una única consulta
+    # Restar gastos por cuenta with una única consulta
     gastos_por_cuenta = db.session.query(
         Gasto.cuenta, db.func.sum(Gasto.monto)
     ).filter_by(profile_id=profile_id).group_by(Gasto.cuenta).all()
@@ -525,12 +534,9 @@ def listar_billeteras():
     
     profile_id = session['profile_id']
     billeteras = Billetera.query.filter_by(profile_id=profile_id).all()
-    
-    # Billeteras predeterminadas que siempre deben existir
+      # Solo la billetera "Efectivo" debe existir siempre por defecto
     billeteras_predefinidas = [
-        {"nombre": "Efectivo", "icono": "money-bill-wave", "color": "#28a745"},
-        {"nombre": "Bancolombia", "icono": "university", "color": "#007bff"},
-        {"nombre": "Nequi", "icono": "mobile-alt", "color": "#e83e8c"}
+        {"nombre": "Efectivo", "icono": "money-bill-wave", "color": "#28a745"}
     ]
     
     # Verificar si ya existen las billeteras predefinidas
@@ -654,6 +660,26 @@ def eliminar_billetera(id):
     
     flash(f'Billetera "{nombre_billetera}" eliminada correctamente', 'success')
     return redirect(url_for('listar_billeteras'))
+
+@app.route('/billetera/<int:id>/toggle_balance', methods=['POST'])
+def toggle_billetera_balance(id):
+    if 'profile_id' not in session:
+        return redirect(url_for('login'))
+    
+    billetera = Billetera.query.get_or_404(id)
+      # Verificar que la billetera pertenezca al usuario actual
+    if billetera.profile_id != session['profile_id']:
+        flash('No tienes permiso para modificar esta billetera', 'danger')
+        return redirect(url_for('dashboard'))
+    
+    # Toggle del campo incluir_en_balance
+    billetera.incluir_en_balance = not billetera.incluir_en_balance
+    db.session.commit()
+    
+    estado = "incluida en" if billetera.incluir_en_balance else "excluida del"
+    flash(f'Billetera "{billetera.nombre}" ahora está {estado} balance total', 'success')
+    
+    return redirect(url_for('dashboard'))
 
 @app.route('/informes')
 def informes():

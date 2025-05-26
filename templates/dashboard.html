@@ -106,18 +106,35 @@
             </button>
           </div>          <!-- Si hay cuentas para mostrar -->
           {% if balance_por_cuenta %}
-          <div id="accountDetails" class="account-details mt-3" {% if not show_accounts %}style="display: none;"{% endif %}>
-            {% for cuenta, saldo in balance_por_cuenta.items() %}
-            <div class="account-item">
-              <span class="account-name">
-                {% if billeteras_dict.get(cuenta) %}
-                <i class="{{ billeteras_dict[cuenta]['icono'] }}" {% if billeteras_dict[cuenta]['color'] %}style="color: {{ billeteras_dict[cuenta]['color'] }};"{% endif %}></i>
-                {% endif %}
-                {{ cuenta }}:
-              </span>
-              <strong class="{{ 'balance-hidden' if hide_balance else '' }}">
-                ${{ saldo|format_money }}
-              </strong>
+          <div id="accountDetails" class="account-details mt-3" {% if not show_accounts %}style="display: none;"{% endif %}>            {% for cuenta, saldo in balance_por_cuenta.items() %}
+            {% set billetera_obj = billeteras|selectattr("nombre", "equalto", cuenta)|first %}
+            <div class="account-item {{ 'account-excluded' if billetera_obj and not billetera_obj.incluir_en_balance else '' }}">
+              <div class="account-info">
+                <span class="account-name">
+                  {% if billeteras_dict.get(cuenta) %}
+                  <i class="{{ billeteras_dict[cuenta]['icono'] }}" {% if billeteras_dict[cuenta]['color'] %}style="color: {{ billeteras_dict[cuenta]['color'] }};"{% endif %}></i>
+                  {% endif %}
+                  {{ cuenta }}:
+                  {% if billetera_obj and not billetera_obj.incluir_en_balance %}
+                  <small class="text-muted">(excluida)</small>
+                  {% endif %}
+                </span>
+                <strong class="{{ 'balance-hidden' if hide_balance else '' }}">
+                  ${{ saldo|format_money }}
+                </strong>
+              </div>
+              
+              <!-- Botón para incluir/excluir del balance -->
+              {% if billetera_obj %}              <div class="account-actions">
+                <form method="POST" action="{{ url_for('toggle_billetera_balance', id=billetera_obj.id) }}" style="display: inline;">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn-toggle-balance" 
+                          title="{{ 'Excluir del balance total' if billetera_obj.incluir_en_balance else 'Incluir en el balance total' }}">
+                    <i class="fas fa-{{ 'eye' if billetera_obj.incluir_en_balance else 'eye-slash' }}"></i>
+                  </button>
+                </form>
+              </div>
+              {% endif %}
             </div>
             {% endfor %}
           </div>
