@@ -1,229 +1,377 @@
 /* ============================================
-   VARIABLES DE COLORES - MODO CLARO
+   VARIABLES DE COLORES PROFESIONALES
    ============================================ */
 :root {
-    /* Colores principales */
-    --primary-color: #4a9de9;        /* Azul principal */
-    --success-color: #38b000;        /* Verde para ingresos */
-    --danger-color: #ff595e;         /* Rojo para gastos */
-    --dark-color: #4a9de9;           /* Azul para barra superior */
+    /* Paleta de colores profesional */
+    --primary-color: #2563eb;        /* Azul corporativo moderno */
+    --primary-dark: #1d4ed8;         /* Azul más oscuro */
+    --primary-light: #3b82f6;        /* Azul claro */
     
-    /* Colores secundarios */
-    --light-color: #f8f9fa;          /* Fondo claro */
-    --bg-color: #f5f7fa;             /* Fondo principal */
-    --text-color: #212529;           /* Texto principal */
-    --text-muted: #ffffff;           /* Texto secundario */
-    --border-color: #e0e0e0;         /* Bordes */
-    --shadow-color: rgba(0, 0, 0, 0.05); /* Sombras */
+    --success-color: #10b981;        /* Verde esmeralda */
+    --success-dark: #059669;         /* Verde oscuro */
+    --success-light: #34d399;        /* Verde claro */
     
-    /* Colores especiales */
-    --wallet-color: #ffe8d6;         /* Color de fondo para billeteras */
-    --coin-color: #ff9e00;           /* Color para monedas */
+    --danger-color: #ef4444;         /* Rojo coral */
+    --danger-dark: #dc2626;          /* Rojo oscuro */
+    --danger-light: #f87171;         /* Rojo claro */
+    
+    --warning-color: #f59e0b;        /* Amarillo dorado */
+    --info-color: #06b6d4;           /* Cyan */
+    
+    /* Grises profesionales */
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    
+    /* Colores del sistema - Modo claro */
+    --bg-color: #ffffff;             /* Fondo principal */
+    --bg-secondary: var(--gray-50);  /* Fondo secundario */
+    --bg-tertiary: var(--gray-100);  /* Fondo terciario */
+    
+    --text-color: var(--gray-900);   /* Texto principal */
+    --text-secondary: var(--gray-600); /* Texto secundario */
+    --text-muted: var(--gray-500);   /* Texto deshabilitado */
+    
+    --border-color: var(--gray-200); /* Bordes */
+    --border-light: var(--gray-100); /* Bordes suaves */
+    
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    
+    /* Gradientes */
+    --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    --gradient-success: linear-gradient(135deg, var(--success-color) 0%, var(--success-dark) 100%);
+    --gradient-danger: linear-gradient(135deg, var(--danger-color) 0%, var(--danger-dark) 100%);
+    
+    /* Espaciado y tipografía */
+    --border-radius-sm: 6px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --border-radius-xl: 16px;
+    --border-radius-2xl: 20px;
+    
+    /* Transiciones */
+    --transition-fast: 0.15s ease-in-out;
+    --transition-normal: 0.25s ease-in-out;
+    --transition-slow: 0.35s ease-in-out;
 }
 
 /* ============================================
-   ESTILOS GENERALES
+   ESTILOS GENERALES PROFESIONALES
    ============================================ */
+* {
+    box-sizing: border-box;
+}
+
 body {
-    background-color: var(--bg-color);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg-color);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: var(--text-color);
+    line-height: 1.6;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Importar fuente Inter para mayor profesionalismo */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+.container {
+    max-width: 1200px;
 }
 
 /* ============================================
-   BARRA DE NAVEGACIÓN
+   BARRA DE NAVEGACIÓN PROFESIONAL
    ============================================ */
 .navbar {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    background-color: var(--dark-color); /* Added from inline style */
+    background: var(--gradient-primary);
+    padding: 1rem 0;
+    box-shadow: var(--shadow-lg);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
 }
 
 .navbar-brand {
-    font-weight: 700;
-    letter-spacing: 0.5px;
+    font-weight: 600;
+    font-size: 1.25rem;
+    letter-spacing: -0.025em;
+    color: white !important;
     display: flex;
     align-items: center;
-    font-size: 1.4rem;
+    transition: var(--transition-normal);
+}
+
+.navbar-brand:hover {
+    transform: translateY(-1px);
 }
 
 .app-logo {
-    height: 50px;
-    margin-right: 15px;
+    height: 40px;
+    width: 40px;
+    margin-right: 12px;
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-logout {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
     color: white;
-    background-color: rgba(255, 255, 255, 0.2);
-    border: none;
-    border-radius: 50px;
-    padding: 8px 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--border-radius-lg);
+    padding: 10px 16px;
     display: flex;
     align-items: center;
-    transition: all 0.3s;
+    gap: 8px;
+    transition: var(--transition-normal);
     font-weight: 500;
+    text-decoration: none;
 }
 
 .btn-logout:hover {
-    background-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.25);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
+    color: white;
 }
 
 .btn-logout i {
-    margin-right: 6px;
+    font-size: 1rem;
 }
 
-/* Botón de cambio de tema */
 .btn-theme-toggle {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
     color: white;
-    background-color: rgba(255, 255, 255, 0.2);
-    border: none;
-    border-radius: 50%;
-    width: 34px;
-    height: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--border-radius-lg);
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s;
+    transition: var(--transition-normal);
     cursor: pointer;
 }
 
 .btn-theme-toggle:hover {
-    background-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.25);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-theme-toggle i {
+    font-size: 1.1rem;
 }
 
 /* ============================================
-   LOGO PRINCIPAL
+   LOGO PRINCIPAL MODERNO
    ============================================ */
 .logo-container {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 2rem;
 }
 
 .main-logo {
-    width: 130px;
-    height: auto;
-    margin-bottom: 15px;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 1rem;
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-lg);
+    transition: var(--transition-normal);
+}
+
+.main-logo:hover {
+    transform: scale(1.05) rotate(2deg);
+}
+
+.logo-container h1 {
+    font-weight: 600;
+    font-size: 1.5rem;
+    color: var(--text-color);
+    margin: 0;
+    letter-spacing: -0.025em;
 }
 
 /* ============================================
-   TARJETA DE BALANCE
+   TARJETA DE BALANCE PREMIUM
    ============================================ */
 .balance-card {
-    background-color: var(--primary-color);
+    background: var(--gradient-primary);
     color: white;
-    border-radius: 15px;
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: var(--border-radius-2xl);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-xl);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    position: relative;
+    overflow: hidden;
+}
+
+.balance-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    transform: translate(50%, -50%);
+}
+
+.balance-info h5 {
+    font-weight: 500;
+    font-size: 0.95rem;
+    opacity: 0.9;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
 }
 
 .balance-amount {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 2;
+}
+
+.balance-amount h3 {
+    font-weight: 700;
+    font-size: 2.25rem;
+    margin: 0;
+    color: white !important;
+    letter-spacing: -0.025em;
 }
 
 .balance-logo {
-    display: inline-block;
-    vertical-align: middle;
-    width: 30px;
-    height: 30px;
-    margin-right: 5px;
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+    opacity: 0.9;
 }
 
 .balance-hidden {
     filter: blur(8px);
+    transition: var(--transition-normal);
 }
 
 .balance-hidden:hover {
-    filter: blur(8px);
+    filter: blur(6px);
 }
 
-/* Botón ocultar/mostrar balance */
 .btn-hide-balance {
-    background-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
     color: white;
-    border: none;
-    border-radius: 50%;
-    width: 34px;
-    height: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--border-radius-lg);
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s;
-    margin-left: 12px;
+    transition: var(--transition-normal);
+    margin-left: 1rem;
 }
 
 .btn-hide-balance:hover {
-    background-color: rgba(255, 255, 255, 0.3);
-    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
-/* Acciones de balance */
 .balance-actions {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
     gap: 12px;
-    padding-right: 10px;
+    position: relative;
+    z-index: 2;
 }
 
 .btn-toggle-accounts {
-    background-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
     color: white;
-    border: none;
-    border-radius: 50%;
-    width: 34px;
-    height: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--border-radius-lg);
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
-    padding: 0;
+    transition: var(--transition-normal);
     cursor: pointer;
 }
 
 .btn-toggle-accounts:hover {
-    background-color: rgba(255, 255, 255, 0.3);
-    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .btn-informes {
-    background-color: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
     color: white;
-    border: none;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--border-radius-lg);
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s;
+    transition: var(--transition-normal);
+    text-decoration: none;
 }
 
 .btn-informes:hover {
-    background-color: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.25);
     transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    color: white;
 }
 
-/* Panel de cuentas */
+/* Panel de cuentas profesional */
 .account-details {
     color: white;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
 }
 
 .account-item {
     font-size: 0.95rem;
-    padding: 5px 0;
+    padding: 12px 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    transition: var(--transition-normal);
+}
+
+.account-item:last-child {
+    border-bottom: none;
+}
+
+.account-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--border-radius-md);
+    padding-left: 12px;
+    padding-right: 12px;
+    margin: 0 -12px;
 }
 
 .account-info {
@@ -235,47 +383,52 @@ body {
 
 .account-name {
     font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .account-name i {
-    opacity: 0.9;
+    opacity: 0.8;
     width: 20px;
     text-align: center;
+    font-size: 0.9rem;
 }
 
 .account-actions {
-    margin-left: 10px;
+    margin-left: 12px;
 }
 
 .btn-toggle-balance {
-    background-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
     color: white;
-    border: none;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--border-radius-md);
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
-    padding: 0;
+    transition: var(--transition-normal);
     cursor: pointer;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
 }
 
 .btn-toggle-balance:hover {
-    background-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.25);
     transform: scale(1.1);
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-toggle-balance:focus {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
 }
 
 /* Estilos para billeteras excluidas del balance */
 .account-excluded {
-    opacity: 0.7;
+    opacity: 0.6;
     position: relative;
 }
 
@@ -284,9 +437,9 @@ body {
     position: absolute;
     left: 0;
     top: 50%;
-    right: 35px; /* Espacio para el botón */
+    right: 40px;
     height: 1px;
-    background-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.4);
     transform: translateY(-50%);
     pointer-events: none;
 }
@@ -296,206 +449,352 @@ body {
 }
 
 /* ============================================
-   PESTAÑAS DE ACCIÓN (INGRESO/GASTO)
+   PESTAÑAS DE ACCIÓN MODERNAS
    ============================================ */
+.nav-tabs {
+    border-bottom: 2px solid var(--border-light);
+    margin-bottom: 1.5rem;
+}
+
 .nav-tabs .nav-link {
     border: none;
-    color: #6c757d;
-    padding: 12px 16px;
+    color: var(--text-secondary);
+    padding: 12px 20px;
     font-weight: 500;
+    border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    transition: var(--transition-normal);
+    background: none;
+    position: relative;
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--primary-color);
+    background: var(--bg-secondary);
 }
 
 .nav-tabs .nav-link.active {
-    color: var(--dark-color);
-    border-bottom: 2px solid var(--dark-color);
-    background: none;
+    color: var(--primary-color);
+    border-bottom: 3px solid var(--primary-color);
+    background: var(--bg-color);
+    font-weight: 600;
+}
+
+.nav-tabs .nav-link.active::before {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-primary);
+    border-radius: 2px 2px 0 0;
 }
 
 .tab-content {
-    padding-top: 20px;
+    padding-top: 0;
 }
 
 /* ============================================
-   TARJETAS Y ELEMENTOS DE INTERFAZ
+   TARJETAS Y ELEMENTOS PREMIUM
    ============================================ */
 .top-card {
-    border-radius: 15px;
-    border: none;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s;
+    border-radius: var(--border-radius-xl);
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-lg);
+    transition: var(--transition-normal);
     overflow: hidden;
+    background: var(--bg-color);
+}
+
+.top-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
 }
 
 .action-card {
-    background: white;
-    border-radius: 15px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-    border: none;
+    background: var(--bg-color);
+    border-radius: var(--border-radius-xl);
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-light);
+    overflow: hidden;
+    transition: var(--transition-normal);
+}
+
+.action-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
 }
 
 .action-header {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    padding: 15px 20px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-light);
+    padding: 1.25rem 1.5rem;
     font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-color);
 }
 
 .action-body {
-    padding: 20px;
+    padding: 1.5rem;
 }
 
 /* ============================================
-   BOTONES DE ACCIÓN
+   BOTONES DE ACCIÓN PROFESIONALES
    ============================================ */
 .btn-ingreso {
-    background-color: var(--success-color);
+    background: var(--gradient-success);
     border: none;
-    border-radius: 10px;
-    padding: 10px;
+    border-radius: var(--border-radius-lg);
+    padding: 12px 20px;
     color: white;
     font-weight: 600;
-    transition: all 0.3s;
+    transition: var(--transition-normal);
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    font-size: 0.875rem;
 }
 
 .btn-gasto {
-    background-color: var(--danger-color);
+    background: var(--gradient-danger);
     border: none;
-    border-radius: 10px;
-    padding: 10px;
+    border-radius: var(--border-radius-lg);
+    padding: 12px 20px;
     color: white;
     font-weight: 600;
-    transition: all 0.3s;
+    transition: var(--transition-normal);
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    font-size: 0.875rem;
 }
 
 .btn-ingreso:hover,
 .btn-ingreso:focus {
-    background-color: #2c9d00;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(56, 176, 0, 0.3);
+    background: var(--success-dark);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-xl);
+    color: white;
 }
 
 .btn-gasto:hover,
 .btn-gasto:focus {
-    background-color: #e63946;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(255, 89, 94, 0.3);
+    background: var(--danger-dark);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-xl);
+    color: white;
 }
 
 .btn-floating {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 60px;
-    height: 60px;
+    bottom: 24px;
+    right: 24px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
-    background-color: var(--primary-color);
+    background: var(--gradient-primary);
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 12px rgba(58, 134, 255, 0.4);
-    transition: all 0.3s;
+    box-shadow: var(--shadow-xl);
+    transition: var(--transition-normal);
     z-index: 1000;
+    border: none;
+    cursor: pointer;
 }
 
 .btn-floating:hover,
 .btn-floating:focus {
-    background-color: #2a75e8;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(58, 134, 255, 0.5);
+    background: var(--primary-dark);
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 25px 40px rgba(37, 99, 235, 0.4);
+    color: white;
+}
+
+.btn-floating i {
+    font-size: 1.25rem;
 }
 
 .btn-action {
     border: none;
     background: none;
-    color: #6c757d;
-    transition: transform 0.2s, color 0.2s;
+    color: var(--text-secondary);
+    transition: var(--transition-normal);
     margin-left: 8px;
-    padding: 4px 6px;
+    padding: 6px 8px;
+    border-radius: var(--border-radius-md);
+}
+
+.btn-action:hover {
+    background: var(--bg-secondary);
 }
 
 .btn-action.delete:hover,
 .btn-action.delete:focus {
     color: var(--danger-color);
+    background: rgba(239, 68, 68, 0.1);
     transform: translateY(-2px);
 }
 
 .btn-action.edit:hover,
 .btn-action.edit:focus {
     color: var(--primary-color);
+    background: rgba(37, 99, 235, 0.1);
     transform: translateY(-2px);
 }
 
 .btn-outline-secondary {
-    border-color: #ced4da;
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+    border-radius: var(--border-radius-lg);
+    padding: 10px 16px;
+    font-weight: 500;
+    transition: var(--transition-normal);
+}
+
+.btn-outline-secondary:hover {
+    background: var(--bg-secondary);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
 }
 
 /* ============================================
-   FORMULARIOS
+   FORMULARIOS MODERNOS
    ============================================ */
 .form-control {
-    border-radius: 10px;
-    padding: 12px;
-    border: 1px solid #e0e0e0;
+    border-radius: var(--border-radius-lg);
+    padding: 12px 16px;
+    border: 2px solid var(--border-color);
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-weight: 400;
+    transition: var(--transition-normal);
+    box-shadow: var(--shadow-sm);
 }
 
 .form-control:focus {
-    box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.25);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    border-color: var(--primary-color);
+    outline: none;
+    background: var(--bg-color);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 8px;
+    font-size: 0.875rem;
+    letter-spacing: 0.025em;
+}
+
+.input-group-text {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.form-select {
+    border-radius: var(--border-radius-lg);
+    padding: 12px 16px;
+    border: 2px solid var(--border-color);
+    background: var(--bg-color);
+    color: var(--text-color);
+    transition: var(--transition-normal);
+}
+
+.form-select:focus {
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
     border-color: var(--primary-color);
 }
 
 /* ============================================
-   TRANSACCIONES
+   TRANSACCIONES PREMIUM
    ============================================ */
 .transactions-card {
-    border-radius: 15px;
-    border: none;
-    background: white;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-    margin-bottom: 20px;
+    border-radius: var(--border-radius-xl);
+    border: 1px solid var(--border-light);
+    background: var(--bg-color);
+    box-shadow: var(--shadow-md);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    transition: var(--transition-normal);
+}
+
+.transactions-card:hover {
+    box-shadow: var(--shadow-lg);
 }
 
 .transactions-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px;
-    background-color: #f8f9fa;
-    border-radius: 10px 10px 0 0;
+    padding: 1.25rem 1.5rem;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-light);
     cursor: pointer;
+    transition: var(--transition-normal);
+}
+
+.transactions-header:hover {
+    background: var(--bg-tertiary);
 }
 
 .transactions-header h5 {
     margin: 0;
     font-weight: 600;
+    color: var(--text-color);
+    font-size: 1.1rem;
 }
 
 .transaction-item {
-    padding: 15px 20px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-light);
     display: flex;
     align-items: center;
+    transition: var(--transition-normal);
+}
+
+.transaction-item:last-child {
+    border-bottom: none;
+}
+
+.transaction-item:hover {
+    background: var(--bg-secondary);
 }
 
 .transaction-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--border-radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 15px;
+    margin-right: 1rem;
     flex-shrink: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
 }
 
 .ingreso-icon {
-    background-color: rgba(56, 176, 0, 0.1);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%);
     color: var(--success-color);
+    border: 2px solid rgba(16, 185, 129, 0.2);
 }
 
 .gasto-icon {
-    background-color: rgba(255, 89, 94, 0.1);
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.05) 100%);
     color: var(--danger-color);
+    border: 2px solid rgba(239, 68, 68, 0.2);
 }
 
 .transaction-details {
@@ -504,36 +803,42 @@ body {
 
 .transaction-amount {
     font-weight: 700;
-    font-size: 1.05rem;
+    font-size: 1.1rem;
+    color: var(--text-color);
+    margin-bottom: 4px;
 }
 
 .transaction-description {
     font-size: 0.9rem;
-    color: #6c757d;
-    margin-top: 3px;
+    color: var(--text-secondary);
+    margin-bottom: 2px;
+    font-weight: 500;
 }
 
 .transaction-account {
     display: block;
     font-size: 0.8rem;
-    margin-top: 3px;
-    color: #6c757d;
+    color: var(--text-muted);
+    font-weight: 400;
 }
 
 .transaction-date {
     font-size: 0.8rem;
-    color: #adb5bd;
+    color: var(--text-muted);
     text-align: right;
+    font-weight: 500;
 }
 
 .transaction-actions {
     flex-shrink: 0;
-    margin-left: 10px;
+    margin-left: 1rem;
     display: flex;
+    gap: 4px;
 }
 
 .transactions-toggle-icon {
-    transition: transform 0.3s;
+    transition: var(--transition-normal);
+    color: var(--text-secondary);
 }
 
 .transactions-toggle-icon.collapsed {
@@ -541,376 +846,372 @@ body {
 }
 
 .no-transactions {
-    padding: 40px 20px;
+    padding: 3rem 1.5rem;
     text-align: center;
-    color: #adb5bd;
+    color: var(--text-muted);
+}
+
+.no-transactions i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
 }
 
 /* ============================================
-   PAGINACIÓN
+   PAGINACIÓN MODERNA
    ============================================ */
 .transactions-pagination {
     display: flex;
     justify-content: center;
-    padding: 15px;
-    border-top: 1px solid rgba(0,0,0,0.1);
+    align-items: center;
+    padding: 1.25rem;
+    border-top: 1px solid var(--border-light);
+    background: var(--bg-secondary);
 }
 
 .pagination-btn {
-    padding: 5px 15px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    margin: 0 5px;
-    color: #6c757d;
+    padding: 8px 16px;
+    border-radius: var(--border-radius-lg);
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin: 0 4px;
+    color: var(--text-secondary);
     text-decoration: none;
+    transition: var(--transition-normal);
+    border: 1px solid transparent;
 }
 
-.pagination-btn:hover, 
-.pagination-btn.active {
-    background-color: #007bff;
+.pagination-btn:hover {
+    background: var(--primary-color);
     color: white;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
 }
 
-.pagination-count {
-    font-size: 0.9rem;
-    color: #6c757d;
-    align-self: center;
-    margin: 0 10px;
+.pagination-btn.active {
+    background: var(--gradient-primary);
+    color: white;
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-md);
 }
 
 /* ============================================
-   MODALES
+   MODALES PROFESIONALES
    ============================================ */
 .modal-content {
-    border-radius: 15px;
-    border: none;
+    border-radius: var(--border-radius-xl);
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-xl);
+    backdrop-filter: blur(20px);
+    background: var(--bg-color);
 }
 
 .modal-header {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid var(--border-light);
+    padding: 1.5rem;
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
+}
+
+.modal-header .modal-title {
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 1.25rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
+    color: var(--text-color);
 }
 
 .modal-footer {
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    border-top: 1px solid var(--border-light);
+    padding: 1.5rem;
+    background: var(--bg-secondary);
+    border-radius: 0 0 var(--border-radius-xl) var(--border-radius-xl);
+}
+
+.modal-backdrop {
+    backdrop-filter: blur(8px);
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 /* ============================================
-   RESPONSIVIDAD
+   RESPONSIVIDAD AVANZADA
    ============================================ */
-@media (max-width: 576px) {
+@media (max-width: 768px) {
     .container {
-        padding-left: 15px;
-        padding-right: 15px;
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
 
-    .transaction-item {
-        padding: 12px 15px;
+    .navbar {
+        padding: 0.75rem 0;
     }
 
-    .transaction-icon {
-        width: 36px;
-        height: 36px;
+    .navbar-brand {
+        font-size: 1.1rem;
     }
 
-    .transaction-amount {
-        font-size: 0.95rem;
+    .app-logo {
+        height: 32px;
+        width: 32px;
     }
-    
+
     .btn-logout span {
         display: none;
     }
 
-    .btn-logout i {
-        margin-right: 0;
+    .btn-logout {
+        padding: 10px 12px;
+        min-width: 44px;
+    }
+
+    .btn-theme-toggle {
+        width: 40px;
+        height: 40px;
+    }
+
+    .main-logo {
+        width: 60px;
+        height: 60px;
+    }
+
+    .logo-container h1 {
+        font-size: 1.25rem;
+    }
+
+    .balance-card {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .balance-card::before {
+        width: 150px;
+        height: 150px;
+    }
+
+    .balance-amount h3 {
+        font-size: 1.75rem;
+    }
+
+    .balance-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .account-item {
+        padding: 10px 0;
+    }
+
+    .transaction-item {
+        padding: 1rem;
+    }
+
+    .transaction-icon {
+        width: 40px;
+        height: 40px;
+        margin-right: 0.75rem;
+        font-size: 1rem;
+    }
+
+    .transaction-amount {
+        font-size: 1rem;
+    }
+
+    .action-header,
+    .action-body {
+        padding: 1rem;
+    }
+
+    .transactions-header {
+        padding: 1rem;
+    }
+
+    .btn-floating {
+        bottom: 16px;
+        right: 16px;
+        width: 56px;
+        height: 56px;
+    }
+
+    .btn-floating i {
         font-size: 1.1rem;
     }
+}
 
-    .btn-logout {
-        padding: 8px 10px;
+@media (max-width: 576px) {
+    .balance-card {
+        padding: 1.25rem;
+    }
+
+    .balance-amount {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .balance-actions {
+        flex-direction: row;
+        align-self: flex-end;
+    }
+
+    .transaction-item {
+        padding: 0.75rem;
+    }
+
+    .transaction-details {
+        min-width: 0;
+    }
+
+    .transaction-description {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .nav-tabs .nav-link {
+        padding: 10px 12px;
+        font-size: 0.875rem;
     }
 }
 
-/* Hacer que el valor del balance sea blanco en modo claro */
-.balance-amount h3 {
-    color: white !important;
-}
+/* ============================================
+   ESTILOS ADICIONALES PROFESIONALES
+   ============================================ */
 
-/* Solo para el texto negativo (en rojo), mantener un color destacado */
-.balance-amount h3.text-danger {
-    color: #ff595e !important; /* Mantener el rojo para valores negativos */
-}
-
-/* Hacer que text-muted sea siempre blanco en modo claro */
-.text-muted {
-    color: white !important;
-}
-
-/* Tarjeta de balance en modo oscuro - AGREGADA: gradiente solo en modo oscuro */
-[data-theme="dark"] .balance-card {
-  background: var(--primary-color) linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
-}
-
-/* Corregir la inversión de colores en dark-mode.css */
-[data-theme="dark"] .form-control,
-[data-theme="dark"] .input-group-text {
-  background-color: #2d2d2d !important;
-  border-color: var(--border-color);
-  color: white !important;
-}
-
-[data-theme="dark"] .card,
-[data-theme="dark"] .action-card,
-[data-theme="dark"] .transactions-card {
-  background-color: #1e1e1e !important;
-  color: white !important;
-}
-
-[data-theme="dark"] body {
-  background-color: #0d1117 !important; /* Azul oscuro estilo GitHub */
-  color: white !important;
-}
-
-[data-theme="dark"] .form-control,
-[data-theme="dark"] .input-group-text,
-[data-theme="dark"] input,
-[data-theme="dark"] select,
-[data-theme="dark"] textarea {
-  background-color: #2d2d2d !important;
-  border-color: #333 !important;
-  color: white !important;
-}
-
-[data-theme="dark"] .modal-content,
-[data-theme="dark"] .card,
-[data-theme="dark"] .action-card,
-[data-theme="dark"] .action-header,
-[data-theme="dark"] .transactions-card,
-[data-theme="dark"] .transactions-header {
-  background-color: #1e1e1e !important;
-  color: white !important;
-  border-color: #333 !important;
-}
-
-[data-theme="dark"] .nav-tabs .nav-link.active {
-  color: #4a9de9 !important;
-  border-bottom: 2px solid #4a9de9;
-}
-
-[data-theme="dark"] .dropdown-menu {
-  background-color: #1e1e1e !important;
-  border-color: #333 !important;
-}
-
-[data-theme="dark"] .dropdown-item {
-  color: white !important;
-}
-
-[data-theme="dark"] .dropdown-item:hover {
-  background-color: #2d2d2d !important;
-}
-
-[data-theme="dark"] .action-header,
-[data-theme="dark"] .transactions-header {
-  background-color: #161b22 !important; /* Ligeramente más claro */
-  border-color: #30363d !important;
-}
-
-/* Añadir al final de dashboard.css */
-[data-theme="dark"] .mb-4,
-[data-theme="dark"] .col-md-6 {
-  color: white !important;
-}
-
-[data-theme="dark"] input::placeholder,
-[data-theme="dark"] textarea::placeholder,
-[data-theme="dark"] .form-control::placeholder {
-  color: rgba(255, 255, 255, 0.6) !important;
-}
-
-[data-theme="dark"] .form-select {
-  background-color: #2d2d2d !important;
-  color: white !important;
-  border-color: #333 !important;
-}
-
-/* Asegurar que todos los textos sean visibles en modo oscuro */
-[data-theme="dark"] label,
-[data-theme="dark"] .form-label,
-[data-theme="dark"] .input-group-text,
-[data-theme="dark"] h1, 
-[data-theme="dark"] h2, 
-[data-theme="dark"] h3, 
-[data-theme="dark"] h4, 
-[data-theme="dark"] h5, 
-[data-theme="dark"] h6,
-[data-theme="dark"] .card-title,
-[data-theme="dark"] .modal-title {
-  color: white !important;
-}
-
-/* Corregir color de texto en los campos de formulario */
-[data-theme="dark"] .form-control::placeholder {
-  color: rgba(255, 255, 255, 0.5) !important;
-}
-
-/* Asegurar que los valores en los inputs sean visibles */
-[data-theme="dark"] input,
-[data-theme="dark"] select,
-[data-theme="dark"] textarea,
-[data-theme="dark"] .form-control {
-  color: white !important;
-}
-
-/* Corregir colores en modales */
-[data-theme="dark"] .modal-content {
-  background-color: #1e1e1e !important;
-  border-color: #333 !important;
-}
-
-[data-theme="dark"] .modal-header,
-[data-theme="dark"] .modal-footer {
-  border-color: #333 !important;
-}
-
-/* Mejorar visibilidad de los placeholders */
-[data-theme="dark"] input::placeholder,
-[data-theme="dark"] textarea::placeholder {
-  color: rgba(255, 255, 255, 0.5) !important;
-  opacity: 1 !important; /* Algunos navegadores aplican opacidad adicional */
-}
-
-/* Asegurar que los selects también tengan buen contraste */
-[data-theme="dark"] .form-select {
-  background-color: #2d2d2d !important;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
-  color: white !important;
-}
-
-/* Mejorar visibilidad de los separadores */
-[data-theme="dark"] hr {
-  border-color: #333 !important;
-}
-
-/* Mejorar contraste de botones disabled */
-[data-theme="dark"] .btn:disabled {
-  background-color: #3d3d3d !important;
-  color: #aaa !important;
-}
-
-/* Corregir texto de saludo en la barra de navegación */
-[data-theme="dark"] .navbar-brand,
-[data-theme="dark"] .navbar-dark .navbar-brand {
-  color: white !important;
-}
-
-/* Corregir botón de cerrar sesión */
-[data-theme="dark"] .btn-logout,
-[data-theme="dark"] .btn-logout span,
-[data-theme="dark"] .btn-back,
-[data-theme="dark"] .btn-back span {
-  color: white !important;
-}
-
-/* Asegurar que todos los textos sean visibles en el dashboard */
-[data-theme="dark"] .container h1,
-[data-theme="dark"] .container h2,
-[data-theme="dark"] .container h3,
-[data-theme="dark"] .container h4,
-[data-theme="dark"] .container h5,
-[data-theme="dark"] .container p,
-[data-theme="dark"] .card-header,
-[data-theme="dark"] .card-title {
-  color: white !important;
-}
-
-/* Mejorar contraste de elementos secundarios */
-[data-theme="dark"] .account-name,
-[data-theme="dark"] .transaction-account,
-[data-theme="dark"] .transaction-date,
-[data-theme="dark"] .transaction-description {
-  color: #ccc !important;
-}
-
-/* Asegurar que las etiquetas en formularios sean visibles */
-[data-theme="dark"] .action-card label,
-[data-theme="dark"] .form-label,
-[data-theme="dark"] .input-group-text {
-  color: white !important;
-}
-
-/* Asegurar visibilidad en encabezados de tarjetas */
-[data-theme="dark"] .action-header h4,
-[data-theme="dark"] .transactions-header h4 {
-  color: white !important;
-}
-
-/* Asegurar que el ícono de cerrar sesión sea blanco */
-[data-theme="dark"] .btn-logout i {
-  color: white !important;
-}
-
-/* Asegurar que todos los íconos en botones sean blancos */
-[data-theme="dark"] .btn i {
-  color: white !important;
-}
-
-/* Asegurar que el botón de informes tenga texto e ícono blancos */
-[data-theme="dark"] .btn-informes {
-  color: white !important;
-}
-
-[data-theme="dark"] .btn-informes i {
-  color: white !important;
-}
-
-/* Hacer que el valor del balance sea blanco en ambos modos (no verde) */
-.balance-amount h3 {
-  color: white !important;
-}
-
-/* Eliminar o sobrescribir la regla específica para el texto verde del balance */
+/* Hacer que el balance siempre sea blanco en ambos modos */
+.balance-amount h3,
 .balance-amount h3.text-success {
-  color: white !important; /* Sobrescribe el verde claro para que sea blanco */
+    color: white !important;
 }
 
-/* Asegurar que sea blanco incluso en modo oscuro */
-[data-theme="dark"] .balance-amount h3,
-[data-theme="dark"] .balance-amount h3.text-success {
-  color: white !important;
-}
-
-/* Solo para el texto negativo (en rojo), mantener un color destacado */
 .balance-amount h3.text-danger {
-  color: #ff595e !important; /* Mantener el rojo para valores negativos */
+    color: #ff6b6b !important;
 }
 
-[data-theme="dark"] .balance-amount h3.text-danger {
-  color: #ff595e !important; /* Mantener el rojo para valores negativos en modo oscuro */
+/* Text-muted blanco en la tarjeta de balance */
+.balance-card .text-muted {
+    color: rgba(255, 255, 255, 0.8) !important;
 }
 
-/* Garantizar que todos los íconos en modo oscuro sean visibles */
-[data-theme="dark"] .btn-toggle-accounts i,
-[data-theme="dark"] .btn-hide-balance i,
-[data-theme="dark"] .btn-theme-toggle i,
-[data-theme="dark"] .transaction-icon i {
-  color: white !important;
+/* Animaciones suaves */
+.balance-card,
+.action-card,
+.transactions-card,
+.transaction-item,
+.btn {
+    transition: var(--transition-normal);
 }
 
-/* Para los íconos de la tarjeta de transacciones */
-[data-theme="dark"] .ingreso-icon i {
-  color: var(--success-color) !important;
+/* Mejoras de accesibilidad */
+.btn:focus,
+.form-control:focus,
+.form-select:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
 }
 
-[data-theme="dark"] .gasto-icon i {
-  color: var(--danger-color) !important;
+/* Estados de carga */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
 }
 
-/* Configuración en selectores */
-.btn-outline-secondary {
-  border-color: #ced4da;
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid transparent;
+    border-top: 2px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
 }
 
-/* Corrección para text-muted en modo oscuro - AGREGADA */
-[data-theme="dark"] .text-muted {
-  color: white !important;
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Efectos de glassmorphism */
+.glass-effect {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Scroll personalizado */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
+}
+
+/* Tipografía mejorada */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+}
+
+.text-sm {
+    font-size: 0.875rem;
+}
+
+.text-xs {
+    font-size: 0.75rem;
+}
+
+.font-medium {
+    font-weight: 500;
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+/* Estados hover mejorados */
+.hover-lift:hover {
+    transform: translateY(-2px);
+}
+
+.hover-scale:hover {
+    transform: scale(1.02);
+}
+
+/* Badges profesionales */
+.badge-professional {
+    background: var(--gradient-primary);
+    color: white;
+    border-radius: var(--border-radius-lg);
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+}
+
+.badge-success {
+    background: var(--gradient-success);
+}
+
+.badge-danger {
+    background: var(--gradient-danger);
 }

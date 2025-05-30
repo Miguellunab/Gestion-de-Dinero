@@ -407,19 +407,16 @@
             </div>
           </div>
           {% endif %}
-        </div>
-
-        <!-- CONTENEDOR CENTRALIZADO DE GRÁFICAS DE LÍNEA -->
+        </div>        <!-- CONTENEDOR CENTRALIZADO DE GRÁFICAS DE LÍNEA -->
         <div class="charts-container">
           <div class="chart-card">
             <div class="chart-header">
               <h4>Flujo de Dinero</h4>
               <div class="chart-legend">
                 {% if billetera_sel == 'Todas' %}
-                  {% for b in billeteras_nombres %}
-                    {% if billeteras_dict[b].color %}
+                  {% for b in billeteras_nombres %}                    {% if billeteras_dict[b].color %}
                       <span class="legend-item">
-                        <i class="fas fa-circle" style="color: {{ billeteras_dict[b].color }}"></i>
+                        <i class="fas fa-circle legend-color" data-color="{{ billeteras_dict[b].color|default('#2563eb') }}"></i>
                         {{ b }}
                       </span>
                     {% endif %}
@@ -440,7 +437,7 @@
               <h4>Balance acumulado</h4>
               <div class="chart-legend">
                 <span class="legend-item">
-                  <i class="fas fa-circle" style="color: #4a9de9"></i> 
+                  <i class="fas fa-circle" style="color: #2563eb"></i> 
                   Acumulado
                 </span>
               </div>
@@ -704,7 +701,7 @@
               
               for (const billetera in billeterasSeries) {
                 if (billeterasSeries.hasOwnProperty(billetera)) {
-                  const color = billeterasColores[billetera]?.color || '#4a9de9';
+                  const color = billeterasColores[billetera]?.color || '#2563eb';
                   datasets.push({
                     label: billetera,
                     data: Object.values(billeterasSeries[billetera]),
@@ -861,7 +858,7 @@
                   {
                     label: 'Balance Acumulado',
                     data: balanceData,
-                    borderColor: '#4a9de9',
+                    borderColor: '#2563eb',
                     backgroundColor: 'rgba(74, 157, 233, 0.1)',
                     tension: 0.4,
                     fill: true,

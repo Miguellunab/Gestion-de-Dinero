@@ -1,8 +1,8 @@
 /* Estilos para la página de movimientos */
 :root {
-  --primary-color: #4a9de9;
+  --primary-color: #2563eb;
   --accent-color: #f9a825;
-  --dark-color: #4a9de9; /* Actualizado para coincidir con dashboard.css */
+  --dark-color: #2563eb; /* Actualizado para coincidir con dashboard.css */
   --light-color: #f5f5f7;
   --error-color: #e53935;
   --success-color: #43a047;

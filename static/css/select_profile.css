@@ -1,219 +1,304 @@
-/* ===================================================
-   select_profile.css - Base
-   =================================================== */
-
-/* Colores consistentes con el dashboard */
+/* ============================================
+   VARIABLES PROFESIONALES - MODO CLARO
+   ============================================ */
 :root {
-    --primary-color: #3a86ff;
-    --success-color: #38b000;
-    --danger-color: #ff595e;
-    --dark-color: #4a9de9;
-    --light-color: #f8f9fa;
-    --wallet-color: #ffe8d6;
-    --coin-color: #ff9e00;
+    /* Paleta de colores profesional */
+    --primary-color: #2563eb;         /* Azul profesional */
+    --success-color: #10b981;         /* Verde */
+    --danger-color: #ef4444;          /* Rojo */
+    --warning-color: #f59e0b;         /* Amarillo */
+    --dark-color: #2563eb;           /* Color principal de la app */
+    
+    /* Colores base */
+    --bg-color: #f8fafc;             /* Fondo principal - Slate 50 */
+    --bg-secondary: #ffffff;          /* Fondo secundario - Blanco */
+    --bg-tertiary: #f1f5f9;          /* Fondo terciario - Slate 100 */
+    
+    --text-color: #0f172a;           /* Texto principal - Slate 900 */
+    --text-secondary: #475569;       /* Texto secundario - Slate 600 */
+    --text-muted: #94a3b8;           /* Texto deshabilitado - Slate 400 */
+    
+    --border-color: #e2e8f0;         /* Bordes - Slate 200 */
+    --border-light: #cbd5e1;         /* Bordes suaves - Slate 300 */
+    
+    /* Sombras */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      /* Gradientes */
+    --gradient-primary: #2563eb;
+    --gradient-success: #10b981;
+    --gradient-danger: #ef4444;
+    --gradient-app: #2563eb;
 }
 
+/* ============================================
+   ESTILOS BASE
+   ============================================ */
 body {
-    background-color: #f5f7fa;
+    background-color: var(--bg-color);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    padding-top: 20px;
-    height: 100vh;
+    color: var(--text-color);
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px 0;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
+/* ============================================
+   TARJETA DE LOGIN
+   ============================================ */
 .login-card {
-    background-color: white;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    background-color: var(--bg-secondary);
+    border-radius: 1.25rem;
+    box-shadow: var(--shadow-xl);
     overflow: hidden;
-    max-width: 400px;
+    max-width: 420px;
     width: 100%;
+    border: 1px solid var(--border-color);
 }
 
 .login-header {
-    background: linear-gradient(135deg, var(--dark-color), #56ccf2);
-    padding: 30px 20px;
+    background-color: var(--gradient-app);
+    padding: 2.5rem 2rem;
     text-align: center;
     color: white;
+    position: relative;
 }
 
 .app-logo {
     width: 80px;
     height: auto;
-    margin-bottom: 15px;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .profile-name {
-  background-color: transparent !important; /* Eliminar cualquier fondo */
-  color: white !important; /* Asegurar que el texto sea visible */
-  text-align: center;
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin: 10px 0;
-  padding: 0; /* Asegurar que no haya relleno */
-  border: none; /* Eliminar cualquier borde */
+    background-color: transparent !important;
+    color: white !important;
+    text-align: center;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0.75rem 0;
+    padding: 0;
+    border: none;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .login-body {
-    padding: 30px;
+    padding: 2.5rem;
+}
+
+/* ============================================
+   FORMULARIOS
+   ============================================ */
+.form-label {
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
 }
 
 .pin-input {
-    font-size: 1.2rem;
-    letter-spacing: 3px;
+    font-size: 1.5rem;
+    letter-spacing: 4px;
     text-align: center;
-    padding: 12px;
-    border-radius: 10px;
-    border: 1px solid #e0e0e0;
-    transition: all 0.3s;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-secondary);
+    color: var(--text-color);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-sm);
+    width: 100%;
 }
 
 .pin-input:focus {
-    box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.25);
+    outline: none;
     border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1), var(--shadow-md);
+    background-color: var(--bg-secondary);
+}
+
+.pin-input::placeholder {
+    color: var(--text-muted);
+    letter-spacing: normal;
 }
 
 .input-group-text {
-    background-color: white;
-    border-color: #e0e0e0;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
     cursor: pointer;
-    color: #6c757d;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
+    border-radius: 0 0.75rem 0.75rem 0;
+}
+
+.input-group .pin-input {
+    border-radius: 0.75rem 0 0 0.75rem;
 }
 
 .input-group-text:hover {
     color: var(--primary-color);
+    background-color: var(--bg-tertiary);
 }
 
+/* ============================================
+   BOTONES
+   ============================================ */
 .btn-enter {
-    background-color: var(--dark-color);
+    background-color: var(--gradient-primary);
     border: none;
-    border-radius: 10px;
-    padding: 12px;
+    border-radius: 0.75rem;
+    padding: 0.875rem 1.5rem;
     color: white;
     font-weight: 600;
-    transition: all 0.3s;
-    margin-top: 20px;
+    font-size: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-top: 1.5rem;
+    width: 100%;
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-enter:hover {
-    background-color: #3b7ec3;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(58, 134, 255, 0.3);
+    box-shadow: var(--shadow-lg);
+    filter: brightness(1.05);
+}
+
+.btn-enter:active {
+    transform: translateY(0);
 }
 
 .btn-back {
-    color: #6c757d;
+    color: var(--text-secondary);
     text-decoration: none;
-    display: block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
-    margin-top: 20px;
-    transition: all 0.2s;
+    margin-top: 1.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    width: 100%;
 }
 
 .btn-back:hover {
-    color: var(--dark-color);
+    color: var(--primary-color);
+    background-color: rgba(37, 99, 235, 0.05);
+    text-decoration: none;
 }
 
-/* Botón de tema en select_profile */
+.btn-back i {
+    margin-right: 0.5rem;
+}
+/* ============================================
+   BOTÓN DE CAMBIO DE TEMA
+   ============================================ */
 .btn-theme-toggle {
-  color: #333;
-  background-color: rgba(0, 0, 0, 0.1);
-  border: none;
-  border-radius: 50%;
-  width: 34px;
-  height: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s;
-  cursor: pointer;
-  z-index: 1000;
-}
-
-[data-theme="dark"] .btn-theme-toggle {
-  color: white;
-  background-color: rgba(255, 255, 255, 0.2);
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    color: var(--text-secondary);
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    z-index: 1000;
+    box-shadow: var(--shadow-md);
 }
 
 .btn-theme-toggle:hover {
-  background-color: rgba(0, 0, 0, 0.2);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-[data-theme="dark"] .btn-theme-toggle:hover {
-  background-color: rgba(255, 255, 255, 0.3);
-}
-
-/* ===================================================
-   dark-mode.css - Adaptaciones para select_profile
-   =================================================== */
-
-/* Mejorar visibilidad de los placeholders en modo oscuro */
-[data-theme="dark"] input::placeholder,
-[data-theme="dark"] textarea::placeholder {
-    color: rgba(255, 255, 255, 0.5) !important;
-    opacity: 1 !important;
-}
-
-/* Asegurar que los selects tengan buen contraste en modo oscuro */
-[data-theme="dark"] .form-select {
-    background-color: #2d2d2d !important;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
-    color: white !important;
-}
-
-/* Modo Oscuro para select_profile */
-[data-theme="dark"] body {
-    background-color: #121212 !important;
+    background-color: var(--primary-color);
     color: white;
+    transform: translateY(-2px) rotate(180deg);
+    box-shadow: var(--shadow-lg);
+}
+
+/* ============================================
+   MODO OSCURO (DARK THEME)
+   ============================================ */
+[data-theme="dark"] body {
+    background-color: #0d1117 !important;
+    color: #f0f6fc !important;
 }
 
 [data-theme="dark"] .login-card {
-    background-color: #1e1e1e !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
-}
-
-[data-theme="dark"] .login-header {
-    background: linear-gradient(135deg, #4a9de9, #2a75e8) !important;
-    color: white !important;
-}
-
-[data-theme="dark"] .login-body {
-    background-color: #1e1e1e;
-    color: white;
+    background-color: #21262d !important;
+    border-color: #30363d !important;
 }
 
 [data-theme="dark"] .pin-input {
-    background-color: #2d2d2d !important;
-    border-color: #333 !important;
-    color: white !important;
+    background-color: #0d1117 !important;
+    color: #f0f6fc !important;
+    border-color: #30363d !important;
+}
+
+[data-theme="dark"] .pin-input:focus {
+    border-color: #58a6ff !important;
+    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.25), 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+    background-color: #0d1117 !important;
+}
+
+[data-theme="dark"] .pin-input::placeholder {
+    color: rgba(240, 246, 252, 0.5) !important;
 }
 
 [data-theme="dark"] .input-group-text {
-    background-color: #2d2d2d !important;
-    border-color: #333 !important;
-    color: white !important;
+    background-color: #0d1117 !important;
+    border-color: #30363d !important;
+    color: #8b949e !important;
 }
 
-[data-theme="dark"] .btn-enter {
-    background-color: #4a9de9 !important;
-    border-color: #4a9de9 !important;
-    color: white !important;
+[data-theme="dark"] .input-group-text:hover {
+    color: #58a6ff !important;
+    background-color: #161b22 !important;
+}
+
+[data-theme="dark"] .form-label {
+    color: #f0f6fc !important;
 }
 
 [data-theme="dark"] .btn-back {
-    color: #adb5bd !important;
+    color: #8b949e !important;
 }
 
-[data-theme="dark"] a {
+[data-theme="dark"] .btn-back:hover {
     color: #58a6ff !important;
+    background-color: rgba(88, 166, 255, 0.1) !important;
 }
 
-[data-theme="dark"] .login-header .profile-name {
-  background-color: transparent !important; /* Eliminar fondo en modo oscuro */
-  color: white !important; /* Asegurar que el texto sea visible */
+[data-theme="dark"] .btn-enter {
+    background-color: #2563eb !important;
+}
+
+[data-theme="dark"] .btn-theme-toggle {
+    color: #f0f6fc !important;
+    background-color: #21262d !important;
+    border-color: #30363d !important;
+}
+
+[data-theme="dark"] .btn-theme-toggle:hover {
+    background-color: #58a6ff !important;
+    color: white !important;
+}
+
+[data-theme="dark"] .form-select {
+    background-color: #0d1117 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23f0f6fc' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+    color: #f0f6fc !important;
+    border-color: #30363d !important;
 }

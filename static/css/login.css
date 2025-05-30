@@ -1,253 +1,369 @@
-/* Colores consistentes con el dashboard */
+/* ============================================
+   VARIABLES PROFESIONALES - MODO CLARO
+   ============================================ */
 :root {
-    --primary-color: #3a86ff;
-    --success-color: #38b000;
-    --danger-color: #ff595e;
-    --dark-color: #4a9de9;
-    --light-color: #f8f9fa;
-    --wallet-color: #ffe8d6;
-    --coin-color: #ff9e00;
+    /* Paleta de colores profesional */
+    --primary-color: #2563eb;         /* Azul profesional */
+    --success-color: #10b981;         /* Verde */
+    --danger-color: #ef4444;          /* Rojo */
+    --warning-color: #f59e0b;         /* Amarillo */
+    --dark-color: #2563eb;           /* Color principal de la app */
+    
+    /* Colores base */
+    --bg-color: #f8fafc;             /* Fondo principal - Slate 50 */
+    --bg-secondary: #ffffff;          /* Fondo secundario - Blanco */
+    --bg-tertiary: #f1f5f9;          /* Fondo terciario - Slate 100 */
+    
+    --text-color: #0f172a;           /* Texto principal - Slate 900 */
+    --text-secondary: #475569;       /* Texto secundario - Slate 600 */
+    --text-muted: #94a3b8;           /* Texto deshabilitado - Slate 400 */
+    
+    --border-color: #e2e8f0;         /* Bordes - Slate 200 */
+    --border-light: #cbd5e1;         /* Bordes suaves - Slate 300 */
+    
+    /* Sombras */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      /* Gradientes */
+    --gradient-primary: #2563eb;
+    --gradient-success: #10b981;
+    --gradient-danger: #ef4444;
+    --gradient-app: #2563eb;
 }
 
+/* ============================================
+   ESTILOS BASE
+   ============================================ */
 body {
-    background-color: #f5f7fa;
+    background-color: var(--bg-color);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    padding-top: 20px;
+    color: var(--text-color);
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px 0;
+    min-height: 100vh;
 }
 
+/* ============================================
+   HEADER Y NAVEGACIÓN
+   ============================================ */
 .login-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 3rem;
 }
 
 .app-logo {
     width: 100px;
     height: auto;
-    margin-bottom: 15px;
+    margin-bottom: 1rem;
+    filter: drop-shadow(var(--shadow-sm));
 }
 
+.app-header {
+    background-color: var(--gradient-app);
+    color: white;
+    padding: 2rem 0;
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+}
+
+/* ============================================
+   TARJETAS DE PERFIL
+   ============================================ */
 .profile-card {
-    border-radius: 16px;
-    overflow: hidden;
-    border: none;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s, box-shadow 0.3s;
+    background-color: var(--bg-secondary);
+    border-radius: 1rem;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+    overflow: hidden;
 }
 
 .profile-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--primary-color);
 }
 
 .profile-card .card-body {
-    padding: 25px;
-    min-height: 170px;
+    padding: 2rem;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .profile-name {
-    font-size: 1.3rem;
+    font-size: 1.25rem;
     font-weight: 600;
-    margin-bottom: 15px;
-    color: #333;
+    margin-bottom: 0.75rem;
+    color: var(--text-color);
+    line-height: 1.4;
 }
 
 .profile-pin {
-    color: #6c757d;
-    font-size: 0.95rem;
-    margin-bottom: 20px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
 }
 
+/* ============================================
+   BOTONES
+   ============================================ */
 .btn-enter {
-    background-color: var(--dark-color);
+    background-color: var(--gradient-primary);
     border: none;
-    border-radius: 50px;
-    padding: 8px 20px;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1.5rem;
     color: white;
-    font-weight: 500;
-    transition: all 0.3s;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: 0.75rem;
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-enter:hover {
-    background-color: #3b7ec3;
     transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    filter: brightness(1.05);
 }
 
+.btn-create {
+    background-color: var(--bg-secondary);
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 100%;
+}
+
+.btn-create:hover {
+    background-color: var(--gradient-primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* ============================================
+   ACCIONES DE PERFIL
+   ============================================ */
 .profile-actions {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 1rem;
+    right: 1rem;
     display: flex;
-    gap: 8px;
+    gap: 0.5rem;
+    z-index: 10;
 }
 
 .btn-profile-action {
-    width: 30px;
-    height: 30px;
+    width: 2.5rem;
+    height: 2.5rem;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     border: none;
-    transition: all 0.2s;
+    font-size: 0.9rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
 }
 
 .btn-edit {
-    background-color: rgba(58, 134, 255, 0.1);
+    background-color: rgba(37, 99, 235, 0.1);
     color: var(--primary-color);
 }
 
 .btn-delete {
-    background-color: rgba(255, 89, 94, 0.1);
+    background-color: rgba(239, 68, 68, 0.1);
     color: var(--danger-color);
 }
 
 .btn-edit:hover {
     background-color: var(--primary-color);
     color: white;
+    transform: scale(1.1);
 }
 
 .btn-delete:hover {
     background-color: var(--danger-color);
     color: white;
+    transform: scale(1.1);
 }
 
+/* ============================================
+   TARJETA NUEVO PERFIL
+   ============================================ */
 .new-profile-card {
-    background-color: #ffffff;
-    border: 2px dashed #ccd0d5;
-    border-radius: 16px;
+    background-color: var(--bg-secondary);
+    border: 2px dashed var(--border-light);
+    border-radius: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.new-profile-card:hover {
+    border-color: var(--primary-color);
+    background-color: rgba(37, 99, 235, 0.02);
+    transform: translateY(-2px);
 }
 
 .new-profile-icon {
-    font-size: 2rem;
-    color: #ccd0d5;
-    margin-bottom: 15px;
+    font-size: 2.5rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
 }
 
-.btn-create {
-    background-color: white;
-    border: 2px solid var(--dark-color);
-    color: var(--dark-color);
-    border-radius: 50px;
-    padding: 8px 20px;
-    font-weight: 500;
-    transition: all 0.3s;
+.new-profile-card:hover .new-profile-icon {
+    color: var(--primary-color);
+    transform: scale(1.1);
 }
 
-.btn-create:hover {
-    background-color: var(--dark-color);
+/* ============================================
+   BOTÓN DE CAMBIO DE TEMA
+   ============================================ */
+.btn-theme-toggle {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    color: var(--text-secondary);
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    z-index: 1000;
+    box-shadow: var(--shadow-md);
+}
+
+.btn-theme-toggle:hover {
+    background-color: var(--primary-color);
     color: white;
+    transform: translateY(-2px) rotate(180deg);
+    box-shadow: var(--shadow-lg);
 }
 
-/* Header con gradiente */
-.app-header {
-    background: linear-gradient(135deg, var(--dark-color), #56ccf2);
-    color: white;
-    padding: 25px 0;
-    border-radius: 15px;
-    margin-bottom: 30px;
-    box-shadow: 0 8px 16px rgba(74, 157, 233, 0.25);
-}
-
-/* Scrollbar personalizada */
+/* ============================================
+   SCROLLBAR PERSONALIZADA
+   ============================================ */
 ::-webkit-scrollbar {
     width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #cccccc;
+    background: var(--bg-tertiary);
     border-radius: 4px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background: #aaaaaa;
+::-webkit-scrollbar-thumb {
+    background: var(--border-light);
+    border-radius: 4px;
+    transition: background 0.3s ease;
 }
 
-/* Añadir a login.css */
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* ============================================
+   MODO OSCURO (DARK THEME)
+   ============================================ */
 [data-theme="dark"] body {
-  background-color: #0d1117 !important;
-  color: white !important;
+    background-color: #0d1117 !important;
+    color: #f0f6fc !important;
 }
 
 [data-theme="dark"] .login-container,
 [data-theme="dark"] .login-form {
-  background-color: #161b22 !important;
-  border-color: #30363d !important;
+    background-color: #161b22 !important;
+    border-color: #30363d !important;
 }
 
 [data-theme="dark"] .login-header {
-  color: white !important;
+    color: #f0f6fc !important;
+}
+
+[data-theme="dark"] .profile-card {
+    background-color: #21262d !important;
+    border-color: #30363d !important;
+}
+
+[data-theme="dark"] .new-profile-card {
+    background-color: #21262d !important;
+    border: 2px dashed #484f58 !important;
+}
+
+[data-theme="dark"] .new-profile-card:hover {
+    border-color: #2563eb !important;
+    background-color: rgba(37, 99, 235, 0.05) !important;
+}
+
+[data-theme="dark"] .new-profile-icon {
+    color: #7d8590 !important;
+}
+
+[data-theme="dark"] .new-profile-card:hover .new-profile-icon {
+    color: #2563eb !important;
 }
 
 [data-theme="dark"] .form-control {
-  background-color: #2d2d2d !important;
-  color: white !important;
-  border-color: #333 !important;
+    background-color: #0d1117 !important;
+    color: #f0f6fc !important;
+    border-color: #30363d !important;
+}
+
+[data-theme="dark"] .form-control:focus {
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25) !important;
 }
 
 [data-theme="dark"] .form-control::placeholder {
-  color: rgba(255, 255, 255, 0.6) !important;
+    color: rgba(240, 246, 252, 0.5) !important;
 }
 
-/* Mejorar visibilidad de los placeholders */
-[data-theme="dark"] input::placeholder,
-[data-theme="dark"] textarea::placeholder {
-  color: rgba(255, 255, 255, 0.5) !important;
-  opacity: 1 !important; /* Algunos navegadores aplican opacidad adicional */
-}
-
-/* Asegurar que los selects también tengan buen contraste */
 [data-theme="dark"] .form-select {
-  background-color: #2d2d2d !important;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
-  color: white !important;
-}
-
-/* Botón de tema en login */
-.btn-theme-toggle {
-  color: #333;
-  background-color: rgba(0, 0, 0, 0.1);
-  border: none;
-  border-radius: 50%;
-  width: 34px;
-  height: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s;
-  cursor: pointer;
-  z-index: 1000;
+    background-color: #0d1117 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23f0f6fc' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+    color: #f0f6fc !important;
+    border-color: #30363d !important;
 }
 
 [data-theme="dark"] .btn-theme-toggle {
-  color: white;
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-.btn-theme-toggle:hover {
-  background-color: rgba(0, 0, 0, 0.2);
-  transform: translateY(-2px);
+    color: #f0f6fc !important;
+    background-color: #21262d !important;
+    border-color: #30363d !important;
 }
 
 [data-theme="dark"] .btn-theme-toggle:hover {
-  background-color: rgba(255, 255, 255, 0.3);
+    background-color: #2563eb !important;
+    color: white !important;
 }
 
-/* Corregir botón de acceder en modo oscuro */
 [data-theme="dark"] .btn-enter,
 [data-theme="dark"] .btn-primary,
 [data-theme="dark"] button[type="submit"] {
-  color: white !important;
-  background-color: var(--dark-color) !important;
+    color: white !important;
+    background: linear-gradient(135deg, #2563eb 0%, #2563eb 100%) !important;
 }
 
-/* Asegurar que todos los textos importantes sean visibles */
 [data-theme="dark"] h1, 
 [data-theme="dark"] h2, 
 [data-theme="dark"] h3, 
@@ -257,20 +373,21 @@ body {
 [data-theme="dark"] label,
 [data-theme="dark"] .profile-name,
 [data-theme="dark"] .card-title {
-  color: white !important;
+    color: #f0f6fc !important;
 }
 
-/* Corregir nombres de usuarios y otras tarjetas */
-[data-theme="dark"] .profile-card {
-  background-color: #1e1e1e !important;
-  border-color: #30363d !important;
+[data-theme="dark"] .profile-pin {
+    color: #8b949e !important;
 }
 
-[data-theme="dark"] .new-profile-card {
-  background-color: #1e1e1e !important;
-  border: 2px dashed #3d444c !important;
+[data-theme="dark"] ::-webkit-scrollbar-track {
+    background: #161b22;
 }
 
-[data-theme="dark"] .new-profile-icon {
-  color: #6c757d !important;
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: #30363d;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: #484f58;
 }

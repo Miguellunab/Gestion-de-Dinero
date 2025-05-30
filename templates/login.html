@@ -21,11 +21,10 @@
     <!-- CSS personalizado para login -->
     <link
       rel="stylesheet"
-      href="{{ url_for('static', filename='css/login.css') }}?v=2" />
-    <!-- CSS para modo oscuro -->
+      href="{{ url_for('static', filename='css/login.css') }}?v=2" />    <!-- CSS para modo oscuro -->
     <link
       rel="stylesheet"
-      href="{{ url_for('static', filename='css/dark-mode.css') }}?v=3" />
+      href="{{ url_for('static', filename='css/dark-mode.css') }}?v=4" />
   </head>
   <body>
     <div class="container py-4">
@@ -159,8 +158,7 @@
                   class="btn-close"
                   data-bs-dismiss="modal"
                   aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
+              </div>              <div class="modal-body">
                 <p>
                   ¿Estás seguro de que deseas eliminar el perfil
                   <strong>{{ profile.name }}</strong>?
@@ -169,6 +167,27 @@
                   Esta acción eliminará todos los datos asociados al perfil y no
                   se puede deshacer.
                 </p>
+                <form
+                  id="deleteForm{{ profile.id }}"
+                  action="{{ url_for('delete_profile', profile_id=profile.id) }}"
+                  method="post">
+                  <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}" />                  <div class="mb-3">
+                    <label for="deletePassword{{ profile.id }}" class="form-label">
+                      <strong>Confirma tu PIN para eliminar:</strong>
+                    </label>
+                    <input
+                      type="password"
+                      class="form-control"
+                      id="deletePassword{{ profile.id }}"
+                      name="password"
+                      placeholder="Ingresa el PIN del perfil"
+                      maxlength="4"
+                      required />
+                  </div>
+                </form>
               </div>
               <div class="modal-footer">
                 <button
@@ -177,19 +196,12 @@
                   data-bs-dismiss="modal">
                   Cancelar
                 </button>
-                <form
-                  action="{{ url_for('delete_profile', profile_id=profile.id) }}"
-                  method="post">
-                  <input
-                    type="hidden"
-                    name="csrf_token"
-                    value="{{ csrf_token() }}" />
-                  <button
-                    type="submit"
-                    class="btn btn-danger">
-                    Eliminar
-                  </button>
-                </form>
+                <button
+                  type="submit"
+                  form="deleteForm{{ profile.id }}"
+                  class="btn btn-danger">
+                  <i class="fas fa-trash-alt me-1"></i>Eliminar Perfil
+                </button>
               </div>
             </div>
           </div>

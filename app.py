@@ -202,13 +202,37 @@ def edit_profile(profile_id):
 @app.route('/delete_profile/<int:profile_id>', methods=['POST'])
 def delete_profile(profile_id):
     profile = Profile.query.get_or_404(profile_id)
-    # Borra los gastos e ingresos asociados
-    Gasto.query.filter_by(profile_id=profile_id).delete()
-    Ingreso.query.filter_by(profile_id=profile_id).delete()
-    # Borra el perfil
-    db.session.delete(profile)
-    db.session.commit()
-    flash("Perfil eliminado correctamente", "success")
+    
+    # Verificar la contraseña (PIN)
+    password = request.form.get('password')
+    if not password or not profile.check_pin(password):
+        flash("PIN incorrecto", "danger")
+        return redirect(url_for('login'))
+    
+    try:
+        # Eliminar en el orden correcto para evitar violaciones de integridad referencial
+        # 1. Primero gastos e ingresos
+        Gasto.query.filter_by(profile_id=profile_id).delete()
+        Ingreso.query.filter_by(profile_id=profile_id).delete()
+        
+        # 2. Luego transferencias
+        from models import Transferencia
+        Transferencia.query.filter_by(profile_id=profile_id).delete()
+        
+        # 3. Después billeteras
+        from models import Billetera
+        Billetera.query.filter_by(profile_id=profile_id).delete()
+        
+        # 4. Finalmente el perfil
+        db.session.delete(profile)
+        db.session.commit()
+        
+        flash("Perfil eliminado correctamente", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash("Error al eliminar el perfil. Intenta de nuevo.", "danger")
+        print(f"Error eliminando perfil: {e}")
+    
     return redirect(url_for('login'))
 
 # ---------------------- RUTAS DE LA APLICACIÓN (GESTIÓN DE DINERO) ----------------------

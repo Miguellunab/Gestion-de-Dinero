@@ -1,485 +1,781 @@
 /* ============================================
-   VARIABLES DE COLORES - MODO OSCURO
+   MODO OSCURO PROFESIONAL PREMIUM
    ============================================ */
+
+/* Variables del tema oscuro */
 [data-theme="dark"] {
-    /* Colores de fondo */
-    --bg-color: #121212;             /* Fondo de página */
-    --card-bg: #1e1e1e;              /* Fondo de tarjetas */
+    /* Paleta de colores oscura profesional */
+    --bg-color: #0f172a;              /* Fondo principal - Slate 900 */
+    --bg-secondary: #1e293b;          /* Fondo secundario - Slate 800 */
+    --bg-tertiary: #334155;           /* Fondo terciario - Slate 700 */
     
-    /* Colores de texto */
-    --text-color: #f8f9fa;           /* Texto principal */
-    --text-muted: #ffffff;           /* Texto secundario (blanco en modo oscuro) */
+    --text-color: #f8fafc;            /* Texto principal - Slate 50 */
+    --text-secondary: #cbd5e1;        /* Texto secundario - Slate 300 */
+    --text-muted: #94a3b8;            /* Texto deshabilitado - Slate 400 */
     
-    /* Colores estructurales */
-    --border-color: #2d2d2d;         /* Bordes */
-    --shadow-color: rgba(0, 0, 0, 0.2); /* Sombras */
+    --border-color: #334155;          /* Bordes - Slate 700 */
+    --border-light: #475569;          /* Bordes suaves - Slate 600 */
     
-    /* Colores de aplicación específicos */
-    --primary-dark: #4a9de9;         /* Azul principal oscuro */
-    --success-dark: #2c9d00;         /* Verde para ingresos */
-    --danger-dark: #e63946;          /* Rojo para gastos */
+    /* Colores principales */
+    --primary-color: #2563eb;         /* Azul profesional */
+    --success-color: #10b981;         /* Verde */
+    --danger-color: #ef4444;          /* Rojo */
+    --warning-color: #f59e0b;         /* Amarillo */
+    
+    /* Sombras mejoradas para modo oscuro */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+      /* Gradientes para modo oscuro */
+    --gradient-primary: #2563eb;
+    --gradient-success: #10b981;
+    --gradient-danger: #ef4444;
 }
 
 /* ============================================
-   ESTILOS GENERALES
+   ESTILOS BASE MODO OSCURO
    ============================================ */
+
 [data-theme="dark"] body {
-    background-color: #0d1117;       /* Azul oscuro estilo GitHub */
+    background: var(--bg-color);
     color: var(--text-color);
 }
 
 /* ============================================
-   BARRA DE NAVEGACIÓN EN MODO OSCURO
+   NAVEGACIÓN MODO OSCURO
    ============================================ */
-[data-theme="dark"] .navbar.navbar-dark {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%) !important;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+
+[data-theme="dark"] .navbar {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: var(--shadow-lg);
 }
 
-[data-theme="dark"] .navbar-brand,
-[data-theme="dark"] .navbar-dark .navbar-brand {
+[data-theme="dark"] .navbar-brand {
     color: white !important;
 }
 
 [data-theme="dark"] .btn-logout,
-[data-theme="dark"] .btn-logout span {
-    color: white !important;
-}
-
-[data-theme="dark"] .btn-logout i {
-    color: white !important;
-}
-
 [data-theme="dark"] .btn-theme-toggle {
-    background-color: rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+[data-theme="dark"] .btn-logout:hover,
+[data-theme="dark"] .btn-theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
 }
 
 /* ============================================
-   TARJETA DE BALANCE EN MODO OSCURO
+   TARJETA DE BALANCE MODO OSCURO
    ============================================ */
+
 [data-theme="dark"] .balance-card {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
+    background: var(--gradient-primary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: var(--shadow-xl);
 }
 
-[data-theme="dark"] .balance-amount h3,
-[data-theme="dark"] .balance-amount h3.text-success {
-    color: white !important;
-}
-
-[data-theme="dark"] .balance-amount h3.text-danger {
-    color: #ff595e !important;
-}
-
-[data-theme="dark"] .btn-informes {
-    color: white !important;
-}
-
-[data-theme="dark"] .btn-informes i {
-    color: white !important;
+[data-theme="dark"] .balance-card::before {
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
 }
 
 /* ============================================
-   TARJETAS Y CONTENEDORES
+   TARJETAS Y ELEMENTOS MODO OSCURO
    ============================================ */
-[data-theme="dark"] .card,
+
 [data-theme="dark"] .action-card,
-[data-theme="dark"] .transactions-card {
-    background-color: var(--card-bg) !important;
-    border-color: var(--border-color) !important;
-    color: white !important;
+[data-theme="dark"] .transactions-card,
+[data-theme="dark"] .top-card {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+    box-shadow: var(--shadow-md);
+}
+
+[data-theme="dark"] .action-card:hover,
+[data-theme="dark"] .transactions-card:hover,
+[data-theme="dark"] .top-card:hover {
+    box-shadow: var(--shadow-lg);
+    border-color: var(--border-light);
 }
 
 [data-theme="dark"] .action-header,
 [data-theme="dark"] .transactions-header {
-    background-color: #161b22 !important;
-    border-color: #30363d !important;
-    color: white !important;
+    background: var(--bg-tertiary);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .transactions-header:hover {
+    background: var(--border-light);
 }
 
 /* ============================================
-   FORMULARIOS
+   FORMULARIOS MODO OSCURO
    ============================================ */
+
 [data-theme="dark"] .form-control,
-[data-theme="dark"] .input-group-text,
-[data-theme="dark"] input,
-[data-theme="dark"] select,
-[data-theme="dark"] textarea {
-    background-color: #2d2d2d !important;
-    border-color: #333 !important;
-    color: white !important;
-}
-
-[data-theme="dark"] .form-control:focus {
-    border-color: var(--primary-color) !important;
-    box-shadow: 0 0 0 0.25rem rgba(30, 136, 229, 0.25) !important;
-}
-
 [data-theme="dark"] .form-select {
-    background-color: #2d2d2d !important;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
-    color: white !important;
-    border-color: #333 !important;
+    background: var(--bg-tertiary);
+    border-color: var(--border-color);
+    color: var(--text-color);
+    box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+    background: var(--bg-tertiary);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+    color: var(--text-color);
 }
 
 [data-theme="dark"] .form-control::placeholder {
-    color: rgba(255, 255, 255, 0.5) !important;
-    opacity: 1 !important;
-}
-
-/* ============================================
-   PESTAÑAS Y NAVEGACIÓN
-   ============================================ */
-[data-theme="dark"] .nav-tabs .nav-link {
     color: var(--text-muted);
 }
 
-[data-theme="dark"] .nav-tabs .nav-link.active {
-    color: #4a9de9 !important;
-    border-bottom: 2px solid #4a9de9;
+[data-theme="dark"] .input-group-text {
+    background: var(--bg-tertiary);
+    border-color: var(--border-color);
+    color: var(--text-secondary);
 }
 
-/* Corregir el fondo del contenido de las pestañas en modo oscuro */
-[data-theme="dark"] .tab-content.bg-white {
-    background-color: var(--card-bg) !important;
-    color: var(--text-color) !important;
+[data-theme="dark"] .form-label {
+    color: var(--text-color);
 }
 
 /* ============================================
-   TRANSACCIONES
+   PESTAÑAS MODO OSCURO
    ============================================ */
+
+[data-theme="dark"] .nav-tabs {
+    border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .nav-tabs .nav-link {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .nav-tabs .nav-link:hover {
+    color: var(--primary-color);
+    background: var(--bg-secondary);
+}
+
+[data-theme="dark"] .nav-tabs .nav-link.active {
+    color: var(--primary-color);
+    background: var(--bg-color);
+    border-bottom-color: var(--primary-color);
+}
+
+/* Contenido de pestañas - ARREGLO PRINCIPAL */
+[data-theme="dark"] .tab-content {
+    background: var(--bg-secondary) !important;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .tab-pane {
+    background: var(--bg-secondary);
+    color: var(--text-color);
+}
+
+/* ============================================
+   TRANSACCIONES MODO OSCURO
+   ============================================ */
+
 [data-theme="dark"] .transaction-item {
     border-bottom-color: var(--border-color);
 }
 
-[data-theme="dark"] .transaction-description,
+[data-theme="dark"] .transaction-item:hover {
+    background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .transaction-amount {
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .transaction-description {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .transaction-account,
 [data-theme="dark"] .transaction-date {
-    color: var(--text-color) !important;
-}
-
-[data-theme="dark"] .transaction-account {
-    background-color: #252525 !important;
-    color: #dddddd !important;
-}
-
-[data-theme="dark"] .transaction-account small {
-    color: #adb5bd !important;
-}
-
-/* Garantizar que todos los íconos sean visibles */
-[data-theme="dark"] .btn-toggle-accounts i,
-[data-theme="dark"] .btn-hide-balance i,
-[data-theme="dark"] .btn-theme-toggle i,
-[data-theme="dark"] .transaction-icon i {
-    color: white !important;
+    color: var(--text-muted);
 }
 
 [data-theme="dark"] .ingreso-icon {
-    background-color: rgba(67, 160, 71, 0.2);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.1) 100%);
+    border-color: rgba(16, 185, 129, 0.3);
+    color: var(--success-color);
 }
 
 [data-theme="dark"] .gasto-icon {
-    background-color: rgba(229, 57, 53, 0.2);
-}
-
-[data-theme="dark"] .ingreso-icon i {
-    color: var(--success-color) !important;
-}
-
-[data-theme="dark"] .gasto-icon i {
-    color: var(--danger-color) !important;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.1) 100%);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: var(--danger-color);
 }
 
 /* ============================================
-   BOTONES Y ACCIONES
+   BOTONES MODO OSCURO
    ============================================ */
-[data-theme="dark"] .btn-action {
-    background-color: #252525 !important;
-    color: #dddddd !important;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important;
-}
 
 [data-theme="dark"] .btn-action:hover {
-    background-color: #333333 !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4) !important;
-}
-
-[data-theme="dark"] .btn-action.edit:hover {
-    background-color: #1e88e5 !important;
-    color: white !important;
+    background: var(--bg-tertiary);
 }
 
 [data-theme="dark"] .btn-action.delete:hover {
-    background-color: #e53935 !important;
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--danger-color);
+}
+
+[data-theme="dark"] .btn-action.edit:hover {
+    background: rgba(37, 99, 235, 0.15);
+    color: var(--primary-color);
+}
+
+[data-theme="dark"] .btn-outline-secondary {
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .btn-outline-secondary:hover {
+    background: var(--bg-secondary);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+/* ============================================
+   MODALES MODO OSCURO
+   ============================================ */
+
+[data-theme="dark"] .modal-content {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+    box-shadow: var(--shadow-xl);
+}
+
+[data-theme="dark"] .modal-header,
+[data-theme="dark"] .modal-footer {
+    background: var(--bg-tertiary);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .modal-title {
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .modal-body {
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* ============================================
+   PAGINACIÓN MODO OSCURO
+   ============================================ */
+
+[data-theme="dark"] .transactions-pagination {
+    background: var(--bg-tertiary);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .pagination-btn {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .pagination-btn:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+[data-theme="dark"] .pagination-btn.active {
+    background: var(--gradient-primary);
+    color: white;
+}
+
+[data-theme="dark"] .pagination-count {
+    color: var(--text-secondary);
+}
+
+/* ============================================
+   ELEMENTOS ESPECIALES MODO OSCURO
+   ============================================ */
+
+[data-theme="dark"] .no-transactions {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .transactions-toggle-icon {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .logo-container h1 {
+    color: var(--text-color);
+}
+
+/* ============================================
+   SCROLL PERSONALIZADO MODO OSCURO
+   ============================================ */
+
+[data-theme="dark"] ::-webkit-scrollbar-track {
+    background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: var(--border-light);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
+}
+
+/* ============================================
+   EFECTOS GLASSMORPHISM MODO OSCURO
+   ============================================ */
+
+[data-theme="dark"] .glass-effect {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+}
+
+/* ============================================
+   ESTADOS DE CARGA MODO OSCURO
+   ============================================ */
+
+[data-theme="dark"] .loading::after {
+    border-top-color: var(--primary-color);
+}
+
+/* ============================================
+   BADGES MODO OSCURO
+   ============================================ */
+
+[data-theme="dark"] .badge-professional {
+    background: var(--gradient-primary);
+    color: white;
+}
+
+[data-theme="dark"] .badge-success {
+    background: var(--gradient-success);
+    color: white;
+}
+
+[data-theme="dark"] .badge-danger {
+    background: var(--gradient-danger);
+    color: white;
+}
+
+/* ============================================
+   DROPDOWNS MODO OSCURO
+   ============================================ */
+
+[data-theme="dark"] .dropdown-menu {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+    box-shadow: var(--shadow-lg);
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .dropdown-item:hover,
+[data-theme="dark"] .dropdown-item:focus {
+    background: var(--bg-tertiary);
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .dropdown-divider {
+    border-color: var(--border-color);
+}
+
+/* ============================================
+   TOOLTIPS MODO OSCURO
+   ============================================ */
+
+[data-theme="dark"] .tooltip .tooltip-inner {
+    background: var(--bg-tertiary);
+    color: var(--text-color);
+    box-shadow: var(--shadow-md);
+}
+
+[data-theme="dark"] .tooltip .tooltip-arrow::before {
+    border-top-color: var(--bg-tertiary);
+}
+
+/* ============================================
+   ALERTAS MODO OSCURO
+   ============================================ */
+
+[data-theme="dark"] .alert {
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .alert-success {
+    background: rgba(16, 185, 129, 0.15) !important;
+    border: 1px solid rgba(16, 185, 129, 0.3) !important;
+    color: #10b981 !important;
+}
+
+[data-theme="dark"] .alert-danger {
+    background: rgba(239, 68, 68, 0.15) !important;
+    border: 1px solid rgba(239, 68, 68, 0.3) !important;
+    color: #ff6b6b !important;
+}
+
+[data-theme="dark"] .alert-info {
+    background: rgba(37, 99, 235, 0.15) !important;
+    border: 1px solid rgba(37, 99, 235, 0.3) !important;
+    color: var(--primary-color) !important;
+}
+
+[data-theme="dark"] .alert-warning {
+    background: rgba(245, 158, 11, 0.15) !important;
+    border: 1px solid rgba(245, 158, 11, 0.3) !important;
+    color: #f59e0b !important;
+}
+
+/* ============================================
+   MEJORAS DE ACCESIBILIDAD MODO OSCURO
+   ============================================ */
+
+[data-theme="dark"] .btn:focus,
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* ============================================
+   TRANSICIONES SUAVES
+   ============================================ */
+
+[data-theme="dark"] * {
+    transition: background-color 0.25s ease-in-out, 
+                border-color 0.25s ease-in-out, 
+                color 0.25s ease-in-out,
+                box-shadow 0.25s ease-in-out;
+}
+
+/* ============================================
+   MEJORAS VISUALES ESPECÍFICAS
+   ============================================ */
+
+/* Mejorar contraste en modo oscuro */
+[data-theme="dark"] .balance-amount h3 {
     color: white !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-[data-theme="dark"] .btn:not(.btn-link) span {
-    color: inherit !important;
+[data-theme="dark"] .balance-amount h3.text-danger {
+    color: #ff6b6b !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+/* Text-muted en tarjeta de balance */
+[data-theme="dark"] .balance-card .text-muted {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Mejorar visibilidad de íconos */
+[data-theme="dark"] .navbar i,
+[data-theme="dark"] .balance-card i,
 [data-theme="dark"] .btn i {
     color: white !important;
 }
 
-[data-theme="dark"] .btn:disabled {
-    background-color: #3d3d3d !important;
-    color: #aaa !important;
-}
-
-/* Corregir color del icono de flecha atrás */
-[data-theme="dark"] .btn-back i {
-    color: #313233 !important; /* Gris claro para contraste en fondo oscuro */
-}
-
-/* ============================================
-   MODALES
-   ============================================ */
-[data-theme="dark"] .modal-content {
-    background-color: #202020 !important;
-    border-color: #333333 !important;
-    color: #ffffff !important;
-}
-
-[data-theme="dark"] .modal-header {
-    background-color: #242424 !important;
-    border-bottom: 1px solid #333333 !important;
-    color: #ffffff !important;
-}
-
-[data-theme="dark"] .modal-footer {
-    border-top: 1px solid #333333 !important;
-    background-color: #202020 !important;
-}
-
-[data-theme="dark"] .modal-title {
-    color: #ffffff !important;
-}
-
-[data-theme="dark"] .btn-close {
-    filter: invert(1) grayscale(100%) brightness(200%) !important;
-    opacity: 0.8 !important;
-}
-
-[data-theme="dark"] .btn-close:hover {
-    opacity: 1 !important;
-}
-
-[data-theme="dark"] .modal-footer .btn-secondary {
-    background-color: #3a3a3a !important;
-    border-color: #444444 !important;
-    color: #ffffff !important;
-    transition: all 0.3s ease !important;
-}
-
-[data-theme="dark"] .modal-footer .btn-secondary:hover {
-    background-color: #4a4a4a !important;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3) !important;
-}
-
-[data-theme="dark"] .modal-footer .btn-primary {
-    background-color: #4a9de9 !important;
-    border-color: #4a9de9 !important;
-    color: #ffffff !important;
-    transition: all 0.3s ease !important;
-}
-
-[data-theme="dark"] .modal-footer .btn-primary:hover {
-    background-color: #4a9de9 !important;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3) !important;
-    transform: translateY(-1px) !important;
-}
-
-/* ============================================
-   DROPDOWN Y MENÚS
-   ============================================ */
-[data-theme="dark"] .dropdown-menu {
-    background-color: #1a1a1a !important;
-    border-color: #333333 !important;
-}
-
-[data-theme="dark"] .dropdown-item {
+/* Asegurar que todos los textos en las acciones de balance sean visibles */
+[data-theme="dark"] .account-name,
+[data-theme="dark"] .account-info {
     color: white !important;
 }
 
-[data-theme="dark"] .dropdown-item:hover {
-    background-color: #2d2d2d !important;
+/* Mejorar contraste en formularios */
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+    color: var(--text-color) !important;
 }
 
 /* ============================================
-   SEPARADORES Y BORDES
+   EFECTOS HOVER MEJORADOS MODO OSCURO
    ============================================ */
-[data-theme="dark"] hr {
-    border-color: #333 !important;
+
+[data-theme="dark"] .balance-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .main-logo:hover {
+    box-shadow: 0 15px 30px rgba(37, 99, 235, 0.3);
 }
 
 /* ============================================
-   AJUSTES DE TEXTO
+   RESPONSIVIDAD MODO OSCURO
    ============================================ */
-/* Asegurar que todos los textos sean visibles */
-[data-theme="dark"] label,
-[data-theme="dark"] .form-label,
-[data-theme="dark"] .input-group-text,
-[data-theme="dark"] h1, 
-[data-theme="dark"] h2, 
-[data-theme="dark"] h3, 
-[data-theme="dark"] h4, 
-[data-theme="dark"] h5, 
-[data-theme="dark"] h6,
-[data-theme="dark"] .card-title,
-[data-theme="dark"] p,
-[data-theme="dark"] .modal-title {
-    color: white !important;
+
+@media (max-width: 768px) {
+    [data-theme="dark"] .balance-card {
+        background: var(--gradient-primary);
+    }
+    
+    [data-theme="dark"] .action-card {
+        margin-bottom: 1rem;
+    }
 }
 
-/* El más importante: asegurar que text-muted sea siempre blanco en modo oscuro */
-[data-theme="dark"] .text-muted {
-    color: white !important;
+@media (max-width: 576px) {
+    [data-theme="dark"] .transaction-item {
+        padding: 0.75rem;
+    }
+    
+    [data-theme="dark"] .balance-card {
+        padding: 1.25rem;
+    }
 }
 
 /* ============================================
-   BILLETERAS (billeteras.html)
+   ESTADO FINAL OPTIMIZADO
    ============================================ */
 
-/* Botón Volver */
+/* Asegurar que el tema oscuro tenga la máxima calidad visual */
+[data-theme="dark"] {
+    color-scheme: dark;
+}
+
+/* Optimización de rendimiento */
+[data-theme="dark"] *,
+[data-theme="dark"] *::before,
+[data-theme="dark"] *::after {
+    box-sizing: border-box;
+}
+
+/* Smooth theme transitions */
+html[data-theme="dark"] {
+    transition: color-scheme 0.3s ease-in-out;
+}
+
+/* ============================================
+   BILLETERAS MODO OSCURO
+   ============================================ */
+
+/* Tarjetas de billeteras */
+[data-theme="dark"] .wallet-card {
+    background: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    box-shadow: var(--shadow-md);
+}
+
+[data-theme="dark"] .wallet-card:hover {
+    box-shadow: var(--shadow-lg);
+    border-color: var(--border-light);
+    transform: translateY(-2px);
+}
+
+/* Nombre de billetera */
+[data-theme="dark"] .wallet-name {
+    color: var(--text-color);
+}
+
+/* Iconos de billeteras - mantener color original con mejor contraste */
+[data-theme="dark"] .wallet-icon {
+    /* El color del fondo se mantiene del style inline */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .wallet-icon i {
+    color: white !important; /* Icono blanco para máximo contraste */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+/* Badge de billetera por defecto */
+[data-theme="dark"] .default-wallet-badge {
+    background: rgba(37, 99, 235, 0.15);
+    color: var(--primary-color);
+    border: 1px solid rgba(37, 99, 235, 0.3);
+}
+
+/* Botón de volver */
 [data-theme="dark"] .back-button {
-    color: var(--text-color) !important; /* Texto blanco */
-}
-
-[data-theme="dark"] .back-button i {
-    color: var(--primary-dark) !important; /* Icono azul principal */
+    background: var(--bg-secondary);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
 }
 
 [data-theme="dark"] .back-button:hover {
-    color: var(--primary-dark) !important;
+    background: var(--bg-tertiary);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
 }
 
-/* Botón de cambio de tema */
-[data-theme="dark"] .btn-theme-toggle {
-    color: var(--text-color) !important; /* Icono blanco */
-    background-color: var(--card-bg) !important; /* Fondo de tarjeta */
-    border-color: var(--border-color) !important; /* Borde oscuro */
-}
-
-[data-theme="dark"] .btn-theme-toggle:hover {
-    background-color: #2d2d2d !important; /* Un poco más claro al pasar el mouse */
-}
-
-/* Título y descripción */
-[data-theme="dark"] h2 {
-    color: var(--text-color) !important;
-}
-
-[data-theme="dark"] .text-muted {
-    color: white !important; /* Gris claro para texto muted en modo oscuro */
-}
-
-/* Tarjetas de billetera */
-[data-theme="dark"] .wallet-card {
-    background-color: var(--card-bg) !important;
-    border-color: var(--border-color) !important;
-}
-
-[data-theme="dark"] .wallet-name {
-    color: var(--text-color) !important;
-}
-
-[data-theme="dark"] .default-wallet-badge {
-    color: #ccc !important;
-    background-color: #3a3a3a !important;
-}
-
-/* Botones de acción en tarjeta */
-[data-theme="dark"] .wallet-actions .btn-outline-primary {
-    color: var(--primary-dark) !important;
-    border-color: var(--primary-dark) !important;
-}
-
-[data-theme="dark"] .wallet-actions .btn-outline-primary:hover {
-    background-color: rgba(74, 157, 233, 0.1) !important;
-}
-
-[data-theme="dark"] .wallet-actions .btn-outline-danger {
-    color: var(--danger-dark) !important;
-    border-color: var(--danger-dark) !important;
-}
-
-[data-theme="dark"] .wallet-actions .btn-outline-danger:hover {
-    background-color: rgba(230, 57, 70, 0.1) !important;
-}
-
-/* Tarjeta Añadir Billetera */
+/* Tarjeta de añadir billetera */
 [data-theme="dark"] .add-wallet-card {
-    background-color: var(--card-bg) !important;
-    border-color: var(--border-color) !important;
-}
-
-[data-theme="dark"] .add-wallet-card i,
-[data-theme="dark"] .add-wallet-card .text-muted {
-    color: #adb5bd !important; /* Icono y texto gris claro */
+    background: var(--bg-secondary) !important;
+    border-color: var(--border-color);
+    color: var(--text-muted);
 }
 
 [data-theme="dark"] .add-wallet-card:hover {
-    border-color: var(--primary-dark) !important;
-    background-color: #2d2d2d !important;
+    background: var(--bg-tertiary) !important;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
 }
 
-[data-theme="dark"] .add-wallet-card:hover i,
+[data-theme="dark"] .add-wallet-card .text-muted {
+    color: var(--text-muted) !important;
+}
+
 [data-theme="dark"] .add-wallet-card:hover .text-muted {
-    color: var(--primary-dark) !important;
+    color: var(--primary-color) !important;
 }
 
-/* Modales en modo oscuro (Asegurar consistencia) */
-[data-theme="dark"] .modal-content {
-    background-color: #202020 !important;
-    border-color: #333333 !important;
-    color: #ffffff !important;
+/* Formularios de creación/edición de billeteras */
+[data-theme="dark"] .create-wallet-form {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
 }
 
-[data-theme="dark"] .modal-header {
-    background-color: #242424 !important;
-    border-bottom: 1px solid #333333 !important;
-    color: #ffffff !important;
+/* ============================================
+   MODALES DE BILLETERAS MODO OSCURO
+   ============================================ */
+
+/* Ya están cubiertos por los estilos generales de modales, pero añadimos específicos */
+[data-theme="dark"] .wallet-color-option {
+    border: 2px solid var(--border-color);
 }
 
-[data-theme="dark"] .modal-footer {
-    border-top: 1px solid #333333 !important;
-    background-color: #202020 !important;
+[data-theme="dark"] .wallet-color-option.active {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
 }
 
-[data-theme="dark"] .modal-title {
-    color: #ffffff !important;
+[data-theme="dark"] .wallet-icon-option {
+    background: var(--bg-tertiary);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
 }
 
-[data-theme="dark"] .form-label {
-    color: #ffffff !important;
+[data-theme="dark"] .wallet-icon-option:hover {
+    background: var(--primary-color);
+    color: white;
 }
 
-[data-theme="dark"] .form-control {
-    background-color: #2d2d2d !important;
-    border-color: #333 !important;
-    color: white !important;
+[data-theme="dark"] .wallet-icon-option.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* ============================================
+   CÍRCULOS DE COLORES MODO OSCURO
+   ============================================ */
+
+/* Círculos de colores para selección */
+[data-theme="dark"] .color-circle {
+    border: 2px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .color-circle:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
 }
 
 [data-theme="dark"] .color-circle.selected {
-    border-color: #f8f9fa !important; /* Borde blanco para selección en modo oscuro */
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
 }
 
-[data-theme="dark"] .icon-option {
+/* ============================================
+   PÁGINAS DE AUTENTICACIÓN MODO OSCURO
+   ============================================ */
+
+/* Login Page */
+[data-theme="dark"] .login-container {
+    background: var(--bg-color);
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .login-header {
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .login-header h1 {
+    color: var(--text-color);
+}
+
+/* ============================================
+   ESTILOS ADICIONALES PARA PÁGINAS AUTH
+   ============================================ */
+
+/* Headers de aplicación */
+[data-theme="dark"] .app-header {
+    background: var(--bg-color);
+}
+
+[data-theme="dark"] .app-logo {
+    filter: brightness(1.2);
+}
+
+/* Clases específicas de Bootstrap que pueden faltar */
+[data-theme="dark"] .card {
+    background: var(--bg-secondary) !important;
     border-color: var(--border-color) !important;
-    color: #adb5bd !important;
+    color: var(--text-color) !important;
 }
 
-[data-theme="dark"] .icon-option:hover {
-    background-color: #2d2d2d !important;
+[data-theme="dark"] .text-white-50 {
+    color: rgba(248, 250, 252, 0.7) !important;
 }
 
-[data-theme="dark"] .icon-option.selected {
-    background-color: var(--primary-dark) !important;
-    border-color: var(--primary-dark) !important;
-    color: white !important;
+[data-theme="dark"] .btn-create {
+    background: var(--gradient-primary);
+    border: none;
+    color: white;
 }
 
-[data-theme="dark"] .btn-close {
-    filter: invert(1) grayscale(100%) brightness(200%) !important;
+[data-theme="dark"] .btn-create:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    color: white;
 }
+
+[data-theme="dark"] .new-profile-icon {
+    color: var(--text-muted);
+    font-size: 3rem;
+}
+
+[data-theme="dark"] .new-profile-card:hover .new-profile-icon {
+    color: var(--primary-color);
+}
+
+/* Profile-specific containers */
+[data-theme="dark"] .profile-card {
+    background: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .profile-header {
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .profile-title {
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .profile-body {
+    background: var(--bg-secondary);
+}
+
+/* ============================================
+   TRANSACCIONES MODO OSCURO
+   ============================================ */
