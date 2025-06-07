@@ -11,3 +11,7 @@ __pycache__/
 # Ignorar configuraciones de IDE
 .vscode/
 .idea/
+
+# Ignorar base de datos de producción
+instance/finanzas.db
+instance/*.db
