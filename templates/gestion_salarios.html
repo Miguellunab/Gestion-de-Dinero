@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Salarios - Dinero App</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon.png', _external=True) }}?v=2">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon.png', _external=True) }}?v=2">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/favicon.png', _external=True) }}?v=2">
+    
+    <!-- CSS personalizado -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=3">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}?v=1">
+    
+    <style>
+        /* ============================================
+           VARIABLES CSS PARA MODO CLARO Y OSCURO
+           ============================================ */
+        :root {
+            --salary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --stat-card-bg: #ffffff;
+            --stat-card-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            --table-hover-bg: #f8f9fa;
+            --stat-text-color: #333333;
+            --stat-label-color: #6c757d;
+        }
+
+        [data-theme="dark"] {
+            --stat-card-bg: #1e293b;
+            --stat-card-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            --table-hover-bg: #374151;
+            --stat-text-color: #f1f5f9;
+            --stat-label-color: #94a3b8;
+        }
+
+        /* ============================================
+           HEADER PROFESIONAL
+           ============================================ */        .salary-header {
+            background: var(--salary-gradient);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 1rem 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .salary-header .container {
+            position: relative;
+            z-index: 2;
+        }.salary-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="80" r="3" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="60" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
+            animation: float 20s ease-in-out infinite;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* ============================================
+           TARJETAS DE ESTADÍSTICAS
+           ============================================ */
+        .stat-card-enhanced {
+            background: var(--stat-card-bg);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: var(--stat-card-shadow);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            color: var(--stat-text-color);
+        }
+
+        .stat-card-enhanced::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #667eea, #764ba2);
+        }
+
+        .stat-card-enhanced:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--stat-text-color);
+        }
+
+        .stat-label {
+            color: var(--stat-label-color);
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ============================================
+           TABLA PROFESIONAL
+           ============================================ */
+        .salary-table-container {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .table th {
+            background: #f8f9fa;
+            border: none;
+            font-weight: 600;
+            color: #495057;
+            padding: 1rem;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table td {
+            padding: 1rem;
+            border: none;
+            border-bottom: 1px solid #f1f3f4;
+            vertical-align: middle;
+        }
+
+        .table-hover tbody tr:hover td {
+            background-color: var(--table-hover-bg);
+        }
+
+        .amount-positive {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .amount-negative {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        /* ============================================
+           BOTONES PROFESIONALES
+           ============================================ */
+        .btn-group {
+            border-radius: 0.375rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-group .btn {
+            border: none !important;
+            font-weight: 500;
+            font-size: 0.875rem;
+            padding: 0.5rem 0.75rem;
+            transition: all 0.2s ease-in-out;
+            position: relative;
+        }
+
+        .btn-group .btn-outline-primary {
+            background-color: #3b82f6 !important;
+            color: white !important;
+            border-radius: 0.375rem 0 0 0.375rem !important;
+        }
+
+        .btn-group .btn-outline-primary:hover {
+            background-color: #2563eb !important;
+            color: white !important;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(59, 130, 246, 0.25);
+        }
+
+        .btn-group .btn-outline-danger {
+            background-color: #ef4444 !important;
+            color: white !important;
+            border-radius: 0 0.375rem 0.375rem 0 !important;
+        }
+
+        .btn-group .btn-outline-danger:hover {
+            background-color: #dc2626 !important;
+            color: white !important;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(239, 68, 68, 0.25);
+        }        .btn-salary-primary {
+            background: var(--salary-gradient);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            pointer-events: auto;
+            z-index: 1000;
+            position: relative;
+        }
+
+        .btn-salary-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            color: white;
+            cursor: pointer;
+        }
+
+        .btn-salary-primary:focus {
+            outline: 2px solid #667eea;
+            outline-offset: 2px;
+        }
+
+        .salary-badge {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        /* ============================================
+           DETALLES EXPANDIBLES
+           ============================================ */
+        .details-row {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-left: 4px solid #667eea;
+        }
+
+        .details-info-card {
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .details-info-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+            opacity: 0.8;
+        }
+
+        .details-info-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .details-info-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .empty-state {
+            padding: 4rem 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 1rem;
+            border: 2px dashed #dee2e6;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+
+        /* ============================================
+           MODO OSCURO - CORRECCIONES CRÍTICAS
+           ============================================ */
+        [data-theme="dark"] .stat-card-enhanced {
+            background: #1e293b !important;
+            border: 1px solid #334155 !important;
+            color: #f1f5f9 !important;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        [data-theme="dark"] .stat-card-enhanced:hover {
+            background: #1e293b !important;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        [data-theme="dark"] .stat-number {
+            color: #f1f5f9 !important;
+        }
+
+        [data-theme="dark"] .stat-label {
+            color: #94a3b8 !important;
+        }
+
+        [data-theme="dark"] .salary-header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        }        [data-theme="dark"] .salary-table-container {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        /* Estilos para tabla en modo oscuro con alta especificidad */
+        [data-theme="dark"] .table th,
+        [data-theme="dark"] .table.table-hover th {
+            background-color: #0f172a !important;
+            color: #f1f5f9 !important;
+            border-color: #334155 !important;
+        }
+
+        [data-theme="dark"] .table td,
+        [data-theme="dark"] .table.table-hover td,
+        [data-theme="dark"] .table tbody tr td {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f1f5f9 !important;
+        }
+
+        [data-theme="dark"] .table.table-hover tbody tr:hover td,
+        [data-theme="dark"] .table-hover tbody tr:hover td {
+            background-color: #334155 !important;
+            color: #f1f5f9 !important;
+        }        /* Forzar color de fondo en modo oscuro para todas las celdas */
+        [data-theme="dark"] .table-responsive .table td {
+            background: #1e293b !important;
+        }
+
+        [data-theme="dark"] .table-responsive .table th {
+            background: #0f172a !important;
+        }
+
+        /* Asegurar que el contenedor de la tabla también tenga el fondo correcto */
+        [data-theme="dark"] .table-responsive {
+            background: #1e293b !important;
+        }
+
+        /* Override específico para Bootstrap table classes */
+        [data-theme="dark"] .table-responsive .table.table-hover {
+            background: #1e293b !important;
+        }        [data-theme="dark"] .table-responsive .table.table-hover tbody {
+            background: #1e293b !important;
+        }
+
+        /* Correcciones de color de texto para modo oscuro */
+        [data-theme="dark"] #resumen-financiero-title {
+            color: #f1f5f9 !important;
+        }
+
+        [data-theme="dark"] .form-text {
+            color: #94a3b8 !important;
+        }        [data-theme="dark"] .text-muted {
+            color: #94a3b8 !important;
+        }
+
+        [data-theme="dark"] .modal-body .form-text {
+            color: #94a3b8 !important;
+        }
+
+        [data-theme="dark"] .modal .form-text i {
+            color: #60a5fa !important;
+        }
+
+        [data-theme="dark"] .details-row {
+            background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%) !important;
+            border-left-color: #2563eb !important;
+        }
+
+        [data-theme="dark"] .details-info-card {
+            background: var(--bg-tertiary) !important;
+            border-color: var(--border-color) !important;
+            color: var(--text-color) !important;
+        }
+
+        [data-theme="dark"] .modal-content {
+            background: var(--bg-secondary) !important;
+            border: 1px solid var(--border-color) !important;
+        }
+
+        [data-theme="dark"] .modal-header {
+            background: var(--bg-tertiary) !important;
+            border-bottom: 1px solid var(--border-color) !important;
+            color: var(--text-color) !important;
+        }
+
+        [data-theme="dark"] .modal-body {
+            background: var(--bg-secondary) !important;
+            color: var(--text-color) !important;
+        }
+
+        [data-theme="dark"] .modal-footer {
+            background: var(--bg-tertiary) !important;
+            border-top: 1px solid var(--border-color) !important;
+        }
+
+        /* ============================================
+           RESPONSIVE DESIGN - MÓVIL MEJORADO
+           ============================================ */
+        @media (max-width: 768px) {
+            .salary-header {
+                padding: 1.5rem 0;
+                margin-bottom: 1.5rem;
+            }
+            
+            .salary-header h1 {
+                font-size: 1.75rem;
+            }
+            
+            .stat-card-enhanced {
+                margin-bottom: 1rem;
+            }
+            
+            .table td, .table th {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .container-fluid {
+                padding: 0.5rem;
+            }
+            
+            .container.py-4 {
+                padding: 1rem !important;
+            }
+            
+            .salary-header {
+                padding: 1.5rem 0;
+                margin-bottom: 1.5rem;
+                border-radius: 0 0 0.75rem 0.75rem;
+            }
+            
+            .salary-header h1 {
+                font-size: 1.75rem;
+            }
+            
+            .btn-salary-primary {
+                width: 100%;
+                padding: 1rem 1.5rem;
+                font-size: 1rem;
+                margin-top: 1rem;
+            }
+            
+            .stat-card-enhanced {
+                padding: 1.5rem;
+                margin-bottom: 1rem;
+                border-radius: 1rem;
+            }
+            
+            .stat-number {
+                font-size: 1.75rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            .stat-label {
+                font-size: 0.875rem;
+                line-height: 1.3;
+            }
+            
+            .salary-table-container {
+                border-radius: 1rem;
+                margin: 0 -0.5rem;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+            
+            .salary-table-container .d-flex.justify-content-between {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1.5rem !important;
+            }
+            
+            .salary-table-container h4 {
+                font-size: 1.25rem;
+                text-align: center;
+            }
+            
+            .table {
+                font-size: 0.9rem;
+            }
+            
+            .table td:first-child {
+                width: 65%;
+                padding-right: 0.75rem;
+            }
+            
+            .table td:first-child .bg-primary {
+                width: 35px !important;
+                height: 35px !important;
+                min-width: 35px !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .table td:first-child .fw-bold {
+                font-size: 0.95rem;
+                line-height: 1.3;
+                margin-bottom: 0.25rem;
+            }
+            
+            .table td:first-child small {
+                font-size: 0.8rem;
+                line-height: 1.2;
+                display: block;
+                margin-top: 0.25rem;
+            }
+            
+            .table td:first-child .d-md-none {
+                border-top: 1px solid rgba(0,0,0,0.1);
+                padding-top: 0.75rem;
+                margin-top: 0.75rem;
+            }
+            
+            .table td:first-child .d-md-none .d-flex {
+                font-size: 0.8rem;
+                gap: 1rem;
+                justify-content: space-between;
+            }
+            
+            .btn-group {
+                border-radius: 0.5rem;
+                overflow: hidden;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            
+            .btn-group .btn {
+                padding: 0.65rem 0.75rem;
+                font-size: 0.875rem;
+                font-weight: 500;
+            }
+            
+            .modal-dialog {
+                margin: 0;
+                max-width: 100%;
+                height: 100vh;
+            }
+            
+            .modal-content {
+                height: 100vh;
+                border-radius: 0;
+                border: none;
+            }
+            
+            .modal-header {
+                padding: 1.5rem;
+                border-bottom: 2px solid rgba(0,0,0,0.1);
+            }
+            
+            .modal-body {
+                padding: 1.5rem;
+                overflow-y: auto;
+                flex: 1;
+            }
+            
+            .modal-footer {
+                padding: 1.5rem;
+                border-top: 2px solid rgba(0,0,0,0.1);
+                gap: 1rem;
+            }
+            
+            .modal-footer .btn {
+                flex: 1;
+                padding: 0.75rem;
+                font-size: 1rem;
+            }
+            
+            .modal-body .form-group,
+            .modal-body .mb-3 {
+                margin-bottom: 1.5rem;
+            }
+            
+            .modal-body .form-control {
+                padding: 0.75rem;
+                font-size: 1rem;
+                border-radius: 0.5rem;
+            }
+            
+            .modal-body .form-label {
+                font-weight: 600;
+                margin-bottom: 0.75rem;
+                font-size: 0.95rem;
+            }
+        }
+
+        /* ============================================
+           MODO OSCURO RESPONSIVE
+           ============================================ */
+        @media (max-width: 576px) {
+            [data-theme="dark"] .table td:first-child small {
+                color: var(--text-secondary) !important;
+            }
+            
+            [data-theme="dark"] .modal-content {
+                background: var(--bg-primary) !important;
+                color: var(--text-color) !important;
+            }
+            
+            [data-theme="dark"] .modal-header {
+                border-bottom-color: var(--border-color) !important;
+            }
+            
+            [data-theme="dark"] .modal-footer {
+                border-top-color: var(--border-color) !important;
+            }
+            
+            [data-theme="dark"] .table td:first-child .d-md-none {
+                border-top-color: var(--border-color) !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra superior -->
+    <nav class="navbar navbar-dark">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a href="{{ url_for('dashboard') }}" class="navbar-brand mb-0">
+                <img src="{{ url_for('static', filename='images/favicon.png', _external=True) }}" alt="Wallet Logo" class="app-logo">
+                Gestión de Salarios
+            </a>
+            <div class="d-flex align-items-center">
+                <button id="theme-toggle" class="btn-theme-toggle me-3" title="Cambiar tema">
+                    <i id="theme-icon" class="fas fa-moon"></i>
+                </button>
+                <a href="{{ url_for('dashboard') }}" class="btn-logout">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Volver</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <!-- Header profesional -->
+        <div class="salary-header">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="display-6 fw-bold mb-2">
+                            <i class="fas fa-money-check-alt me-3"></i>
+                            Gestión de Salarios
+                        </h1>
+                        <p class="lead mb-0 opacity-90">
+                            Administra tus ingresos y gastos semanales de manera profesional
+                        </p>
+                        <small class="opacity-75 d-block mt-1">
+                            <i class="fas fa-calendar-week me-1"></i>
+                            Período: Martes a Lunes
+                        </small>
+                    </div>
+                    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                        <button class="btn btn-salary-primary btn-lg" data-bs-toggle="modal" data-bs-target="#addSalaryModal">
+                            <i class="fas fa-plus me-2"></i>Nuevo Salario
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mensajes flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' }} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Estadísticas generales -->
+        {% if total_semanas > 0 %}
+        <div class="row g-4 mb-5">            <div class="col-12">
+                <h3 class="h5 text-muted mb-4" id="resumen-financiero-title">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Resumen Financiero
+                </h3>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card-enhanced">
+                    <div class="stat-number text-primary">{{ total_semanas }}</div>
+                    <div class="stat-label">Semanas Registradas</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card-enhanced">
+                    <div class="stat-number text-success">${{ "{:,.0f}".format(salario_bruto_promedio) }}</div>
+                    <div class="stat-label">Salario Bruto Promedio</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card-enhanced">
+                    <div class="stat-number text-success">${{ "{:,.0f}".format(salario_neto_promedio) }}</div>
+                    <div class="stat-label">Salario Neto Promedio</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card-enhanced">
+                    <div class="stat-number text-warning">
+                        {{ "{:.1f}".format((salarios|map(attribute='impuestos')|sum / salarios|map(attribute='salario_bruto')|sum * 100) if salarios|map(attribute='salario_bruto')|sum > 0 else 0) }}%
+                    </div>
+                    <div class="stat-label">Impuestos Promedio</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Tabla de salarios -->
+        <div class="salary-table-container">
+            <div class="d-flex justify-content-between align-items-center p-4 border-bottom">
+                <h4 class="mb-0 fw-bold">
+                    <i class="fas fa-list me-2 text-primary"></i>
+                    Historial de Salarios
+                </h4>
+                <span class="salary-badge">{{ salarios|length }} registros</span>
+            </div>
+            <div class="p-0">
+                {% if salarios %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <i class="fas fa-calendar-week me-1 d-none d-md-inline"></i>
+                                        <span class="d-none d-md-inline">Período de Trabajo</span>
+                                        <span class="d-md-none">Salarios</span>
+                                    </th>
+                                    <th class="text-end d-none d-md-table-cell">
+                                        <i class="fas fa-dollar-sign me-2"></i>Salario Bruto
+                                    </th>
+                                    <th class="text-end d-none d-md-table-cell">
+                                        <i class="fas fa-minus-circle me-2"></i>Deducciones
+                                    </th>
+                                    <th class="text-end d-none d-md-table-cell">
+                                        <i class="fas fa-hand-holding-usd me-2"></i>Salario Neto
+                                    </th>
+                                    <th class="text-end d-none d-sm-table-cell">
+                                        <i class="fas fa-chart-line me-1 d-none d-md-inline"></i>
+                                        <span class="d-none d-md-inline">Balance Semanal</span>
+                                        <span class="d-md-none">Balance</span>
+                                    </th>
+                                    <th class="text-center">
+                                        <i class="fas fa-cog me-1 d-none d-md-inline"></i>
+                                        <span class="d-none d-md-inline">Acciones</span>
+                                        <span class="d-md-none">-</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for salario in salarios %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-2 me-md-3" 
+                                                 style="width: 35px; height: 35px; min-width: 35px;">
+                                                <i class="fas fa-calendar-week text-white small"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="fw-bold fs-6 fs-md-5">{{ salario.rango_formateado }}</div>
+                                                <small class="text-muted d-none d-md-block">Semana laboral</small>
+                                                <!-- Información móvil compacta -->
+                                                <div class="d-md-none mt-1">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <small class="text-muted">Neto:</small>
+                                                            <small class="text-success fw-bold ms-1">${{ "{:,.0f}".format(salario.salario_neto) }}</small>
+                                                        </div>
+                                                        <div>
+                                                            <small class="text-muted">Balance:</small>
+                                                            <small class="amount-{{ 'text-success' if salario.balance_semanal >= 0 else 'text-danger' }} fw-bold ms-1">
+                                                                ${{ "{:,.0f}".format(salario.balance_semanal) }}
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between align-items-center mt-1">
+                                                        <small class="text-muted">
+                                                            Bruto: <span class="text-info fw-bold">${{ "{:,.0f}".format(salario.salario_bruto) }}</span>
+                                                        </small>
+                                                        <small class="text-muted">
+                                                            Deducc: <span class="text-warning fw-bold">${{ "{:,.0f}".format(salario.impuestos + salario.housing + salario.gastos_comida + salario.gastos_variables) }}</span>
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-end d-none d-md-table-cell">
+                                        <span class="amount-positive fs-6 fw-bold">${{ "{:,.2f}".format(salario.salario_bruto) }}</span>
+                                    </td>
+                                    <td class="text-end d-none d-md-table-cell">
+                                        <span class="amount-negative fs-6 fw-bold">-${{ "{:,.2f}".format(salario.impuestos + salario.housing + salario.gastos_comida + salario.gastos_variables) }}</span>
+                                    </td>
+                                    <td class="text-end d-none d-md-table-cell">
+                                        <span class="amount-positive fs-6 fw-bold">${{ "{:,.2f}".format(salario.salario_neto) }}</span>
+                                    </td>
+                                    <td class="text-end d-none d-sm-table-cell">
+                                        <span class="amount-{{ 'positive' if salario.balance_semanal >= 0 else 'negative' }} fs-6 fw-bold">
+                                            ${{ "{:,.2f}".format(salario.balance_semanal) }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-outline-primary btn-sm edit-salary-btn" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#editSalaryModal" 
+                                                    data-id="{{ salario.id }}" 
+                                                    data-fecha="{{ salario.fecha_referencia }}"
+                                                    data-salario-bruto="{{ salario.salario_bruto }}" 
+                                                    data-impuestos="{{ salario.impuestos }}" 
+                                                    data-housing="{{ salario.housing }}" 
+                                                    data-comida="{{ salario.gastos_comida }}" 
+                                                    data-variables="{{ salario.gastos_variables }}"
+                                                    title="Editar salario">
+                                                <i class="fas fa-edit"></i>
+                                                <span class="d-none d-lg-inline ms-1">Editar</span>
+                                            </button>
+                                            <button class="btn btn-outline-danger btn-sm delete-salary-btn" 
+                                                    data-salary-id="{{ salario.id }}"
+                                                    title="Eliminar salario">
+                                                <i class="fas fa-trash"></i>
+                                                <span class="d-none d-lg-inline ms-1">Eliminar</span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Fila de detalles expandible -->
+                                <tr class="details-row">
+                                    <td colspan="6">
+                                        <div class="row g-4 py-4">
+                                            <div class="col-md-2">
+                                                <div class="details-info-card text-center">
+                                                    <div class="details-info-icon">
+                                                        <i class="fas fa-receipt text-warning"></i>
+                                                    </div>
+                                                    <div class="details-info-label text-muted">
+                                                        Impuestos
+                                                    </div>
+                                                    <div class="details-info-value amount-negative">-${{ "{:,.2f}".format(salario.impuestos) }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="details-info-card text-center">
+                                                    <div class="details-info-icon">
+                                                        <i class="fas fa-home text-info"></i>
+                                                    </div>
+                                                    <div class="details-info-label text-muted">
+                                                        Vivienda
+                                                    </div>
+                                                    <div class="details-info-value amount-negative">-${{ "{:,.2f}".format(salario.housing) }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="details-info-card text-center">
+                                                    <div class="details-info-icon">
+                                                        <i class="fas fa-utensils text-success"></i>
+                                                    </div>
+                                                    <div class="details-info-label text-muted">
+                                                        Comida
+                                                    </div>
+                                                    <div class="details-info-value amount-negative">-${{ "{:,.2f}".format(salario.gastos_comida) }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="details-info-card text-center">
+                                                    <div class="details-info-icon">
+                                                        <i class="fas fa-chart-line text-primary"></i>
+                                                    </div>
+                                                    <div class="details-info-label text-muted">
+                                                        Variables
+                                                    </div>
+                                                    <div class="details-info-value amount-negative">-${{ "{:,.2f}".format(salario.gastos_variables) }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="details-info-card text-center">
+                                                    <div class="details-info-icon">
+                                                        <i class="fas fa-percentage text-secondary"></i>
+                                                    </div>
+                                                    <div class="details-info-label text-muted">
+                                                        % Impuestos
+                                                    </div>
+                                                    <div class="details-info-value text-info">{{ "{:.1f}".format((salario.impuestos / salario.salario_bruto * 100) if salario.salario_bruto > 0 else 0) }}%</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="details-info-card text-center">
+                                                    <div class="details-info-icon">
+                                                        <i class="fas fa-piggy-bank text-success"></i>
+                                                    </div>
+                                                    <div class="details-info-label text-muted">
+                                                        % Ahorrado
+                                                    </div>
+                                                    <div class="details-info-value text-info">{{ "{:.1f}".format((salario.balance_semanal / salario.salario_neto * 100) if salario.salario_neto > 0 else 0) }}%</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-money-check-alt"></i>
+                        </div>
+                        <h5 class="text-muted mb-3">No hay salarios registrados</h5>
+                        <p class="text-muted mb-4">Comienza agregando tu primer salario semanal para hacer seguimiento de tus finanzas</p>
+                        <button class="btn btn-salary-primary btn-lg" data-bs-toggle="modal" data-bs-target="#addSalaryModal">
+                            <i class="fas fa-plus me-2"></i>Agregar Primer Salario
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para agregar salario -->
+    <div class="modal fade" id="addSalaryModal" tabindex="-1" aria-labelledby="addSalaryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold" id="addSalaryModalLabel">
+                        <i class="fas fa-plus-circle me-2"></i>Agregar Salario Semanal
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ url_for('agregar_salario') }}" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div class="modal-body p-4">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="fecha_referencia" class="form-label fw-semibold">
+                                    <i class="fas fa-calendar text-primary me-2"></i>Fecha de Referencia
+                                </label>
+                                <input type="date" class="form-control form-control-lg" id="fecha_referencia" name="fecha_referencia" required>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    La semana se calculará automáticamente (Martes a Lunes)
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="salario_bruto" class="form-label fw-semibold">
+                                    <i class="fas fa-dollar-sign text-success me-2"></i>Salario Bruto
+                                </label>
+                                <input type="number" class="form-control form-control-lg" id="salario_bruto" name="salario_bruto" step="0.01" inputmode="decimal" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="impuestos" class="form-label fw-semibold">
+                                    <i class="fas fa-receipt text-warning me-2"></i>Deducciones/Impuestos
+                                </label>
+                                <input type="number" class="form-control form-control-lg" id="impuestos" name="impuestos" step="0.01" inputmode="decimal" value="0">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="housing" class="form-label fw-semibold">
+                                    <i class="fas fa-home text-info me-2"></i>Deducción Vivienda
+                                </label>
+                                <input type="number" class="form-control form-control-lg" id="housing" name="housing" step="0.01" inputmode="decimal" value="0">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="gastos_comida" class="form-label fw-semibold">
+                                    <i class="fas fa-utensils text-orange me-2"></i>Gastos Comida
+                                </label>
+                                <input type="number" class="form-control form-control-lg" id="gastos_comida" name="gastos_comida" step="0.01" inputmode="decimal" value="0">
+                            </div>
+                            <div class="col-12">
+                                <label for="gastos_variables" class="form-label fw-semibold">
+                                    <i class="fas fa-chart-line text-secondary me-2"></i>Gastos Variables
+                                </label>
+                                <input type="number" class="form-control form-control-lg" id="gastos_variables" name="gastos_variables" step="0.01" inputmode="decimal" value="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light p-4">
+                        <button type="button" class="btn btn-secondary btn-lg" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-salary-primary btn-lg">
+                            <i class="fas fa-save me-2"></i>Guardar Salario
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar salario -->
+    <div class="modal fade" id="editSalaryModal" tabindex="-1" aria-labelledby="editSalaryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title fw-bold" id="editSalaryModalLabel">
+                        <i class="fas fa-edit me-2"></i>Editar Salario Semanal
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="editSalaryForm" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div class="modal-body p-4">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="edit_fecha_referencia" class="form-label fw-semibold">
+                                    <i class="fas fa-calendar text-primary me-2"></i>Fecha de Referencia
+                                </label>
+                                <input type="date" class="form-control form-control-lg" id="edit_fecha_referencia" name="fecha_referencia" required>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    La semana se calculará automáticamente (Martes a Lunes)
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="edit_salario_bruto" class="form-label fw-semibold">
+                                    <i class="fas fa-dollar-sign text-success me-2"></i>Salario Bruto
+                                </label>
+                                <input type="number" class="form-control form-control-lg" id="edit_salario_bruto" name="salario_bruto" step="0.01" inputmode="decimal" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="edit_impuestos" class="form-label fw-semibold">
+                                    <i class="fas fa-receipt text-warning me-2"></i>Deducciones/Impuestos
+                                </label>
+                                <input type="number" class="form-control form-control-lg" id="edit_impuestos" name="impuestos" step="0.01" inputmode="decimal">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="edit_housing" class="form-label fw-semibold">
+                                    <i class="fas fa-home text-info me-2"></i>Deducción Vivienda
+                                </label>
+                                <input type="number" class="form-control form-control-lg" id="edit_housing" name="housing" step="0.01" inputmode="decimal">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="edit_gastos_comida" class="form-label fw-semibold">
+                                    <i class="fas fa-utensils text-orange me-2"></i>Gastos Comida
+                                </label>
+                                <input type="number" class="form-control form-control-lg" id="edit_gastos_comida" name="gastos_comida" step="0.01" inputmode="decimal">
+                            </div>
+                            <div class="col-12">
+                                <label for="edit_gastos_variables" class="form-label fw-semibold">
+                                    <i class="fas fa-chart-line text-secondary me-2"></i>Gastos Variables
+                                </label>
+                                <input type="number" class="form-control form-control-lg" id="edit_gastos_variables" name="gastos_variables" step="0.01" inputmode="decimal">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light p-4">
+                        <button type="button" class="btn btn-secondary btn-lg" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-warning btn-lg text-dark fw-bold">
+                            <i class="fas fa-save me-2"></i>Actualizar Salario
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/theme-switcher.js') }}?v=1"></script>    <script>
+        // Establecer fecha por defecto (hoy)
+        document.addEventListener('DOMContentLoaded', function() {
+            const fechaInput = document.getElementById('fecha_referencia');
+            if (fechaInput) {
+                fechaInput.valueAsDate = new Date();
+            }
+            
+            // Verificar y corregir problemas con botones "Nuevo Salario"
+            const newSalaryBtns = document.querySelectorAll('[data-bs-target="#addSalaryModal"]');
+            console.log('Found new salary buttons:', newSalaryBtns.length);
+            
+            newSalaryBtns.forEach((btn, index) => {
+                console.log(`Button ${index}:`, btn);
+                
+                // Asegurar que el botón tenga las propiedades correctas
+                btn.style.pointerEvents = 'auto';
+                btn.style.cursor = 'pointer';
+                btn.style.zIndex = '1000';
+                btn.style.position = 'relative';
+                
+                // Agregar evento click como respaldo
+                btn.addEventListener('click', function(e) {
+                    console.log('New salary button clicked manually'); 
+                    
+                    // Prevenir cualquier interferencia
+                    e.stopPropagation();
+                    
+                    // Intentar abrir el modal
+                    const modalElement = document.getElementById('addSalaryModal');
+                    if (modalElement) {
+                        try {
+                            // Método 1: Usar Bootstrap API
+                            let modal = bootstrap.Modal.getInstance(modalElement);
+                            if (!modal) {
+                                modal = new bootstrap.Modal(modalElement);
+                            }
+                            modal.show();
+                            console.log('Modal opened with Bootstrap API');
+                        } catch (error) {
+                            console.error('Error showing modal with Bootstrap:', error);
+                            
+                            // Método 2: Fallback manual
+                            modalElement.style.display = 'block';
+                            modalElement.classList.add('show');
+                            modalElement.setAttribute('aria-modal', 'true');
+                            modalElement.setAttribute('role', 'dialog');
+                            modalElement.removeAttribute('aria-hidden');
+                            document.body.classList.add('modal-open');
+                            
+                            // Crear backdrop si no existe
+                            let backdrop = document.querySelector('.modal-backdrop');
+                            if (!backdrop) {
+                                backdrop = document.createElement('div');
+                                backdrop.className = 'modal-backdrop fade show';
+                                document.body.appendChild(backdrop);
+                            }
+                            
+                            console.log('Modal opened manually');
+                        }
+                    }
+                });
+                
+                // Agregar evento para hover visual
+                btn.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-1px)';
+                    this.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.4)';
+                });
+                
+                btn.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                });
+            });
+            
+            // Manejar botones de editar
+            document.querySelectorAll('.edit-salary-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const id = this.getAttribute('data-id');
+                    const fecha = this.getAttribute('data-fecha');
+                    const salarioBruto = this.getAttribute('data-salario-bruto');
+                    const impuestos = this.getAttribute('data-impuestos');
+                    const housing = this.getAttribute('data-housing');
+                    const comida = this.getAttribute('data-comida');
+                    const variables = this.getAttribute('data-variables');
+                    
+                    const form = document.getElementById('editSalaryForm');
+                    if (form) {
+                        form.action = `/editar_salario/${id}`;
+                        document.getElementById('edit_fecha_referencia').value = fecha;
+                        document.getElementById('edit_salario_bruto').value = salarioBruto;
+                        document.getElementById('edit_impuestos').value = impuestos;
+                        document.getElementById('edit_housing').value = housing;
+                        document.getElementById('edit_gastos_comida').value = comida;
+                        document.getElementById('edit_gastos_variables').value = variables;
+                    }
+                });
+            });
+            
+            // Manejar botones de eliminar
+            document.querySelectorAll('.delete-salary-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const id = this.getAttribute('data-salary-id');
+                    if (confirm('¿Estás seguro de que deseas eliminar este registro de salario?')) {
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = `/eliminar_salario/${id}`;
+                        
+                        const csrfToken = document.createElement('input');
+                        csrfToken.type = 'hidden';
+                        csrfToken.name = 'csrf_token';
+                        csrfToken.value = '{{ csrf_token() }}';
+                        form.appendChild(csrfToken);
+                        
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+            });
+            
+            // Agregar manejador para cerrar modales manualmente abiertos
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('modal-backdrop') || 
+                    e.target.getAttribute('data-bs-dismiss') === 'modal') {
+                    
+                    const modal = document.querySelector('.modal.show');
+                    if (modal) {
+                        modal.style.display = 'none';
+                        modal.classList.remove('show');
+                        modal.setAttribute('aria-hidden', 'true');
+                        modal.removeAttribute('aria-modal');
+                        modal.removeAttribute('role');
+                        document.body.classList.remove('modal-open');
+                        
+                        const backdrop = document.querySelector('.modal-backdrop');
+                        if (backdrop) {
+                            backdrop.remove();
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

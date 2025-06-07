@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv  # Añadir esta línea
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from config import Config
-from models import db, Profile, Gasto, Ingreso, Billetera, Transferencia  # Importar el nuevo modelo
+from models import db, Profile, Gasto, Ingreso, Billetera, Transferencia, SalarioSemanal  # Importar el nuevo modelo
 from flask_migrate import Migrate
 from datetime import datetime, timedelta, date  # Añadir importación de funciones para manipular fechas
 import calendar
@@ -337,12 +337,173 @@ def dashboard():
                           profile=profile, 
                           balance=balance, 
                           gastos=gastos_recientes, 
-                          ingresos=ingresos_recientes, 
-                          balance_por_cuenta=balance_por_cuenta,
+                          ingresos=ingresos_recientes,                          balance_por_cuenta=balance_por_cuenta,
                           billeteras=billeteras,
                           billeteras_dict=billeteras_dict,
                           show_accounts=True if balance_por_cuenta else False,
                           hide_balance=False)
+
+# ---------------------- FUNCIONES AUXILIARES PARA GESTIÓN DE SALARIOS ----------------------
+def obtener_semana_salario(fecha):
+    """
+    Calcula el rango de la semana salarial (martes a lunes) para una fecha dada.
+    """
+    # Asegurar que fecha es un objeto date
+    if isinstance(fecha, str):
+        fecha = datetime.strptime(fecha, '%Y-%m-%d').date()
+    elif isinstance(fecha, datetime):
+        fecha = fecha.date()
+    
+    # Encontrar el martes de la semana
+    # weekday(): lunes=0, martes=1, miércoles=2, ..., domingo=6
+    dias_hasta_martes = (fecha.weekday() - 1) % 7
+    inicio_semana = fecha - timedelta(days=dias_hasta_martes)
+    fin_semana = inicio_semana + timedelta(days=6)  # lunes siguiente
+    
+    return inicio_semana, fin_semana
+
+def formatear_rango_semana(inicio, fin):
+    """Formatea el rango de semana para mostrar en la interfaz."""
+    meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+             'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+    
+    if inicio.month == fin.month:
+        return f"{inicio.day}-{fin.day} {meses[inicio.month-1]} {inicio.year}"
+    else:
+        return f"{inicio.day} {meses[inicio.month-1]} - {fin.day} {meses[fin.month-1]} {inicio.year}"
+
+# ---------------------- RUTAS DE GESTIÓN DE SALARIOS ----------------------
+@app.route('/gestion_salarios')
+def gestion_salarios():
+    if 'profile_id' not in session:
+        return redirect(url_for('login'))
+    
+    profile_id = session['profile_id']
+    profile = Profile.query.get_or_404(profile_id)
+    
+    # Obtener todos los salarios ordenados por fecha (más recientes primero)
+    salarios = SalarioSemanal.query.filter_by(profile_id=profile_id).order_by(SalarioSemanal.fecha_inicio.desc()).all()
+    
+    # Formatear rangos de semana para mostrar
+    for salario in salarios:
+        salario.rango_formateado = formatear_rango_semana(salario.fecha_inicio, salario.fecha_fin)
+    
+    # Calcular estadísticas generales
+    total_semanas = len(salarios)
+    salario_bruto_promedio = sum(s.salario_bruto for s in salarios) / total_semanas if total_semanas > 0 else 0
+    salario_neto_promedio = sum(s.salario_neto for s in salarios) / total_semanas if total_semanas > 0 else 0
+    
+    return render_template('gestion_salarios.html', 
+                         profile=profile, 
+                         salarios=salarios,
+                         total_semanas=total_semanas,
+                         salario_bruto_promedio=salario_bruto_promedio,
+                         salario_neto_promedio=salario_neto_promedio)
+
+@app.route('/agregar_salario', methods=['POST'])
+def agregar_salario():
+    if 'profile_id' not in session:
+        return redirect(url_for('login'))
+    
+    profile_id = session['profile_id']
+    
+    try:        # Obtener datos del formulario
+        fecha_referencia = request.form.get('fecha_referencia')
+        salario_bruto = float(request.form.get('salario_bruto', 0))
+        impuestos = float(request.form.get('impuestos', 0))
+        housing = float(request.form.get('housing', 0))
+        gastos_comida = float(request.form.get('gastos_comida', 0))
+        gastos_variables = float(request.form.get('gastos_variables', 0))
+        
+        # Calcular el rango de la semana salarial
+        fecha_ref = datetime.strptime(fecha_referencia, '%Y-%m-%d').date()
+        fecha_inicio, fecha_fin = obtener_semana_salario(fecha_ref)
+        
+        # Verificar si ya existe un salario para esta semana
+        salario_existente = SalarioSemanal.query.filter_by(
+            profile_id=profile_id,
+            fecha_inicio=fecha_inicio,
+            fecha_fin=fecha_fin
+        ).first()
+        
+        if salario_existente:
+            flash('Ya existe un registro de salario para esta semana.', 'warning')
+            return redirect(url_for('gestion_salarios'))
+          # Crear nuevo registro de salario
+        nuevo_salario = SalarioSemanal(
+            profile_id=profile_id,
+            fecha_inicio=fecha_inicio,
+            fecha_fin=fecha_fin,
+            salario_bruto=salario_bruto,
+            impuestos=impuestos,
+            housing=housing,
+            gastos_comida=gastos_comida,
+            gastos_variables=gastos_variables
+        )
+        
+        # Calcular automáticamente el salario neto y balance
+        nuevo_salario.calcular_totales()
+        
+        db.session.add(nuevo_salario)
+        db.session.commit()
+        
+        flash('Salario semanal agregado exitosamente.', 'success')
+        
+    except ValueError as e:
+        flash('Error en los datos proporcionados. Verifique los montos.', 'error')
+    except Exception as e:
+        db.session.rollback()
+        flash('Error al guardar el salario. Intente nuevamente.', 'error')
+    
+    return redirect(url_for('gestion_salarios'))
+
+@app.route('/editar_salario/<int:salario_id>', methods=['POST'])
+def editar_salario(salario_id):
+    if 'profile_id' not in session:
+        return redirect(url_for('login'))
+    
+    profile_id = session['profile_id']
+    salario = SalarioSemanal.query.filter_by(id=salario_id, profile_id=profile_id).first_or_404()
+    
+    try:
+        # Actualizar datos del salario
+        salario.salario_bruto = float(request.form.get('salario_bruto', 0))
+        salario.impuestos = float(request.form.get('impuestos', 0))
+        salario.housing = float(request.form.get('housing', 0))
+        salario.gastos_comida = float(request.form.get('gastos_comida', 0))
+        salario.gastos_variables = float(request.form.get('gastos_variables', 0))
+        
+        # Recalcular totales
+        salario.calcular_totales()
+        
+        db.session.commit()
+        flash('Salario actualizado exitosamente.', 'success')
+        
+    except ValueError:
+        flash('Error en los datos proporcionados. Verifique los montos.', 'error')
+    except Exception as e:
+        db.session.rollback()
+        flash('Error al actualizar el salario.', 'error')
+    
+    return redirect(url_for('gestion_salarios'))
+
+@app.route('/eliminar_salario/<int:salario_id>', methods=['POST'])
+def eliminar_salario(salario_id):
+    if 'profile_id' not in session:
+        return redirect(url_for('login'))
+    
+    profile_id = session['profile_id']
+    salario = SalarioSemanal.query.filter_by(id=salario_id, profile_id=profile_id).first_or_404()
+    
+    try:
+        db.session.delete(salario)
+        db.session.commit()
+        flash('Salario eliminado exitosamente.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash('Error al eliminar el salario.', 'error')
+    
+    return redirect(url_for('gestion_salarios'))
 
 @app.route('/agregar_gasto', methods=['POST'])
 def agregar_gasto():

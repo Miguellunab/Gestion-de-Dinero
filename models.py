@@ -83,3 +83,39 @@ class Transferencia(db.Model):
     origen = db.Column(db.String(50), nullable=False)
     destino = db.Column(db.String(50), nullable=False)
     profile_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)
+
+class SalarioSemanal(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    # Información de la semana (martes a lunes)
+    fecha_inicio = db.Column(db.Date, nullable=False)  # Fecha del martes que inicia la semana
+    fecha_fin = db.Column(db.Date, nullable=False)     # Fecha del lunes que termina la semana
+    
+    # Información de ingresos y deducciones
+    salario_bruto = db.Column(db.Float, nullable=False, default=0.0)  # Salario antes de deducciones
+    impuestos = db.Column(db.Float, nullable=False, default=0.0)      # Impuestos deducidos
+    housing = db.Column(db.Float, nullable=False, default=0.0)        # Housing deducido
+    salario_neto = db.Column(db.Float, nullable=False, default=0.0)   # Salario después de deducciones
+    
+    # Gastos de la semana
+    gastos_comida = db.Column(db.Float, nullable=False, default=0.0)     # Gastos en comida
+    gastos_variables = db.Column(db.Float, nullable=False, default=0.0)  # Otros gastos variables
+    
+    # Balance final de la semana
+    balance_semanal = db.Column(db.Float, nullable=False, default=0.0)   # Balance final (salario_neto - gastos_totales)
+    
+    # Metadatos
+    fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
+    fecha_actualizacion = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    profile_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)
+    
+    # Relación
+    profile = db.relationship('Profile', backref='salarios_semanales')
+    
+    def calcular_totales(self):
+        """Calcula automáticamente el salario neto y balance semanal"""
+        self.salario_neto = self.salario_bruto - self.impuestos - self.housing
+        gastos_totales = self.gastos_comida + self.gastos_variables
+        self.balance_semanal = self.salario_neto - gastos_totales
+    
+    def __repr__(self):
+        return f'<SalarioSemanal {self.fecha_inicio} - {self.fecha_fin}>'

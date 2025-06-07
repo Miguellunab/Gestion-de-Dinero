@@ -146,10 +146,13 @@
           <button class="btn-toggle-accounts" onclick="toggleAccounts()" title="Ver detalles por cuenta">
             <i class="fas fa-list{{ '-ul' if show_accounts else '' }}"></i>
           </button>
-          {% endif %}
-          <!-- Botón de informes (posicionado a la derecha) -->
+          {% endif %}          <!-- Botón de informes (posicionado a la derecha) -->
           <a href="{{ url_for('informes') }}" class="btn-informes" title="Informes y gráficos">
             <i class="fas fa-chart-line"></i>
+          </a>
+          <!-- Botón de gestión de salarios -->
+          <a href="{{ url_for('gestion_salarios') }}" class="btn-salarios" title="Gestión de Salarios Semanales">
+            <i class="fas fa-money-check-alt"></i>
           </a>
         </div>
       </div>
@@ -179,12 +182,11 @@
           <!-- Formulario de Ingreso -->
           <div class="tab-pane fade show active" id="ingreso" role="tabpanel" aria-labelledby="ingreso-tab">
             <form action="{{ url_for('agregar_ingreso') }}" method="post">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <div class="mb-3">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">              <div class="mb-3">
                 <label for="monto_ingreso" class="form-label">Monto ({{ profile.moneda }}):</label>
                 <div class="input-group">
                   <span class="input-group-text">$</span>
-                  <input type="text" class="form-control" id="monto_ingreso" name="monto" placeholder="10000" inputmode="numeric" required oninput="formatAsPesos(this)" />
+                  <input type="text" class="form-control" id="monto_ingreso" name="monto" placeholder="10000" inputmode="decimal" required oninput="formatAsPesos(this)" />
                 </div>
               </div>
               <div class="mb-3">
@@ -217,12 +219,11 @@
           <!-- Formulario de Gasto -->
           <div class="tab-pane fade" id="gasto" role="tabpanel" aria-labelledby="gasto-tab">
             <form action="{{ url_for('agregar_gasto') }}" method="post">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <div class="mb-3">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">              <div class="mb-3">
                 <label for="monto_gasto" class="form-label">Monto ({{ profile.moneda }}):</label>
                 <div class="input-group">
                   <span class="input-group-text">$</span>
-                  <input type="text" class="form-control" id="monto_gasto" name="monto" placeholder="10000" inputmode="numeric" required oninput="formatAsPesos(this)" />
+                  <input type="text" class="form-control" id="monto_gasto" name="monto" placeholder="10000" inputmode="decimal" required oninput="formatAsPesos(this)" />
                 </div>
               </div>
               <div class="mb-3">
@@ -255,12 +256,11 @@
           <!-- Formulario de Transferencia -->
           <div class="tab-pane fade" id="transferencia" role="tabpanel" aria-labelledby="transferencia-tab">
             <form action="{{ url_for('realizar_transferencia') }}" method="post">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <div class="mb-3">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">              <div class="mb-3">
                 <label for="monto_transferencia" class="form-label">Monto a transferir ({{ profile.moneda }}):</label>
                 <div class="input-group">
                   <span class="input-group-text">$</span>
-                  <input type="text" class="form-control" id="monto_transferencia" name="monto" placeholder="10000" inputmode="numeric" required oninput="formatAsPesos(this)" />
+                  <input type="text" class="form-control" id="monto_transferencia" name="monto" placeholder="10000" inputmode="decimal" required oninput="formatAsPesos(this)" />
                 </div>
               </div>
               <div class="row">
@@ -364,10 +364,9 @@
               <h5 class="modal-title">Editar Movimiento</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-            <div class="modal-body">
-              <div class="mb-3">
+            <div class="modal-body">              <div class="mb-3">
                 <label for="edit_monto" class="form-label">Monto ({{ profile.moneda }}):</label>
-                <input type="text" class="form-control" id="edit_monto" name="monto" required oninput="formatAsPesos(this)">
+                <input type="text" class="form-control" id="edit_monto" name="monto" required inputmode="decimal" oninput="formatAsPesos(this)">
               </div>
               <div class="mb-3">
                 <label for="edit_descripcion" class="form-label">Descripción:</label>

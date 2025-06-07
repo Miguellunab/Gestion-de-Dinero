@@ -344,6 +344,32 @@ body {
     color: white;
 }
 
+.btn-salarios {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--border-radius-lg);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-normal);
+    text-decoration: none;
+}
+
+.btn-salarios:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    color: white;
+}
+
+.btn-salarios i {
+    font-size: 1rem;
+}
+
 /* Panel de cuentas profesional */
 .account-details {
     color: white;
