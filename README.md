@@ -82,3 +82,25 @@ $env:FLASK_APP = "app.py"; ./env/Scripts/python.exe -m flask run
 
 - Este entorno usa SQLite local por defecto, sin necesidad de instalar PostgreSQL.
 - Para producción, usa un servidor WSGI (por ejemplo, `gunicorn`) y configura variables de entorno seguras.
+- Para Vercel, la escritura en disco persistente no funciona (filesystem read-only). Usa Postgres externo (Neon recomendado).
+
+## Despliegue en Vercel con Postgres (Neon)
+
+1. Crea la base en Neon (región cercana a Vercel, US East/Washington es OK).
+2. Obtén la cadena pooled (formato `postgres://...`).
+3. En Vercel → Project Settings → Environment Variables:
+	- `DATABASE_URL` = cadena (la app convierte `postgres://` a `postgresql+psycopg2://`).
+	- `SECRET_KEY` = valor estable y seguro.
+4. Redeploy. La app usará Postgres y deshabilitará el pool persistente (NullPool) para serverless.
+5. Ejecuta migraciones desde tu máquina local apuntando a la URL remota:
+
+```powershell
+$env:DATABASE_URL = "postgresql+psycopg2://USER:PASSWORD@HOST/DBNAME?sslmode=require"
+$env:FLASK_APP = "app.py"; ./env/Scripts/python.exe -m flask db upgrade
+```
+
+### Fallback temporal (solo demo)
+Si no defines `DATABASE_URL` en Vercel, se usará SQLite en `/tmp/finanzas.db` (NO persistente).
+
+### Variables de entorno máximas
+Vercel permite hasta ~64 KB combinados de variables por despliegue; mantén las credenciales compactas.
