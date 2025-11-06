@@ -3,6 +3,30 @@ import secrets
 from datetime import timedelta
 from sqlalchemy.pool import NullPool
 
+def _resolve_database_url():
+    """Obtiene la URL de base de datos desde variables comunes en Vercel/Neon.
+    Prioriza variantes 'pooled'.
+    """
+    candidates = [
+        'DATABASE_URL',               # nuestra principal
+        'POSTGRES_URL',               # Vercel Postgres template
+        'STORAGE_URL',                # integración con prefijo por defecto
+        'POSTGRES_PRISMA_URL',        # a veces definida por integraciones
+        'DATABASE_URL_UNPOOLED',      # alternativas sin pool
+        'POSTGRES_URL_NON_POOLING',
+    ]
+    for key in candidates:
+        val = os.environ.get(key)
+        if val:
+            # Normalizar a driver psycopg2 si es necesario
+            if val.startswith('postgres://'):
+                val = 'postgresql+psycopg2://' + val[len('postgres://'):]
+            elif val.startswith('postgresql://') and 'postgresql+psycopg2://' not in val:
+                val = 'postgresql+psycopg2://' + val[len('postgresql://'):]
+            return val
+    return None
+
+
 class Config:
     # Usar una SECRET_KEY de entorno o generar una aleatoria para desarrollo
     SECRET_KEY = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
@@ -14,11 +38,8 @@ class Config:
     basedir = os.path.abspath(os.path.dirname(__file__))
 
     # Elegir la base de datos según entorno
-    db_url = os.environ.get('DATABASE_URL')
+    db_url = _resolve_database_url()
     if db_url:
-        # Compatibilidad: convertir postgres:// a postgresql+psycopg2://
-        if db_url.startswith('postgres://'):
-            db_url = 'postgresql+psycopg2://' + db_url[len('postgres://'):]
         SQLALCHEMY_DATABASE_URI = db_url
         # Recomendado en serverless: sin pool de conexiones persistente
         SQLALCHEMY_ENGINE_OPTIONS = {
